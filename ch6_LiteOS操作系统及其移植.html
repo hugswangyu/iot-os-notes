@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-Hans" xml:lang="zh-Hans"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第6章 LiteOS 操作系统及其移植 – 物联网终端操作系统笔记</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-1b8143a5af30aa0587ead8c64582f750.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">物联网终端操作系统笔记</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
+<span class="menu-text">首页</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/hugswangyu/iot-os-notes"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="展开或折叠侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch1_物联网及嵌入式概述.html">课程笔记</a></li><li class="breadcrumb-item"><a href="./ch6_LiteOS操作系统及其移植.html">Ch6 LiteOS 操作系统及其移植</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="展开或折叠侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="搜索" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="搜索"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">首页</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">课程笔记</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="展开或折叠此栏">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch1_物联网及嵌入式概述.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch1 物联网及嵌入式概述</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch2_ch3_物联网操作系统的关键技术.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch2-3 物联网操作系统的关键技术</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch4_连接技术.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch4 连接技术</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch5_连接与协议.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch5 连接与协议</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch6_LiteOS操作系统及其移植.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Ch6 LiteOS 操作系统及其移植</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch7_任务.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch7 任务</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch8_信号量与互斥锁.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch8 信号量与互斥锁</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch9_消息队列_事件与软件定时器.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch9 消息队列、事件与软件定时器</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch10_内存管理与中断管理.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch10 内存管理与中断管理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch11_物联网操作系统的应用案例.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch11 物联网操作系统的应用案例</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">本页目录</h2>
+   
+  <ul>
+  <li><a href="#一本章总体框架" id="toc-一本章总体框架" class="nav-link active" data-scroll-target="#一本章总体框架">一、本章总体框架</a></li>
+  <li><a href="#二liteos-是什么" id="toc-二liteos-是什么" class="nav-link" data-scroll-target="#二liteos-是什么">二、LiteOS 是什么？</a></li>
+  <li><a href="#三liteos-的-1n-架构" id="toc-三liteos-的-1n-架构" class="nav-link" data-scroll-target="#三liteos-的-1n-架构">三、LiteOS 的 “1+N” 架构</a>
+  <ul class="collapse">
+  <li><a href="#是-liteos-内核" id="toc-是-liteos-内核" class="nav-link" data-scroll-target="#是-liteos-内核">1. “1” 是 LiteOS 内核</a></li>
+  <li><a href="#n-是多个中间件和功能框架" id="toc-n-是多个中间件和功能框架" class="nav-link" data-scroll-target="#n-是多个中间件和功能框架">2. “N” 是多个中间件和功能框架</a></li>
+  </ul></li>
+  <li><a href="#四互联互通框架" id="toc-四互联互通框架" class="nav-link" data-scroll-target="#四互联互通框架">四、互联互通框架</a></li>
+  <li><a href="#五传感器框架" id="toc-五传感器框架" class="nav-link" data-scroll-target="#五传感器框架">五、传感器框架</a>
+  <ul class="collapse">
+  <li><a href="#实时传感器事件机制" id="toc-实时传感器事件机制" class="nav-link" data-scroll-target="#实时传感器事件机制">1. 实时传感器事件机制</a></li>
+  <li><a href="#多传感器数据融合" id="toc-多传感器数据融合" class="nav-link" data-scroll-target="#多传感器数据融合">2. 多传感器数据融合</a></li>
+  <li><a href="#传感器管理" id="toc-传感器管理" class="nav-link" data-scroll-target="#传感器管理">3. 传感器管理</a></li>
+  </ul></li>
+  <li><a href="#六安全框架" id="toc-六安全框架" class="nav-link" data-scroll-target="#六安全框架">六、安全框架</a>
+  <ul class="collapse">
+  <li><a href="#终端安全" id="toc-终端安全" class="nav-link" data-scroll-target="#终端安全">1. 终端安全</a></li>
+  <li><a href="#传输安全" id="toc-传输安全" class="nav-link" data-scroll-target="#传输安全">2. 传输安全</a></li>
+  <li><a href="#端云安全" id="toc-端云安全" class="nav-link" data-scroll-target="#端云安全">3. 端云安全</a></li>
+  </ul></li>
+  <li><a href="#七javascript-框架与运行引擎" id="toc-七javascript-框架与运行引擎" class="nav-link" data-scroll-target="#七javascript-框架与运行引擎">七、JavaScript 框架与运行引擎</a></li>
+  <li><a href="#八liteos-studio" id="toc-八liteos-studio" class="nav-link" data-scroll-target="#八liteos-studio">八、LiteOS Studio</a></li>
+  <li><a href="#九低功耗框架" id="toc-九低功耗框架" class="nav-link" data-scroll-target="#九低功耗框架">九、低功耗框架</a></li>
+  <li><a href="#十opencpu-架构" id="toc-十opencpu-架构" class="nav-link" data-scroll-target="#十opencpu-架构">十、OpenCPU 架构</a></li>
+  <li><a href="#十一sota-远程升级" id="toc-十一sota-远程升级" class="nav-link" data-scroll-target="#十一sota-远程升级">十一、SOTA 远程升级</a></li>
+  <li><a href="#十二轻量级人工智能框架" id="toc-十二轻量级人工智能框架" class="nav-link" data-scroll-target="#十二轻量级人工智能框架">十二、轻量级人工智能框架</a></li>
+  <li><a href="#十三liteos-内核是什么" id="toc-十三liteos-内核是什么" class="nav-link" data-scroll-target="#十三liteos-内核是什么">十三、LiteOS 内核是什么？</a></li>
+  <li><a href="#十四liteos-内核的两个层次" id="toc-十四liteos-内核的两个层次" class="nav-link" data-scroll-target="#十四liteos-内核的两个层次">十四、LiteOS 内核的两个层次</a>
+  <ul class="collapse">
+  <li><a href="#基础内核" id="toc-基础内核" class="nav-link" data-scroll-target="#基础内核">1. 基础内核</a></li>
+  <li><a href="#扩展内核" id="toc-扩展内核" class="nav-link" data-scroll-target="#扩展内核">2. 扩展内核</a></li>
+  </ul></li>
+  <li><a href="#十五liteos-基础内核的主要子系统" id="toc-十五liteos-基础内核的主要子系统" class="nav-link" data-scroll-target="#十五liteos-基础内核的主要子系统">十五、LiteOS 基础内核的主要子系统</a></li>
+  <li><a href="#十六任务管理" id="toc-十六任务管理" class="nav-link" data-scroll-target="#十六任务管理">十六、任务管理</a>
+  <ul class="collapse">
+  <li><a href="#抢占调度" id="toc-抢占调度" class="nav-link" data-scroll-target="#抢占调度">1. 抢占调度</a></li>
+  <li><a href="#时间片轮转" id="toc-时间片轮转" class="nav-link" data-scroll-target="#时间片轮转">2. 时间片轮转</a></li>
+  </ul></li>
+  <li><a href="#十七内存管理" id="toc-十七内存管理" class="nav-link" data-scroll-target="#十七内存管理">十七、内存管理</a>
+  <ul class="collapse">
+  <li><a href="#静态内存管理" id="toc-静态内存管理" class="nav-link" data-scroll-target="#静态内存管理">1. 静态内存管理</a></li>
+  <li><a href="#动态内存管理" id="toc-动态内存管理" class="nav-link" data-scroll-target="#动态内存管理">2. 动态内存管理</a></li>
+  <li><a href="#boxslabdlink" id="toc-boxslabdlink" class="nav-link" data-scroll-target="#boxslabdlink">3. BOX、SLAB、DLINK</a>
+  <ul class="collapse">
+  <li><a href="#box-算法" id="toc-box-算法" class="nav-link" data-scroll-target="#box-算法">BOX 算法</a></li>
+  <li><a href="#slab-算法" id="toc-slab-算法" class="nav-link" data-scroll-target="#slab-算法">SLAB 算法</a></li>
+  <li><a href="#dlink-算法" id="toc-dlink-算法" class="nav-link" data-scroll-target="#dlink-算法">DLINK 算法</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#十八任务同步" id="toc-十八任务同步" class="nav-link" data-scroll-target="#十八任务同步">十八、任务同步</a>
+  <ul class="collapse">
+  <li><a href="#举例" id="toc-举例" class="nav-link" data-scroll-target="#举例">举例</a></li>
+  </ul></li>
+  <li><a href="#十九任务间通信-ipc" id="toc-十九任务间通信-ipc" class="nav-link" data-scroll-target="#十九任务间通信-ipc">十九、任务间通信 IPC</a></li>
+  <li><a href="#二十时间管理" id="toc-二十时间管理" class="nav-link" data-scroll-target="#二十时间管理">二十、时间管理</a>
+  <ul class="collapse">
+  <li><a href="#系统时间" id="toc-系统时间" class="nav-link" data-scroll-target="#系统时间">1. 系统时间</a></li>
+  <li><a href="#tick" id="toc-tick" class="nav-link" data-scroll-target="#tick">2. Tick</a></li>
+  <li><a href="#软件定时器" id="toc-软件定时器" class="nav-link" data-scroll-target="#软件定时器">3. 软件定时器</a></li>
+  </ul></li>
+  <li><a href="#二十一中断和硬件定时器管理" id="toc-二十一中断和硬件定时器管理" class="nav-link" data-scroll-target="#二十一中断和硬件定时器管理">二十一、中断和硬件定时器管理</a></li>
+  <li><a href="#二十二liteos-sdk-是什么" id="toc-二十二liteos-sdk-是什么" class="nav-link" data-scroll-target="#二十二liteos-sdk-是什么">二十二、LiteOS SDK 是什么？</a></li>
+  <li><a href="#二十三agent-lite-sdk-与-agent-tiny-sdk" id="toc-二十三agent-lite-sdk-与-agent-tiny-sdk" class="nav-link" data-scroll-target="#二十三agent-lite-sdk-与-agent-tiny-sdk">二十三、Agent Lite SDK 与 Agent Tiny SDK（🌟）</a>
+  <ul class="collapse">
+  <li><a href="#agent-lite-sdk" id="toc-agent-lite-sdk" class="nav-link" data-scroll-target="#agent-lite-sdk">1. Agent Lite SDK</a></li>
+  <li><a href="#agent-tiny-sdk" id="toc-agent-tiny-sdk" class="nav-link" data-scroll-target="#agent-tiny-sdk">2. Agent Tiny SDK</a></li>
+  </ul></li>
+  <li><a href="#二十四agent-tiny-sdk-软件结构" id="toc-二十四agent-tiny-sdk-软件结构" class="nav-link" data-scroll-target="#二十四agent-tiny-sdk-软件结构">二十四、Agent Tiny SDK 软件结构</a></li>
+  <li><a href="#二十五agent-lite-sdk-软件结构" id="toc-二十五agent-lite-sdk-软件结构" class="nav-link" data-scroll-target="#二十五agent-lite-sdk-软件结构">二十五、Agent Lite SDK 软件结构</a></li>
+  <li><a href="#二十六huawei-liteos-sdk" id="toc-二十六huawei-liteos-sdk" class="nav-link" data-scroll-target="#二十六huawei-liteos-sdk">二十六、Huawei LiteOS SDK</a></li>
+  <li><a href="#二十七liteos-sdk-的结构" id="toc-二十七liteos-sdk-的结构" class="nav-link" data-scroll-target="#二十七liteos-sdk-的结构">二十七、LiteOS SDK 的结构</a>
+  <ul class="collapse">
+  <li><a href="#开放-api-层" id="toc-开放-api-层" class="nav-link" data-scroll-target="#开放-api-层">1. 开放 API 层</a></li>
+  <li><a href="#协议层" id="toc-协议层" class="nav-link" data-scroll-target="#协议层">2. 协议层</a></li>
+  <li><a href="#适配层" id="toc-适配层" class="nav-link" data-scroll-target="#适配层">3. 适配层</a></li>
+  </ul></li>
+  <li><a href="#二十八两种应用场景" id="toc-二十八两种应用场景" class="nav-link" data-scroll-target="#二十八两种应用场景">二十八、两种应用场景</a>
+  <ul class="collapse">
+  <li><a href="#单模组单-mcu" id="toc-单模组单-mcu" class="nav-link" data-scroll-target="#单模组单-mcu">1. 单模组、单 MCU</a></li>
+  <li><a href="#外置-mcu-模组" id="toc-外置-mcu-模组" class="nav-link" data-scroll-target="#外置-mcu-模组">2. 外置 MCU + 模组</a></li>
+  </ul></li>
+  <li><a href="#二十九sdk-源代码目录" id="toc-二十九sdk-源代码目录" class="nav-link" data-scroll-target="#二十九sdk-源代码目录">二十九、SDK 源代码目录</a></li>
+  <li><a href="#三十osal-操作系统抽象层" id="toc-三十osal-操作系统抽象层" class="nav-link" data-scroll-target="#三十osal-操作系统抽象层">三十、OSAL 操作系统抽象层</a>
+  <ul class="collapse">
+  <li><a href="#osal-的适配方法" id="toc-osal-的适配方法" class="nav-link" data-scroll-target="#osal-的适配方法">OSAL 的适配方法</a></li>
+  </ul></li>
+  <li><a href="#三十一什么是-liteos-移植" id="toc-三十一什么是-liteos-移植" class="nav-link" data-scroll-target="#三十一什么是-liteos-移植">三十一、什么是 LiteOS 移植？</a></li>
+  <li><a href="#三十二为什么要移植" id="toc-三十二为什么要移植" class="nav-link" data-scroll-target="#三十二为什么要移植">三十二、为什么要移植？</a></li>
+  <li><a href="#三十三移植前准备" id="toc-三十三移植前准备" class="nav-link" data-scroll-target="#三十三移植前准备">三十三、移植前准备</a></li>
+  <li><a href="#三十四liteos-核心源码目录" id="toc-三十四liteos-核心源码目录" class="nav-link" data-scroll-target="#三十四liteos-核心源码目录">三十四、LiteOS 核心源码目录</a>
+  <ul class="collapse">
+  <li><a href="#arch" id="toc-arch" class="nav-link" data-scroll-target="#arch">1. arch</a></li>
+  <li><a href="#kernel" id="toc-kernel" class="nav-link" data-scroll-target="#kernel">2. kernel</a></li>
+  <li><a href="#os_config" id="toc-os_config" class="nav-link" data-scroll-target="#os_config">3. OS_CONFIG</a></li>
+  </ul></li>
+  <li><a href="#三十五liteos-移植主要步骤" id="toc-三十五liteos-移植主要步骤" class="nav-link" data-scroll-target="#三十五liteos-移植主要步骤">三十五、LiteOS 移植主要步骤</a></li>
+  <li><a href="#三十六第一步创建裸机工程" id="toc-三十六第一步创建裸机工程" class="nav-link" data-scroll-target="#三十六第一步创建裸机工程">三十六、第一步：创建裸机工程</a></li>
+  <li><a href="#三十七引脚配置" id="toc-三十七引脚配置" class="nav-link" data-scroll-target="#三十七引脚配置">三十七、引脚配置</a></li>
+  <li><a href="#三十八验证裸机工程" id="toc-三十八验证裸机工程" class="nav-link" data-scroll-target="#三十八验证裸机工程">三十八、验证裸机工程</a></li>
+  <li><a href="#三十九第二步添加-liteos-源码" id="toc-三十九第二步添加-liteos-源码" class="nav-link" data-scroll-target="#三十九第二步添加-liteos-源码">三十九、第二步：添加 LiteOS 源码</a></li>
+  <li><a href="#四十第三步向-mdk-工程添加内核文件" id="toc-四十第三步向-mdk-工程添加内核文件" class="nav-link" data-scroll-target="#四十第三步向-mdk-工程添加内核文件">四十、第三步：向 MDK 工程添加内核文件</a></li>
+  <li><a href="#四十一需要添加的主要源码" id="toc-四十一需要添加的主要源码" class="nav-link" data-scroll-target="#四十一需要添加的主要源码">四十一、需要添加的主要源码</a>
+  <ul class="collapse">
+  <li><a href="#liteoscmsis" id="toc-liteoscmsis" class="nav-link" data-scroll-target="#liteoscmsis">LiteOS/cmsis</a></li>
+  <li><a href="#liteoskernel" id="toc-liteoskernel" class="nav-link" data-scroll-target="#liteoskernel">LiteOS/kernel</a></li>
+  <li><a href="#liteosarch" id="toc-liteosarch" class="nav-link" data-scroll-target="#liteosarch">LiteOS/arch</a></li>
+  <li><a href="#liteosconfig" id="toc-liteosconfig" class="nav-link" data-scroll-target="#liteosconfig">LiteOS/config</a></li>
+  </ul></li>
+  <li><a href="#四十二第四步配置头文件路径" id="toc-四十二第四步配置头文件路径" class="nav-link" data-scroll-target="#四十二第四步配置头文件路径">四十二、第四步：配置头文件路径</a></li>
+  <li><a href="#四十三第五步移除-systick-和-pendsv-中断" id="toc-四十三第五步移除-systick-和-pendsv-中断" class="nav-link" data-scroll-target="#四十三第五步移除-systick-和-pendsv-中断">四十三、第五步：移除 SysTick 和 PendSV 中断</a></li>
+  <li><a href="#四十四第六步修改-target_config.h" id="toc-四十四第六步修改-target_config.h" class="nav-link" data-scroll-target="#四十四第六步修改-target_config.h">四十四、第六步：修改 target_config.h</a>
+  <ul class="collapse">
+  <li><a href="#修改-mcu-头文件" id="toc-修改-mcu-头文件" class="nav-link" data-scroll-target="#修改-mcu-头文件">1. 修改 MCU 头文件</a></li>
+  <li><a href="#修改-sram-大小" id="toc-修改-sram-大小" class="nav-link" data-scroll-target="#修改-sram-大小">2. 修改 SRAM 大小</a></li>
+  </ul></li>
+  <li><a href="#四十五target_config.h-中的重要配置" id="toc-四十五target_config.h-中的重要配置" class="nav-link" data-scroll-target="#四十五target_config.h-中的重要配置">四十五、target_config.h 中的重要配置</a>
+  <ul class="collapse">
+  <li><a href="#系统时钟配置" id="toc-系统时钟配置" class="nav-link" data-scroll-target="#系统时钟配置">1. 系统时钟配置</a></li>
+  <li><a href="#tickless-低功耗功能配置" id="toc-tickless-低功耗功能配置" class="nav-link" data-scroll-target="#tickless-低功耗功能配置">2. Tickless （低功耗功能）配置</a></li>
+  <li><a href="#硬件中断配置" id="toc-硬件中断配置" class="nav-link" data-scroll-target="#硬件中断配置">3. 硬件中断配置</a></li>
+  <li><a href="#任务模块配置" id="toc-任务模块配置" class="nav-link" data-scroll-target="#任务模块配置">4. 任务模块配置</a></li>
+  <li><a href="#信号量配置" id="toc-信号量配置" class="nav-link" data-scroll-target="#信号量配置">5. 信号量配置</a></li>
+  <li><a href="#互斥锁配置" id="toc-互斥锁配置" class="nav-link" data-scroll-target="#互斥锁配置">6. 互斥锁配置</a></li>
+  <li><a href="#队列配置" id="toc-队列配置" class="nav-link" data-scroll-target="#队列配置">7. 队列配置</a></li>
+  <li><a href="#软件定时器配置" id="toc-软件定时器配置" class="nav-link" data-scroll-target="#软件定时器配置">8. 软件定时器配置</a></li>
+  <li><a href="#内存模块配置" id="toc-内存模块配置" class="nav-link" data-scroll-target="#内存模块配置">9. 内存模块配置</a></li>
+  <li><a href="#cmsis-配置" id="toc-cmsis-配置" class="nav-link" data-scroll-target="#cmsis-配置">10. CMSIS 配置</a></li>
+  <li><a href="#异常配置runstoptrack" id="toc-异常配置runstoptrack" class="nav-link" data-scroll-target="#异常配置runstoptrack">11. 异常配置、Runstop、Track</a></li>
+  </ul></li>
+  <li><a href="#四十六第七步创建任务测试" id="toc-四十六第七步创建任务测试" class="nav-link" data-scroll-target="#四十六第七步创建任务测试">四十六、第七步：创建任务测试</a></li>
+  <li><a href="#四十七liteos-启动流程" id="toc-四十七liteos-启动流程" class="nav-link" data-scroll-target="#四十七liteos-启动流程">四十七、LiteOS 启动流程</a></li>
+  <li><a href="#四十八liteos-任务切换" id="toc-四十八liteos-任务切换" class="nav-link" data-scroll-target="#四十八liteos-任务切换">四十八、LiteOS 任务切换</a></li>
+  <li><a href="#四十九liteos-任务状态" id="toc-四十九liteos-任务状态" class="nav-link" data-scroll-target="#四十九liteos-任务状态">四十九、LiteOS 任务状态</a>
+  <ul class="collapse">
+  <li><a href="#就绪态" id="toc-就绪态" class="nav-link" data-scroll-target="#就绪态">1. 就绪态</a></li>
+  <li><a href="#运行态" id="toc-运行态" class="nav-link" data-scroll-target="#运行态">2. 运行态</a></li>
+  <li><a href="#阻塞态" id="toc-阻塞态" class="nav-link" data-scroll-target="#阻塞态">3. 阻塞态</a></li>
+  <li><a href="#挂起态" id="toc-挂起态" class="nav-link" data-scroll-target="#挂起态">4. 挂起态</a></li>
+  <li><a href="#删除态" id="toc-删除态" class="nav-link" data-scroll-target="#删除态">5. 删除态</a></li>
+  </ul></li>
+  <li><a href="#五十本章重点背诵版" id="toc-五十本章重点背诵版" class="nav-link" data-scroll-target="#五十本章重点背诵版">五十、本章重点背诵版</a>
+  <ul class="collapse">
+  <li><a href="#liteos-简介" id="toc-liteos-简介" class="nav-link" data-scroll-target="#liteos-简介">1. LiteOS 简介</a></li>
+  <li><a href="#liteos-的-1n-架构" id="toc-liteos-的-1n-架构" class="nav-link" data-scroll-target="#liteos-的-1n-架构">2. LiteOS 的 “1+N” 架构</a></li>
+  <li><a href="#liteos-内核层次" id="toc-liteos-内核层次" class="nav-link" data-scroll-target="#liteos-内核层次">3. LiteOS 内核层次</a></li>
+  <li><a href="#liteos-基础内核子系统" id="toc-liteos-基础内核子系统" class="nav-link" data-scroll-target="#liteos-基础内核子系统">4. LiteOS 基础内核子系统</a></li>
+  <li><a href="#任务管理模块功能" id="toc-任务管理模块功能" class="nav-link" data-scroll-target="#任务管理模块功能">5. 任务管理模块功能</a></li>
+  <li><a href="#静态内存与动态内存区别" id="toc-静态内存与动态内存区别" class="nav-link" data-scroll-target="#静态内存与动态内存区别">6. 静态内存与动态内存区别</a></li>
+  <li><a href="#liteos-sdk-作用" id="toc-liteos-sdk-作用" class="nav-link" data-scroll-target="#liteos-sdk-作用">7. LiteOS SDK 作用</a></li>
+  <li><a href="#agent-lite-sdk-与-agent-tiny-sdk-区别" id="toc-agent-lite-sdk-与-agent-tiny-sdk-区别" class="nav-link" data-scroll-target="#agent-lite-sdk-与-agent-tiny-sdk-区别">8. Agent Lite SDK 与 Agent Tiny SDK 区别</a></li>
+  <li><a href="#osal-作用" id="toc-osal-作用" class="nav-link" data-scroll-target="#osal-作用">9. OSAL 作用</a></li>
+  <li><a href="#liteos-移植流程" id="toc-liteos-移植流程" class="nav-link" data-scroll-target="#liteos-移植流程">10. LiteOS 移植流程</a></li>
+  </ul></li>
+  <li><a href="#五十一考试可能这样问" id="toc-五十一考试可能这样问" class="nav-link" data-scroll-target="#五十一考试可能这样问">五十一、考试可能这样问</a>
+  <ul class="collapse">
+  <li><a href="#题目1liteos-内核可分为哪些层次" id="toc-题目1liteos-内核可分为哪些层次" class="nav-link" data-scroll-target="#题目1liteos-内核可分为哪些层次">题目1：LiteOS 内核可分为哪些层次？</a></li>
+  <li><a href="#题目2liteos-与-liteos-sdk-有何关系" id="toc-题目2liteos-与-liteos-sdk-有何关系" class="nav-link" data-scroll-target="#题目2liteos-与-liteos-sdk-有何关系">题目2：LiteOS 与 LiteOS SDK 有何关系？</a></li>
+  <li><a href="#题目3liteos-是如何启动的" id="toc-题目3liteos-是如何启动的" class="nav-link" data-scroll-target="#题目3liteos-是如何启动的">题目3：LiteOS 是如何启动的？</a></li>
+  <li><a href="#题目4huawei-liteos-sdk-是如何分类的" id="toc-题目4huawei-liteos-sdk-是如何分类的" class="nav-link" data-scroll-target="#题目4huawei-liteos-sdk-是如何分类的">题目4：Huawei LiteOS SDK 是如何分类的？</a></li>
+  <li><a href="#题目5liteos-的任务是如何切换的" id="toc-题目5liteos-的任务是如何切换的" class="nav-link" data-scroll-target="#题目5liteos-的任务是如何切换的">题目5：LiteOS 的任务是如何切换的？</a></li>
+  <li><a href="#题目6任务管理模块主要具有哪些功能" id="toc-题目6任务管理模块主要具有哪些功能" class="nav-link" data-scroll-target="#题目6任务管理模块主要具有哪些功能">题目6：任务管理模块主要具有哪些功能？</a></li>
+  <li><a href="#题目7静态内存管理和动态内存管理有何区别liteos-各自采用哪些算法" id="toc-题目7静态内存管理和动态内存管理有何区别liteos-各自采用哪些算法" class="nav-link" data-scroll-target="#题目7静态内存管理和动态内存管理有何区别liteos-各自采用哪些算法">题目7：静态内存管理和动态内存管理有何区别？LiteOS 各自采用哪些算法？</a></li>
+  <li><a href="#题目8liteos-移植需要哪些软硬件条件" id="toc-题目8liteos-移植需要哪些软硬件条件" class="nav-link" data-scroll-target="#题目8liteos-移植需要哪些软硬件条件">题目8：LiteOS 移植需要哪些软硬件条件？</a></li>
+  </ul></li>
+  <li><a href="#五十二本章一句话总结" id="toc-五十二本章一句话总结" class="nav-link" data-scroll-target="#五十二本章一句话总结">五十二、本章一句话总结</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch1_物联网及嵌入式概述.html">课程笔记</a></li><li class="breadcrumb-item"><a href="./ch6_LiteOS操作系统及其移植.html">Ch6 LiteOS 操作系统及其移植</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">第6章 LiteOS 操作系统及其移植</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>本章的核心是：<strong>LiteOS 是什么、它由哪些部分组成、LiteOS SDK 有什么作用，以及怎样把 LiteOS 移植到 STM32 工程中。</strong></p>
+<hr>
+<section id="一本章总体框架" class="level1">
+<h1>一、本章总体框架</h1>
+<p>这章可以分成四大块：</p>
+<ol type="1">
+<li><strong>LiteOS 操作系统概述</strong>
+<ul>
+<li>LiteOS 的来源；</li>
+<li>LiteOS 的特点；</li>
+<li>LiteOS 的 “1+N” 架构。</li>
+</ul></li>
+<li><strong>LiteOS 内核</strong>
+<ul>
+<li>基础内核；</li>
+<li>扩展内核；</li>
+<li>任务管理、内存管理、任务同步、任务通信、时间管理、中断管理。</li>
+</ul></li>
+<li><strong>LiteOS SDK</strong>
+<ul>
+<li>Agent Lite SDK；</li>
+<li>Agent Tiny SDK；</li>
+<li>Huawei LiteOS SDK；</li>
+<li>OS 适配层 OSAL。</li>
+</ul></li>
+<li><strong>LiteOS 移植</strong>
+<ul>
+<li>下载源码；</li>
+<li>添加内核文件；</li>
+<li>配置头文件；</li>
+<li>修改 <code>target_config.h</code>；</li>
+<li>移除 SysTick 和 PendSV 中断；</li>
+<li>创建任务测试。</li>
+</ul></li>
+</ol>
+<p>考试重点通常是：</p>
+<blockquote class="blockquote">
+<p>LiteOS 架构、LiteOS 内核组成、LiteOS SDK 分类、Agent Lite 与 Agent Tiny 区别、OSAL 作用、LiteOS 移植流程、<code>target_config.h</code> 配置项。</p>
+</blockquote>
+<hr>
+</section>
+<section id="二liteos-是什么" class="level1">
+<h1>二、LiteOS 是什么？</h1>
+<p>LiteOS 是华为面向物联网领域推出的轻量级物联网操作系统。</p>
+<p>2015 年 5 月 20 日，华为在网络大会上发布 Huawei LiteOS。它遵循 BSD-3 开源许可协议，主要面向资源受限、低功耗、联网需求强的物联网设备。</p>
+<p>LiteOS 的主要特点包括：</p>
+<ol type="1">
+<li><strong>轻量级</strong></li>
+<li><strong>低功耗</strong></li>
+<li><strong>互联互通</strong></li>
+<li><strong>组件丰富</strong></li>
+<li><strong>快速开发</strong></li>
+<li><strong>可裁剪</strong></li>
+<li><strong>快速启动</strong></li>
+</ol>
+<p>它可以应用在：</p>
+<ul>
+<li>可穿戴设备；</li>
+<li>智能家居；</li>
+<li>车联网；</li>
+<li>城市公共服务；</li>
+<li>制造业；</li>
+<li>工业网关；</li>
+<li>智能传感器终端。</li>
+</ul>
+<p>一句话理解：</p>
+<blockquote class="blockquote">
+<p>LiteOS 是面向物联网终端设备的轻量级实时操作系统，它既提供 RTOS 内核能力，又提供物联网连接、安全、升级、传感器和端云协同能力。</p>
+</blockquote>
+<hr>
+</section>
+<section id="三liteos-的-1n-架构" class="level1">
+<h1>三、LiteOS 的 “1+N” 架构</h1>
+<p>LiteOS 采用 <strong>“1+N” 架构</strong>。</p>
+<section id="是-liteos-内核" class="level2">
+<h2 class="anchored" data-anchor-id="是-liteos-内核">1. “1” 是 LiteOS 内核</h2>
+<p>这个 “1” 指 LiteOS 内核。</p>
+<p>LiteOS 内核包括：</p>
+<ul>
+<li>基础内核；</li>
+<li>扩展内核。</li>
+</ul>
+<p>内核主要负责物联网设备端的系统资源管理，例如：</p>
+<ul>
+<li>任务调度；</li>
+<li>内存管理；</li>
+<li>中断管理；</li>
+<li>时间管理；</li>
+<li>任务同步；</li>
+<li>任务间通信。</li>
+</ul>
+<p>也就是说，内核是 LiteOS 的核心。</p>
+<hr>
+</section>
+<section id="n-是多个中间件和功能框架" class="level2">
+<h2 class="anchored" data-anchor-id="n-是多个中间件和功能框架">2. “N” 是多个中间件和功能框架</h2>
+<p>“N” 指多个中间件，包括：</p>
+<ol type="1">
+<li>互联互通框架；</li>
+<li>传感器框架；</li>
+<li>安全框架；</li>
+<li>JavaScript 框架；</li>
+<li>运行引擎；</li>
+<li>低功耗框架；</li>
+<li>OpenCPU 架构；</li>
+<li>SOTA 远程升级；</li>
+<li>轻量级人工智能框架。</li>
+</ol>
+<p>可以这样理解：</p>
+<blockquote class="blockquote">
+<p>LiteOS 的内核负责“设备怎么运行”，中间件负责“设备怎么联网、怎么安全、怎么升级、怎么开发、怎么智能化”。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="四互联互通框架" class="level1">
+<h1>四、互联互通框架</h1>
+<p>互联互通框架是 LiteOS 中非常重要的部分。</p>
+<p>它主要提供：</p>
+<ul>
+<li>IP；</li>
+<li>TCP；</li>
+<li>UDP；</li>
+<li>CoAP；</li>
+<li>MQTT；</li>
+<li>LwM2M；</li>
+<li>mbed TLS；</li>
+<li>LwIP 等协议栈。</li>
+</ul>
+<p>作用是：</p>
+<blockquote class="blockquote">
+<p>帮助终端设备接入物联网云平台，实现端云通信。</p>
+</blockquote>
+<p>例如，一个传感器设备使用 LiteOS 后，可以通过 MQTT 或 LwM2M 协议把数据上传到华为 OceanConnect IoT 平台。</p>
+<p>互联互通框架的意义在于：</p>
+<ol type="1">
+<li>降低开发门槛；</li>
+<li>减少开发者自己写协议栈的工作；</li>
+<li>实现不同设备之间互通；</li>
+<li>支持设备快速接入云平台。</li>
+</ol>
+<hr>
+</section>
+<section id="五传感器框架" class="level1">
+<h1>五、传感器框架</h1>
+<p>传感器框架主要面向各种传感器设备。</p>
+<p>物联网设备中经常会连接很多传感器，例如：</p>
+<ul>
+<li>温度传感器；</li>
+<li>湿度传感器；</li>
+<li>加速度传感器；</li>
+<li>陀螺仪；</li>
+<li>光照传感器；</li>
+<li>气体传感器。</li>
+</ul>
+<p>不同传感器硬件接口和数据格式可能不同。 如果每个传感器都单独开发，会非常麻烦。</p>
+<p>LiteOS 传感器框架的作用是：</p>
+<blockquote class="blockquote">
+<p>抽象不同类型传感器接口，屏蔽硬件细节，使应用层可以更方便地调用传感器能力。</p>
+</blockquote>
+<p>传感器框架有三个主要特征：</p>
+<ol type="1">
+<li>实时传感器事件机制；</li>
+<li>多传感器数据融合算法；</li>
+<li>传感器管理。</li>
+</ol>
+<hr>
+<section id="实时传感器事件机制" class="level2">
+<h2 class="anchored" data-anchor-id="实时传感器事件机制">1. 实时传感器事件机制</h2>
+<p>当传感器数据发生变化时，可以通过事件机制通知应用。</p>
+<p>例如：</p>
+<ul>
+<li>温度超过阈值；</li>
+<li>姿态发生变化；</li>
+<li>加速度异常；</li>
+<li>光照强度变化。</li>
+</ul>
+<p>这样应用不需要一直轮询传感器，可以提高效率。</p>
+<hr>
+</section>
+<section id="多传感器数据融合" class="level2">
+<h2 class="anchored" data-anchor-id="多传感器数据融合">2. 多传感器数据融合</h2>
+<p>有些应用需要多个传感器共同判断状态。</p>
+<p>例如智能手环判断运动状态，可能需要：</p>
+<ul>
+<li>加速度传感器；</li>
+<li>陀螺仪；</li>
+<li>心率传感器。</li>
+</ul>
+<p>传感器框架可以提供数据融合算法，让系统获得更准确的判断结果。</p>
+<hr>
+</section>
+<section id="传感器管理" class="level2">
+<h2 class="anchored" data-anchor-id="传感器管理">3. 传感器管理</h2>
+<p>传感器管理包括：</p>
+<ul>
+<li>传感器注册；</li>
+<li>传感器初始化；</li>
+<li>传感器数据读取；</li>
+<li>传感器状态维护；</li>
+<li>传感器事件处理。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="六安全框架" class="level1">
+<h1>六、安全框架</h1>
+<p>物联网设备通常连接云平台，并且可能部署在开放环境中，所以安全非常重要。</p>
+<p>LiteOS 安全框架从三个方面覆盖物联网安全需求：</p>
+<ol type="1">
+<li>终端安全；</li>
+<li>传输安全；</li>
+<li>端云安全。</li>
+</ol>
+<hr>
+<section id="终端安全" class="level2">
+<h2 class="anchored" data-anchor-id="终端安全">1. 终端安全</h2>
+<p>主要保证设备本身可信。</p>
+<p>例如：</p>
+<ul>
+<li>防止非法固件运行；</li>
+<li>防止设备被恶意篡改；</li>
+<li>保护设备中的密钥和敏感数据。</li>
+</ul>
+<hr>
+</section>
+<section id="传输安全" class="level2">
+<h2 class="anchored" data-anchor-id="传输安全">2. 传输安全</h2>
+<p>主要保证数据在传输过程中不被窃听、篡改。</p>
+<p>例如：</p>
+<ul>
+<li>TLS；</li>
+<li>DTLS；</li>
+<li>mbed TLS；</li>
+<li>加密通信；</li>
+<li>身份认证。</li>
+</ul>
+<hr>
+</section>
+<section id="端云安全" class="level2">
+<h2 class="anchored" data-anchor-id="端云安全">3. 端云安全</h2>
+<p>主要保证终端和云平台之间的身份可信、通信可信。</p>
+<p>例如：</p>
+<ul>
+<li>设备认证；</li>
+<li>云端认证；</li>
+<li>安全接入；</li>
+<li>访问控制；</li>
+<li>端云协同安全。</li>
+</ul>
+<p>一句话总结：</p>
+<blockquote class="blockquote">
+<p>LiteOS 安全框架要保证设备安全、通信安全和云端接入安全。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="七javascript-框架与运行引擎" class="level1">
+<h1>七、JavaScript 框架与运行引擎</h1>
+<p>LiteOS 支持 JavaScript 开发框架和轻量级 JavaScript 运行引擎。</p>
+<p>这部分的意义是：</p>
+<blockquote class="blockquote">
+<p>让物联网开发者可以使用更高级、更容易上手的语言开发应用，而不完全依赖 C 语言。</p>
+</blockquote>
+<p>JavaScript 框架的优势包括：</p>
+<ol type="1">
+<li>简化跨硬件平台和中间件的系统集成；</li>
+<li>用高级语言抽象隐藏底层编程细节；</li>
+<li>可以兼容大量第三方库；</li>
+<li>JS 虚拟机提供基于语言的安全性；</li>
+<li>常与运行引擎结合使用。</li>
+</ol>
+<p>运行引擎则构建在 LiteOS 内核之上，为 JavaScript 提供运行时环境。</p>
+<hr>
+</section>
+<section id="八liteos-studio" class="level1">
+<h1>八、LiteOS Studio</h1>
+<p>LiteOS Studio 是 LiteOS 的集成开发环境。</p>
+<p>它属于一站式开发工具，支持：</p>
+<ul>
+<li>C；</li>
+<li>C++；</li>
+<li>汇编等语言。</li>
+</ul>
+<p>作用类似于 Keil、IAR 或其他嵌入式 IDE，但它更面向 LiteOS 和物联网应用开发。</p>
+<hr>
+</section>
+<section id="九低功耗框架" class="level1">
+<h1>九、低功耗框架</h1>
+<p>LiteOS 是轻量级物联网操作系统，最小内核尺寸仅为 6KB，具备快速启动和低功耗优势。</p>
+<p>低功耗对物联网设备非常重要。</p>
+<p>例如：</p>
+<ul>
+<li>智能水表；</li>
+<li>烟雾报警器；</li>
+<li>可穿戴设备；</li>
+<li>农业传感器；</li>
+<li>环境监测节点。</li>
+</ul>
+<p>这些设备可能依靠电池供电，需要运行数月甚至数年。</p>
+<p>LiteOS 低功耗框架可以配合：</p>
+<ul>
+<li>Tickless；</li>
+<li>睡眠模式；</li>
+<li>外设关闭；</li>
+<li>动态时钟管理；</li>
+<li>低功耗调度。</li>
+</ul>
+<hr>
+</section>
+<section id="十opencpu-架构" class="level1">
+<h1>十、OpenCPU 架构</h1>
+<p>OpenCPU 架构是为 LiteOS 小内核设计的，主要用于硬件资源受限的设备。</p>
+<p>简单理解：</p>
+<blockquote class="blockquote">
+<p>OpenCPU 让通信模组本身承担一部分主控功能，减少外部 MCU 的需求，从而降低成本和功耗。</p>
+</blockquote>
+<p>它适合一些小型物联网终端，例如：</p>
+<ul>
+<li>NB-IoT 模组设备；</li>
+<li>小型传感器；</li>
+<li>远程监测终端。</li>
+</ul>
+<hr>
+</section>
+<section id="十一sota-远程升级" class="level1">
+<h1>十一、SOTA 远程升级</h1>
+<p>PPT 中提到 SOTA 远程升级。</p>
+<p>SOTA 可以理解为软件远程升级，类似 OTA。</p>
+<p>它的特点是：</p>
+<ol type="1">
+<li>通过<strong>差分方式</strong>降低升级包大小；</li>
+<li>适合低带宽网络；</li>
+<li>适合电池供电设备；</li>
+<li>差分合并算法对 RAM 要求较少；</li>
+<li>满足海量低资源终端升级需求。</li>
+</ol>
+<p>为什么<strong>差分升级</strong>重要？</p>
+<p>因为物联网终端通常带宽低、功耗低、内存小。如果每次升级都传完整固件，代价很高。 差分升级只传变化部分，可以显著减少升级数据量。</p>
+<hr>
+</section>
+<section id="十二轻量级人工智能框架" class="level1">
+<h1>十二、轻量级人工智能框架</h1>
+<p>PPT 中提到：</p>
+<blockquote class="blockquote">
+<p>LiteOS + MindSpore Lite 面向物联网端侧提供轻量级 AI 解决方案。</p>
+</blockquote>
+<p>它主要解决的问题是：</p>
+<blockquote class="blockquote">
+<p>物联网端侧设备资源受限、算力低，但又需要部署 AI 推理能力。</p>
+</blockquote>
+<p>例如：</p>
+<ul>
+<li>智能摄像头本地识别；</li>
+<li>可穿戴设备健康状态判断；</li>
+<li>工业传感器异常检测；</li>
+<li>智能家居语音或行为识别。</li>
+</ul>
+<p>MindSpore Lite 可以帮助开发者把 AI 模型部署到端侧设备，实现轻量级推理。</p>
+<hr>
+</section>
+<section id="十三liteos-内核是什么" class="level1">
+<h1>十三、LiteOS 内核是什么？</h1>
+<p>PPT 中对内核的解释是：</p>
+<blockquote class="blockquote">
+<p>内核是提供硬件抽象层、磁盘及文件系统控制、多任务等功能的系统软件，为系统其他部分提供系统服务。</p>
+</blockquote>
+<p>在 LiteOS 中，内核是最核心的部分。</p>
+<p>建立在 LiteOS 内核之上的完整系统，还包括：</p>
+<ul>
+<li>扩展中间件；</li>
+<li>安全框架；</li>
+<li>SDK。</li>
+</ul>
+<p>所以要区分：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>LiteOS 内核</td>
+<td>操作系统最核心部分，负责调度、内存、中断等</td>
+</tr>
+<tr class="even">
+<td>LiteOS 操作系统</td>
+<td>内核 + 中间件 + 安全框架 + SDK 等完整系统</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="十四liteos-内核的两个层次" class="level1">
+<h1>十四、LiteOS 内核的两个层次</h1>
+<p>PPT 中说 Huawei LiteOS 内核分为两个层次：</p>
+<ol type="1">
+<li>基础内核；</li>
+<li>扩展内核。</li>
+</ol>
+<hr>
+<section id="基础内核" class="level2">
+<h2 class="anchored" data-anchor-id="基础内核">1. 基础内核</h2>
+<p>基础内核提供 RTOS 特性。</p>
+<p>主要能力包括：</p>
+<ul>
+<li>任务调度；</li>
+<li>内存管理；</li>
+<li>中断机制；</li>
+<li>队列管理；</li>
+<li>事件管理；</li>
+<li>IPC 机制；</li>
+<li>时间管理；</li>
+<li>软定时器；</li>
+<li>双向链表等常用数据结构。</li>
+</ul>
+<p>基础内核是考试重点。</p>
+<hr>
+</section>
+<section id="扩展内核" class="level2">
+<h2 class="anchored" data-anchor-id="扩展内核">2. 扩展内核</h2>
+<p>扩展内核提供更高级的能力。</p>
+<p>PPT 中提到主要包括：</p>
+<ul>
+<li>运行-暂停机制；</li>
+<li>动态框架。</li>
+</ul>
+<p>扩展内核可以理解为在基础 RTOS 能力之上增加的增强功能。</p>
+<hr>
+</section>
+</section>
+<section id="十五liteos-基础内核的主要子系统" class="level1">
+<h1>十五、LiteOS 基础内核的主要子系统</h1>
+<p>PPT 中说 LiteOS 基础内核具有 6 个主要子系统：</p>
+<ol type="1">
+<li>任务管理；</li>
+<li>内存管理；</li>
+<li>任务同步；</li>
+<li>任务间通信；</li>
+<li>时间管理；</li>
+<li>中断和硬件定时器管理。</li>
+</ol>
+<hr>
+</section>
+<section id="十六任务管理" class="level1">
+<h1>十六、任务管理</h1>
+<p>LiteOS 认为：</p>
+<blockquote class="blockquote">
+<p>一个任务就是一个线程。</p>
+</blockquote>
+<p>任务管理模块负责管理 CPU 资源调度，让多个任务能够合理使用 CPU。</p>
+<p>任务管理模块提供的功能包括：</p>
+<ul>
+<li>任务创建；</li>
+<li>任务删除；</li>
+<li>任务延迟；</li>
+<li>任务挂起；</li>
+<li>任务恢复；</li>
+<li>锁定任务调度；</li>
+<li>解锁任务调度。</li>
+</ul>
+<p>LiteOS 支持：</p>
+<ol type="1">
+<li>按优先级高低进行抢占调度；</li>
+<li>同优先级任务采用时间片轮转调度。</li>
+</ol>
+<hr>
+<section id="抢占调度" class="level2">
+<h2 class="anchored" data-anchor-id="抢占调度">1. 抢占调度</h2>
+<p>优先级高的任务可以抢占优先级低的任务。</p>
+<p>例如：</p>
+<ul>
+<li>报警任务优先级高；</li>
+<li>数据上传任务优先级低。</li>
+</ul>
+<p>当报警事件发生时，报警任务可以立即抢占 CPU 执行。</p>
+<hr>
+</section>
+<section id="时间片轮转" class="level2">
+<h2 class="anchored" data-anchor-id="时间片轮转">2. 时间片轮转</h2>
+<p>如果多个任务优先级相同，系统可以让它们轮流执行。</p>
+<p>例如：</p>
+<ul>
+<li>任务 A 执行一个时间片；</li>
+<li>任务 B 执行一个时间片；</li>
+<li>任务 C 执行一个时间片。</li>
+</ul>
+<p>这样可以保证同优先级任务公平运行。</p>
+<hr>
+</section>
+</section>
+<section id="十七内存管理" class="level1">
+<h1>十七、内存管理</h1>
+<p>LiteOS 在有限资源上提供静态内存和动态内存管理。</p>
+<p>PPT 中提到支持的内存管理算法包括：</p>
+<ol type="1">
+<li>固定大小 BOX 算法；</li>
+<li>动态申请 SLAB；</li>
+<li>DLINK 算法。</li>
+</ol>
+<p>还提供：</p>
+<ul>
+<li>内存统计；</li>
+<li>内存越界检测。</li>
+</ul>
+<hr>
+<section id="静态内存管理" class="level2">
+<h2 class="anchored" data-anchor-id="静态内存管理">1. 静态内存管理</h2>
+<p>静态内存管理通常在系统初始化或编译阶段确定内存分配。</p>
+<p>特点：</p>
+<ul>
+<li>分配速度快；</li>
+<li>确定性强；</li>
+<li>不容易产生碎片；</li>
+<li>灵活性较差。</li>
+</ul>
+<p>适合实时性要求高、内存大小固定的场景。</p>
+<hr>
+</section>
+<section id="动态内存管理" class="level2">
+<h2 class="anchored" data-anchor-id="动态内存管理">2. 动态内存管理</h2>
+<p>动态内存管理允许程序运行时申请和释放内存。</p>
+<p>特点：</p>
+<ul>
+<li>灵活；</li>
+<li>适合复杂应用；</li>
+<li>可能产生内存碎片；</li>
+<li>分配时间可能不如静态方式确定。</li>
+</ul>
+<hr>
+</section>
+<section id="boxslabdlink" class="level2">
+<h2 class="anchored" data-anchor-id="boxslabdlink">3. BOX、SLAB、DLINK</h2>
+<section id="box-算法" class="level3">
+<h3 class="anchored" data-anchor-id="box-算法">BOX 算法</h3>
+<p>固定大小内存块管理。</p>
+<p>适合频繁申请固定大小内存的场景。</p>
+</section>
+<section id="slab-算法" class="level3">
+<h3 class="anchored" data-anchor-id="slab-算法">SLAB 算法</h3>
+<p>动态内存分配方法，适合管理固定类型对象，效率较高。</p>
+</section>
+<section id="dlink-算法" class="level3">
+<h3 class="anchored" data-anchor-id="dlink-算法">DLINK 算法</h3>
+<p>基于双向链表的动态内存管理方法，适合动态申请和释放内存。</p>
+<hr>
+</section>
+</section>
+</section>
+<section id="十八任务同步" class="level1">
+<h1>十八、任务同步</h1>
+<p>任务同步是指：</p>
+<blockquote class="blockquote">
+<p>多个任务通过特定机制控制执行顺序。</p>
+</blockquote>
+<p>LiteOS 支持的同步机制包括：</p>
+<ul>
+<li>互斥锁；</li>
+<li>信号量。</li>
+</ul>
+<p>如果没有同步，多个任务之间执行顺序可能混乱。</p>
+<hr>
+<section id="举例" class="level2">
+<h2 class="anchored" data-anchor-id="举例">举例</h2>
+<p>假设任务 A 和任务 B 都要访问同一个串口。</p>
+<p>如果没有同步机制，两个任务可能同时发送数据，导致串口输出混乱。</p>
+<p>使用互斥锁后：</p>
+<ol type="1">
+<li>任务 A 先获得锁；</li>
+<li>任务 B 等待；</li>
+<li>任务 A 使用完串口后释放锁；</li>
+<li>任务 B 再使用串口。</li>
+</ol>
+<p>这就是任务同步。</p>
+<hr>
+</section>
+</section>
+<section id="十九任务间通信-ipc" class="level1">
+<h1>十九、任务间通信 IPC</h1>
+<p>IPC 全称是：</p>
+<blockquote class="blockquote">
+<p>Inter Process Communication，进程间通信。</p>
+</blockquote>
+<p>在 LiteOS 中，IPC 用于任务之间交换信息。</p>
+<p>PPT 中提到 LiteOS 支持 POSIX 规范中的标准 IPC 机制，也支持其他常用 IPC 机制。</p>
+<p>常见 IPC 包括：</p>
+<ul>
+<li>队列；</li>
+<li>事件；</li>
+<li>信号量；</li>
+<li>互斥锁；</li>
+<li>消息队列。</li>
+</ul>
+<p>任务间通信的作用是：</p>
+<blockquote class="blockquote">
+<p>让不同任务之间可以传递数据、通知事件、协同工作。</p>
+</blockquote>
+<hr>
+</section>
+<section id="二十时间管理" class="level1">
+<h1>二十、时间管理</h1>
+<p>LiteOS 时间管理包括：</p>
+<ol type="1">
+<li>系统时间；</li>
+<li>Tick 时间；</li>
+<li>软件定时器。</li>
+</ol>
+<hr>
+<section id="系统时间" class="level2">
+<h2 class="anchored" data-anchor-id="系统时间">1. 系统时间</h2>
+<p>系统时间由定时器或计数器产生的输出脉冲触发中断而产生。</p>
+<p>简单理解：</p>
+<blockquote class="blockquote">
+<p>硬件定时器周期性地产生中断，操作系统根据这些中断维护时间。</p>
+</blockquote>
+<hr>
+</section>
+<section id="tick" class="level2">
+<h2 class="anchored" data-anchor-id="tick">2. Tick</h2>
+<p>Tick 是操作系统调度的基本时间单位。</p>
+<p>Tick 时长由：</p>
+<ul>
+<li>系统主频；</li>
+<li>每秒 Tick 数。</li>
+</ul>
+<p>共同决定。</p>
+<p>例如每秒 1000 个 Tick，则一个 Tick 是 1ms。</p>
+<p>任务延时、时间片轮转、软件定时器都依赖 Tick。</p>
+<hr>
+</section>
+<section id="软件定时器" class="level2">
+<h2 class="anchored" data-anchor-id="软件定时器">3. 软件定时器</h2>
+<p>软件定时器是以 <strong>Tick</strong> 为单位的定时器功能。</p>
+<p>当软件定时器超时时，会调用对应的超时处理函数。</p>
+<p>PPT 中提到，软件定时器的超时处理函数在系统创建的 tick 软中断中被调用。</p>
+<hr>
+</section>
+</section>
+<section id="二十一中断和硬件定时器管理" class="level1">
+<h1>二十一、中断和硬件定时器管理</h1>
+<p>LiteOS 基础内核中硬件相关部分主要是：</p>
+<ul>
+<li>中断管理；</li>
+<li>硬件定时器管理。</li>
+</ul>
+<p>中断用于响应外部事件，例如：</p>
+<ul>
+<li>串口接收；</li>
+<li>按键触发；</li>
+<li>定时器溢出；</li>
+<li>传感器报警。</li>
+</ul>
+<p>硬件定时器用于产生系统节拍、计时、定时任务等。</p>
+<hr>
+</section>
+<section id="二十二liteos-sdk-是什么" class="level1">
+<h1>二十二、LiteOS SDK 是什么？</h1>
+<p>SDK 是 Software Development Kit，软件开发工具包。</p>
+<p>LiteOS SDK 的作用是：</p>
+<blockquote class="blockquote">
+<p>帮助设备快速接入物联网平台，实现数据上报、命令接收、端云协同等功能。</p>
+</blockquote>
+<p>PPT 中提到：</p>
+<ul>
+<li>支持 TCP/IP 协议栈的设备，可以集成 Agent Lite SDK 或 Agent Tiny SDK，直接与物联网平台通信；</li>
+<li>不支持 TCP/IP 协议栈的设备，例如蓝牙设备、ZigBee 设备，需要通过网关转发数据；</li>
+<li>智能设备可以集成 LiteOS 操作系统，并利用 LiteOS SDK 与平台通信。</li>
+</ul>
+<hr>
+</section>
+<section id="二十三agent-lite-sdk-与-agent-tiny-sdk" class="level1">
+<h1>二十三、Agent Lite SDK 与 Agent Tiny SDK（🌟）</h1>
+<p>这是考试重点。</p>
+<p>PPT 中给出了二者区别。</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 62%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>SDK 类型</th>
+<th>面向设备</th>
+<th>支持协议</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Agent Lite SDK</td>
+<td>运算、存储能力较强的嵌入式设备，例如工业网关、采集器</td>
+<td>HTTPS + MQTTS</td>
+</tr>
+<tr class="even">
+<td>Agent Tiny SDK</td>
+<td>功耗、存储、计算资源受限的终端设备，例如单片机、芯片、模组</td>
+<td>LwM2M over CoAP、MQTT</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<section id="agent-lite-sdk" class="level2">
+<h2 class="anchored" data-anchor-id="agent-lite-sdk">1. Agent Lite SDK</h2>
+<p>Agent Lite SDK 面向<strong>资源较强的设备。</strong></p>
+<p>例如：</p>
+<ul>
+<li>工业网关；</li>
+<li>数据采集器；</li>
+<li>边缘网关；</li>
+<li>具备较强计算和存储能力的嵌入式设备。</li>
+</ul>
+<p>它支持 HTTPS + MQTTS，适合更复杂、更安全、更稳定的联网场景。</p>
+<hr>
+</section>
+<section id="agent-tiny-sdk" class="level2">
+<h2 class="anchored" data-anchor-id="agent-tiny-sdk">2. Agent Tiny SDK</h2>
+<p>Agent Tiny SDK 面向<strong>资源受限设备。</strong></p>
+<p>例如：</p>
+<ul>
+<li>MCU；</li>
+<li>单片机；</li>
+<li>小型通信模组；</li>
+<li>电池供电终端；</li>
+<li>简单传感器节点。</li>
+</ul>
+<p>它支持：</p>
+<ul>
+<li>LwM2M over CoAP；</li>
+<li>MQTT。</li>
+</ul>
+<p>适合低功耗、小资源、轻量级通信场景。</p>
+<hr>
+</section>
+</section>
+<section id="二十四agent-tiny-sdk-软件结构" class="level1">
+<h1>二十四、Agent Tiny SDK 软件结构</h1>
+<p>PPT 中列出 Agent Tiny SDK 的软件结构，包括：</p>
+<ol type="1">
+<li>应用编程接口；</li>
+<li>端云互通组件；</li>
+<li>物联组件；</li>
+<li>基础组件；</li>
+<li>OS 适配层；</li>
+<li>硬件平台抽象层 HAL。</li>
+</ol>
+<p>可以这样理解：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>层次</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>应用编程接口</td>
+<td>给应用程序调用</td>
+</tr>
+<tr class="even">
+<td>端云互通组件</td>
+<td>负责设备接入云平台</td>
+</tr>
+<tr class="odd">
+<td>物联组件</td>
+<td>提供物联网协议和功能</td>
+</tr>
+<tr class="even">
+<td>基础组件</td>
+<td>提供基础功能支撑</td>
+</tr>
+<tr class="odd">
+<td>OS 适配层</td>
+<td>适配不同操作系统</td>
+</tr>
+<tr class="even">
+<td>HAL</td>
+<td>屏蔽不同硬件差异</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="二十五agent-lite-sdk-软件结构" class="level1">
+<h1>二十五、Agent Lite SDK 软件结构</h1>
+<p>Agent Lite SDK 架构包括：</p>
+<ol type="1">
+<li>应用编程接口；</li>
+<li>数据上报；</li>
+<li>命令接收；</li>
+<li>回调监听；</li>
+<li>端云互通；</li>
+<li>日志收集；</li>
+<li>子设备管理；</li>
+<li>硬件平台抽象层 HAL。</li>
+</ol>
+<p>它比 Agent Tiny 更适合网关类设备，因为网关可能需要管理多个子设备。</p>
+<p>例如一个 ZigBee 网关可以接入多个 ZigBee 传感器，Agent Lite SDK 就可以帮助网关管理这些子设备并上报到云平台。</p>
+<hr>
+</section>
+<section id="二十六huawei-liteos-sdk" class="level1">
+<h1>二十六、Huawei LiteOS SDK</h1>
+<p>Huawei LiteOS SDK 是部署在资源受限终端设备上的轻量级互联互通中间件。</p>
+<p>用户只需要调用 API，就可以实现：</p>
+<ul>
+<li>设备快速接入物联网平台；</li>
+<li>数据上报；</li>
+<li>命令接收；</li>
+<li>端云协同。</li>
+</ul>
+<p>它集成了：</p>
+<ul>
+<li>MQTT；</li>
+<li>LwM2M；</li>
+<li>CoAP；</li>
+<li>mbedtls；</li>
+<li>LwIP。</li>
+</ul>
+<p>并在这些协议栈之上提供开放 API。</p>
+<hr>
+</section>
+<section id="二十七liteos-sdk-的结构" class="level1">
+<h1>二十七、LiteOS SDK 的结构</h1>
+<p>PPT 中说 LiteOS SDK 主要由三部分组成：</p>
+<ol type="1">
+<li>端云组件；</li>
+<li>LPWA 增强；</li>
+<li>IDE 集成开发环境。</li>
+</ol>
+<p>其中端云组件又分为几个层次：</p>
+<section id="开放-api-层" class="level2">
+<h2 class="anchored" data-anchor-id="开放-api-层">1. 开放 API 层</h2>
+<p>为应用程序定义通用接口。</p>
+<p>开发者可以通过 API 快速完成：</p>
+<ul>
+<li>接入 OceanConnect IoT 平台；</li>
+<li>业务数据上报；</li>
+<li>下发命令处理。</li>
+</ul>
+<hr>
+</section>
+<section id="协议层" class="level2">
+<h2 class="anchored" data-anchor-id="协议层">2. 协议层</h2>
+<p>集成多种协议：</p>
+<ul>
+<li>LwM2M；</li>
+<li>CoAP；</li>
+<li>DTLS；</li>
+<li>TLS；</li>
+<li>UDP。</li>
+</ul>
+<hr>
+</section>
+<section id="适配层" class="level2">
+<h2 class="anchored" data-anchor-id="适配层">3. 适配层</h2>
+<p>用于适配具体硬件平台。</p>
+<p>包括：</p>
+<ul>
+<li>硬件随机数；</li>
+<li>内存管理；</li>
+<li>日志；</li>
+<li>数据存储；</li>
+<li>网络 Socket；</li>
+<li>AT 命令适配。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="二十八两种应用场景" class="level1">
+<h1>二十八、两种应用场景</h1>
+<p>LiteOS SDK 针对两种场景提供不同软件架构：</p>
+<ol type="1">
+<li>单模组、单 MCU；</li>
+<li>外置 MCU + 模组。</li>
+</ol>
+<hr>
+<section id="单模组单-mcu" class="level2">
+<h2 class="anchored" data-anchor-id="单模组单-mcu">1. 单模组、单 MCU</h2>
+<p>这种场景下，设备本身具备主控和联网能力。</p>
+<p>例如某些 NB-IoT 模组内部已经有 MCU，可以直接运行应用。</p>
+<hr>
+</section>
+<section id="外置-mcu-模组" class="level2">
+<h2 class="anchored" data-anchor-id="外置-mcu-模组">2. 外置 MCU + 模组</h2>
+<p>这种场景下，外置 MCU 是主控制器，负责连接传感器和执行业务逻辑；模组负责联网。</p>
+<p>例如：</p>
+<ul>
+<li>STM32 负责采集温度；</li>
+<li>NB-IoT 模组负责上传云平台。</li>
+</ul>
+<p>这时 LiteOS SDK 端云互通组件提供 AT 命令适配层，用于解析和发送 AT 命令。</p>
+<hr>
+</section>
+</section>
+<section id="二十九sdk-源代码目录" class="level1">
+<h1>二十九、SDK 源代码目录</h1>
+<p>PPT 中介绍了一些源码目录：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>目录</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Doc</td>
+<td>存放使用文档和 API 说明</td>
+</tr>
+<tr class="even">
+<td>Drivers</td>
+<td>存放第三方 MCU 厂商 BSP 库</td>
+</tr>
+<tr class="odd">
+<td>Iot_link</td>
+<td>SDK 重要目录，包含丰富组件</td>
+</tr>
+<tr class="even">
+<td>Compression_algo</td>
+<td>存放 LZMA 压缩算法</td>
+</tr>
+<tr class="odd">
+<td>Driver</td>
+<td>存放驱动框架</td>
+</tr>
+<tr class="even">
+<td>Fs</td>
+<td>存放文件系统</td>
+</tr>
+<tr class="odd">
+<td>Inc</td>
+<td>存放内核内部头文件</td>
+</tr>
+<tr class="even">
+<td>Network</td>
+<td>存放网络适配和协议实现代码</td>
+</tr>
+</tbody>
+</table>
+<p>其中最重要的是：</p>
+<blockquote class="blockquote">
+<p>Iot_link 目录。</p>
+</blockquote>
+<p>因为它包含了 SDK 中很多核心物联网组件。</p>
+<hr>
+</section>
+<section id="三十osal-操作系统抽象层" class="level1">
+<h1>三十、OSAL 操作系统抽象层</h1>
+<p>OSAL 全称是：</p>
+<blockquote class="blockquote">
+<p>Operating System Abstract Layer，操作系统抽象层。</p>
+</blockquote>
+<p>PPT 中专门问：为什么需要 OSAL？</p>
+<p>原因是：</p>
+<blockquote class="blockquote">
+<p>SDK 可能运行在不同操作系统上，例如 LiteOS、Linux、MacOS。为了让 SDK 不依赖某一个具体操作系统，需要把操作系统相关功能抽象出来。</p>
+</blockquote>
+<p>OSAL 需要抽象的功能包括：</p>
+<ul>
+<li>任务创建；</li>
+<li>任务删除；</li>
+<li>互斥锁；</li>
+<li>信号量；</li>
+<li>内存管理；</li>
+<li>操作系统服务注册。</li>
+</ul>
+<p>这样 SDK 的上层代码不用关心底层到底是 LiteOS 还是 Linux。</p>
+<hr>
+<section id="osal-的适配方法" class="level2">
+<h2 class="anchored" data-anchor-id="osal-的适配方法">OSAL 的适配方法</h2>
+<p>PPT 中提到通过 <code>osal_install</code> 函数注册操作系统服务。</p>
+<p>结构大意是：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>name<span class="op">;</span>       <span class="co">// 操作系统名，如 linux、macos</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> tag_os_ops <span class="op">*</span>ops<span class="op">;</span>  <span class="co">// 系统功能接口</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> tag_os<span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> osal_install<span class="op">(</span><span class="dt">const</span> tag_os <span class="op">*</span>os<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>osal_install</code> 的作用是：</p>
+<blockquote class="blockquote">
+<p>向抽象层注册具体操作系统的服务接口。</p>
+</blockquote>
+<p>如果系统还没有注册，就把当前操作系统接口保存下来。</p>
+<hr>
+</section>
+</section>
+<section id="三十一什么是-liteos-移植" class="level1">
+<h1>三十一、什么是 LiteOS 移植？</h1>
+<p>移植就是：</p>
+<blockquote class="blockquote">
+<p>把 LiteOS 内核和相关配置适配到某一个具体硬件平台和工程环境中，使它能够在该硬件上正常运行。</p>
+</blockquote>
+<p>例如把 LiteOS 移植到 STM32F103C8T6 开发板上，就是让 LiteOS 能够管理 STM32 上的任务、中断、内存、时间等资源。</p>
+<hr>
+</section>
+<section id="三十二为什么要移植" class="level1">
+<h1>三十二、为什么要移植？</h1>
+<p>因为 LiteOS 虽然提供了通用内核代码，但不同硬件平台有差异：</p>
+<ul>
+<li>CPU 架构不同；</li>
+<li>中断向量不同；</li>
+<li>时钟配置不同；</li>
+<li>RAM 大小不同；</li>
+<li>启动文件不同；</li>
+<li>外设驱动不同；</li>
+<li>编译器不同。</li>
+</ul>
+<p>所以必须根据目标板进行适配。</p>
+<p>一句话：</p>
+<blockquote class="blockquote">
+<p>移植的目的，是让通用操作系统内核能够在具体硬件平台上正确运行。</p>
+</blockquote>
+<hr>
+</section>
+<section id="三十三移植前准备" class="level1">
+<h1>三十三、移植前准备</h1>
+<p>PPT 中提到移植前需要下载 LiteOS 源码。</p>
+<p>LiteOS 源码有两个版本：</p>
+<ol type="1">
+<li>develop 版本；</li>
+<li>master 版本。</li>
+</ol>
+<p>其中：</p>
+<blockquote class="blockquote">
+<p>master 版本是最稳定的发布版本，官方建议使用 master 版本。</p>
+</blockquote>
+<p>实际移植时，不需要把整个 LiteOS 源码都放进工程，否则工程代码量会太大。</p>
+<p>只需要提取核心文件夹。</p>
+<hr>
+</section>
+<section id="三十四liteos-核心源码目录" class="level1">
+<h1>三十四、LiteOS 核心源码目录</h1>
+<p>PPT 中列出了几个核心目录。</p>
+<section id="arch" class="level2">
+<h2 class="anchored" data-anchor-id="arch">1. arch</h2>
+<p><code>arch</code> 是 CPU 架构相关代码。</p>
+<p>例如 ARM Cortex-M 的：</p>
+<ul>
+<li>中断；</li>
+<li>调度；</li>
+<li>Tick；</li>
+<li>上下文切换。</li>
+</ul>
+<p>对于 STM32F103 这类 Cortex-M3 芯片，需要选择对应 cortex-m3 的架构代码。</p>
+<hr>
+</section>
+<section id="kernel" class="level2">
+<h2 class="anchored" data-anchor-id="kernel">2. kernel</h2>
+<p><code>kernel</code> 是 LiteOS 内核代码。</p>
+<p>包括：</p>
+<ul>
+<li>任务调度；</li>
+<li>队列；</li>
+<li>软件定时器；</li>
+<li>时间片；</li>
+<li>错误处理；</li>
+<li>IPC；</li>
+<li>内存管理；</li>
+<li>Tickless 等。</li>
+</ul>
+<p>这是 LiteOS 移植的核心代码。</p>
+<hr>
+</section>
+<section id="os_config" class="level2">
+<h2 class="anchored" data-anchor-id="os_config">3. OS_CONFIG</h2>
+<p><code>OS_CONFIG</code> 是内核配置文件目录。</p>
+<p>里面的 <code>target_config.h</code> 非常重要。</p>
+<p>它用于配置：</p>
+<ul>
+<li>MCU 头文件；</li>
+<li>系统时钟；</li>
+<li>Tick 数；</li>
+<li>任务数量；</li>
+<li>栈大小；</li>
+<li>信号量；</li>
+<li>互斥锁；</li>
+<li>队列；</li>
+<li>软件定时器；</li>
+<li>内存大小；</li>
+<li>是否启用某些内核功能。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="三十五liteos-移植主要步骤" class="level1">
+<h1>三十五、LiteOS 移植主要步骤</h1>
+<p>PPT 中总结了基于 STM32F103C8T6 的 LiteOS 移植过程，开发工具是 MDK5。</p>
+<p>主要步骤如下：</p>
+<ol type="1">
+<li>创建裸机工程；</li>
+<li>添加 LiteOS 内核文件；</li>
+<li>配置头文件路径；</li>
+<li>添加 OS_CONFIG；</li>
+<li>移除 SysTick 和 PendSV 中断；</li>
+<li>修改 <code>target_config.h</code>；</li>
+<li>重定向 <code>printf</code>；</li>
+<li>创建任务测试；</li>
+<li>编译下载验证。</li>
+</ol>
+<hr>
+</section>
+<section id="三十六第一步创建裸机工程" class="level1">
+<h1>三十六、第一步：创建裸机工程</h1>
+<p>PPT 示例使用 STM32F103C8T6 最小系统板。</p>
+<p>板载资源包括：</p>
+<ul>
+<li>三个 LED；</li>
+<li>一个串口。</li>
+</ul>
+<p>LED 引脚：</p>
+<ul>
+<li>PB5；</li>
+<li>PB6；</li>
+<li>PB7。</li>
+</ul>
+<p>串口：</p>
+<ul>
+<li>USART1；</li>
+<li>PA9；</li>
+<li>PA10。</li>
+</ul>
+<p>可以用 STM32CubeMX 创建工程。</p>
+<p>STM32Cube 包含两个部分：</p>
+<ol type="1">
+<li>STM32CubeMX 图形配置工具；</li>
+<li>STM32Cube HAL 库和中间件。</li>
+</ol>
+<hr>
+</section>
+<section id="三十七引脚配置" class="level1">
+<h1>三十七、引脚配置</h1>
+<p>PPT 中的引脚配置包括：</p>
+<ol type="1">
+<li>PB5、PB6、PB7 配置为推挽输出；</li>
+<li>PA9、PA10 配置为 USART1 复用功能；</li>
+<li>PA13 配置为 SWDIO；</li>
+<li>PA14 配置为 SWCLK；</li>
+<li>使能串行调试功能。</li>
+</ol>
+<p>其中 PA13 和 PA14 用于下载和调试。</p>
+<hr>
+</section>
+<section id="三十八验证裸机工程" class="level1">
+<h1>三十八、验证裸机工程</h1>
+<p>在移植 LiteOS 前，先验证裸机工程是否正常。</p>
+<p>PPT 中通过 LED 闪烁和串口输出测试。</p>
+<p>逻辑是：</p>
+<ol type="1">
+<li>点亮 LED1、LED2、LED3；</li>
+<li>延时 300ms；</li>
+<li>熄灭 LED；</li>
+<li>延时 300ms；</li>
+<li>串口输出测试信息；</li>
+<li>如果串口收到数据，则回显。</li>
+</ol>
+<p>这样做的目的是：</p>
+<blockquote class="blockquote">
+<p>先确保硬件、时钟、GPIO、串口和下载调试都正常，再开始移植 LiteOS。</p>
+</blockquote>
+<p>如果裸机工程本身不正常，后面移植 LiteOS 时很难判断问题出在哪里。</p>
+<hr>
+</section>
+<section id="三十九第二步添加-liteos-源码" class="level1">
+<h1>三十九、第二步：添加 LiteOS 源码</h1>
+<p>需要把 LiteOS 核心源码复制到裸机工程中。</p>
+<p>主要复制：</p>
+<ol type="1">
+<li><code>arch</code>；</li>
+<li><code>kernel</code>；</li>
+<li><code>OS_CONFIG</code>。</li>
+</ol>
+<p>其中：</p>
+<ul>
+<li><code>arch</code> 是 <strong>CPU 架构</strong>相关代码；</li>
+<li><code>kernel</code> 是 <strong>LiteOS 内核</strong>代码；</li>
+<li><code>OS_CONFIG</code> 是<strong>内核配置</strong>文件。</li>
+</ul>
+<hr>
+</section>
+<section id="四十第三步向-mdk-工程添加内核文件" class="level1">
+<h1>四十、第三步：向 MDK 工程添加内核文件</h1>
+<p>在 Keil MDK 中需要新建分组，例如：</p>
+<ol type="1">
+<li><code>LiteOS/Arch</code></li>
+<li><code>LiteOS/Kernel</code></li>
+<li><code>LiteOS/CMSIS</code></li>
+<li><code>LiteOS/Config</code></li>
+</ol>
+<p>然后把对应 <code>.c</code> 文件和汇编文件添加进去。</p>
+<p>PPT 中特别提醒：</p>
+<blockquote class="blockquote">
+<p>添加 <code>los_dispatch_keil.S</code> 汇编文件时，需要选择文件类型为 All files。</p>
+</blockquote>
+<p>因为 <code>.S</code> 文件默认可能不会显示。</p>
+<hr>
+</section>
+<section id="四十一需要添加的主要源码" class="level1">
+<h1>四十一、需要添加的主要源码</h1>
+<p>根据 PPT，主要包括：</p>
+<section id="liteoscmsis" class="level2">
+<h2 class="anchored" data-anchor-id="liteoscmsis">LiteOS/cmsis</h2>
+<ul>
+<li><code>cmsis_liteos.c</code></li>
+</ul>
+</section>
+<section id="liteoskernel" class="level2">
+<h2 class="anchored" data-anchor-id="liteoskernel">LiteOS/kernel</h2>
+<p>包括多个目录下的 <code>.c</code> 文件，例如：</p>
+<ul>
+<li><code>kernel/base/core</code></li>
+<li><code>kernel/base/ipc</code></li>
+<li><code>kernel/base/mem</code></li>
+<li><code>kernel/base/misc</code></li>
+<li><code>kernel/base/om</code></li>
+<li><code>kernel/extended/tickless</code></li>
+<li><code>kernel/los_init.c</code></li>
+</ul>
+</section>
+<section id="liteosarch" class="level2">
+<h2 class="anchored" data-anchor-id="liteosarch">LiteOS/arch</h2>
+<p>包括：</p>
+<ul>
+<li><code>arch/arm/arm-m/src</code> 下的 <code>.c</code> 文件；</li>
+<li><code>los_dispatch_keil.S</code>。</li>
+</ul>
+</section>
+<section id="liteosconfig" class="level2">
+<h2 class="anchored" data-anchor-id="liteosconfig">LiteOS/config</h2>
+<p>包括：</p>
+<ul>
+<li><code>target_config.h</code></li>
+<li><code>los_builddef.h</code></li>
+<li><code>los_printf.h</code></li>
+</ul>
+<p>其中最关键的是 <code>target_config.h</code>。</p>
+<hr>
+</section>
+</section>
+<section id="四十二第四步配置头文件路径" class="level1">
+<h1>四十二、第四步：配置头文件路径</h1>
+<p>如果只添加源码文件，但没有配置头文件路径，编译会报错。</p>
+<p>PPT 中提到需要添加的头文件路径包括：</p>
+<ol type="1">
+<li><code>arch/arm/arm-m/include</code></li>
+<li><code>kernel/include</code></li>
+<li><code>kernel/base/include</code></li>
+<li><code>kernel/extended/include</code></li>
+<li><code>OS_CONFIG</code></li>
+<li><code>Libraries/CMSIS/Include</code></li>
+</ol>
+<p>这一步非常重要。</p>
+<p>考试如果问移植流程，必须提到：</p>
+<blockquote class="blockquote">
+<p>添加源码后，需要在工程配置中添加 LiteOS 相关头文件路径。</p>
+</blockquote>
+<hr>
+</section>
+<section id="四十三第五步移除-systick-和-pendsv-中断" class="level1">
+<h1>四十三、第五步：移除 SysTick 和 PendSV 中断</h1>
+<p>PPT 中要求打开 <code>stm32f1xx_it.c</code>，找到：</p>
+<ul>
+<li><code>SysTick_Handler</code></li>
+<li><code>PendSV_Handler</code></li>
+</ul>
+<p>然后屏蔽掉这两个中断处理函数。</p>
+<p>原因是：</p>
+<blockquote class="blockquote">
+<p>LiteOS 内核会使用 SysTick 作为系统节拍，并使用 PendSV 进行任务切换。如果裸机工程中已经定义了这些中断函数，就可能与 LiteOS 的实现冲突，导致编译错误或运行异常（避免与原工程中断处理函数冲突）。</p>
+</blockquote>
+<p>可以这样背：</p>
+<blockquote class="blockquote">
+<p>SysTick 负责系统 Tick，PendSV 负责任务切换，移植 LiteOS 时需要避免与原工程中断处理函数冲突。</p>
+</blockquote>
+<hr>
+</section>
+<section id="四十四第六步修改-target_config.h" class="level1">
+<h1>四十四、第六步：修改 target_config.h</h1>
+<p><code>target_config.h</code> 是 LiteOS 移植中最重要的配置文件。</p>
+<p>它主要配置：</p>
+<ul>
+<li>MCU 驱动头文件；</li>
+<li>系统时钟；</li>
+<li>Tick；</li>
+<li>中断；</li>
+<li>任务；</li>
+<li>信号量；</li>
+<li>互斥锁；</li>
+<li>队列；</li>
+<li>软件定时器；</li>
+<li>内存；</li>
+<li>CMSIS；</li>
+<li>异常；</li>
+<li>Tickless；</li>
+<li>Runstop；</li>
+<li>Track。</li>
+</ul>
+<hr>
+<section id="修改-mcu-头文件" class="level2">
+<h2 class="anchored" data-anchor-id="修改-mcu-头文件">1. 修改 MCU 头文件</h2>
+<p>例如 STM32F103 需要包含对应头文件：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"stm32f10x.h"</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>如果使用 STM32F4，可能需要：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"stm32f4xx.h"</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>这一项必须和具体芯片型号匹配。</p>
+<hr>
+</section>
+<section id="修改-sram-大小" class="level2">
+<h2 class="anchored" data-anchor-id="修改-sram-大小">2. 修改 SRAM 大小</h2>
+<p>PPT 中示例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define BOARD_SRAM_START_ADDR    </span><span class="bn">0x20000000</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define BOARD_SRAM_SIZE_KB       </span><span class="dv">40</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define BOARD_SRAM_END_ADDR      </span><span class="op">(</span><span class="pp">BOARD_SRAM_START_ADDR </span><span class="op">+</span><span class="pp"> </span><span class="dv">1024</span><span class="pp"> </span><span class="op">*</span><span class="pp"> BOARD_SRAM_SIZE_KB</span><span class="op">)</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>这里要根据芯片实际 SRAM 大小修改。</p>
+<p>例如 STM32F103C8T6 常见 SRAM 是 20KB，而 PPT 中某些例子可能是 40KB，所以实际移植时要看具体芯片。</p>
+<p>如果 SRAM 配置错误，可能导致：</p>
+<ul>
+<li>内存越界；</li>
+<li>系统启动失败；</li>
+<li>任务创建失败；</li>
+<li>程序异常跑飞。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="四十五target_config.h-中的重要配置" class="level1">
+<h1>四十五、target_config.h 中的重要配置</h1>
+<p>下面按模块讲解。</p>
+<hr>
+<section id="系统时钟配置" class="level2">
+<h2 class="anchored" data-anchor-id="系统时钟配置">1. 系统时钟配置</h2>
+<p>主要宏包括：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define OS_SYS_CLOCK </span><span class="op">(</span><span class="pp">SystemCoreClock</span><span class="op">)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_BASE_CORE_TICK_PER_SECOND </span><span class="op">(</span><span class="dv">1000</span><span class="bu">UL</span><span class="op">)</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>含义：</p>
+<ul>
+<li><code>OS_SYS_CLOCK</code>：系统时钟；</li>
+<li><code>LOSCFG_BASE_CORE_TICK_PER_SECOND</code>：每秒 Tick 数。</li>
+</ul>
+<p>如果每秒 1000 个 Tick，则 1 个 Tick 是 1ms。</p>
+<hr>
+</section>
+<section id="tickless-低功耗功能配置" class="level2">
+<h2 class="anchored" data-anchor-id="tickless-低功耗功能配置">2. Tickless （低功耗功能）配置</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_KERNEL_TICKLESS NO</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Tickless 是低功耗功能。</p>
+<p>开启后，系统空闲时可以关闭 SysTick 并进入睡眠状态，以降低功耗。</p>
+<p>初学者移植时一般先设为 <code>NO</code>，保证系统稳定运行。</p>
+<hr>
+</section>
+<section id="硬件中断配置" class="level2">
+<h2 class="anchored" data-anchor-id="硬件中断配置">3. 硬件中断配置</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_PLATFORM_HWI NO</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_PLATFORM_HWI_LIMIT </span><span class="dv">96</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>其中：</p>
+<ul>
+<li><code>LOSCFG_PLATFORM_HWI</code> 表示 LiteOS 是否接管外部硬件中断；</li>
+<li>一般建议设置为 <code>NO</code>，也就是非接管中断方式；</li>
+<li><code>LOSCFG_PLATFORM_HWI_LIMIT</code> 表示支持的最大外部中断数。</li>
+</ul>
+<p>PPT 中也提到：</p>
+<blockquote class="blockquote">
+<p>非接管中断方式更简单，更适合初学者学习。</p>
+</blockquote>
+<hr>
+</section>
+<section id="任务模块配置" class="level2">
+<h2 class="anchored" data-anchor-id="任务模块配置">4. 任务模块配置</h2>
+<p>任务模块配置包括：</p>
+<ul>
+<li>默认任务优先级；</li>
+<li>最大任务数量；</li>
+<li>空闲任务栈大小；</li>
+<li>默认任务栈大小；</li>
+<li>最小任务栈大小；</li>
+<li>是否开启时间片；</li>
+<li>同优先级任务时间片长度；</li>
+<li>最高优先级；</li>
+<li>最低优先级。</li>
+</ul>
+<p>重点：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_BASE_CORE_TSK_DEFAULT_PRIO </span><span class="dv">10</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_BASE_CORE_TSK_LIMIT </span><span class="dv">15</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_BASE_CORE_TIMESLICE YES</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOS_TASK_PRIORITY_HIGHEST </span><span class="dv">0</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOS_TASK_PRIORITY_LOWEST </span><span class="dv">31</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>LiteOS 中：</p>
+<blockquote class="blockquote">
+<p>优先级数值越小，优先级越高。</p>
+</blockquote>
+<p>也就是说：</p>
+<ul>
+<li>0 是最高优先级；</li>
+<li>31 是较低优先级。</li>
+</ul>
+<hr>
+</section>
+<section id="信号量配置" class="level2">
+<h2 class="anchored" data-anchor-id="信号量配置">5. 信号量配置</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_BASE_IPC_SEM YES</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_BASE_IPC_SEM_LIMIT </span><span class="dv">20</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>信号量可以用于：</p>
+<ul>
+<li>任务间同步；</li>
+<li>任务与中断间同步；</li>
+<li>资源计数。</li>
+</ul>
+<hr>
+</section>
+<section id="互斥锁配置" class="level2">
+<h2 class="anchored" data-anchor-id="互斥锁配置">6. 互斥锁配置</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_BASE_IPC_MUX YES</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_BASE_IPC_MUX_LIMIT </span><span class="dv">15</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>互斥锁用于保护临界资源。</strong></p>
+<p>PPT 中提到，LiteOS 互斥锁具有优先级继承机制。</p>
+<p>优先级继承可以缓解优先级反转问题。</p>
+<hr>
+</section>
+<section id="队列配置" class="level2">
+<h2 class="anchored" data-anchor-id="队列配置">7. 队列配置</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_BASE_IPC_QUEUE YES</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_BASE_IPC_QUEUE_LIMIT </span><span class="dv">10</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>消息队列用于任务之间或任务与中断之间传递数据。</p>
+<p>特点：</p>
+<ul>
+<li>可以存储有限数量的数据；</li>
+<li>数据大小固定；</li>
+<li>适合异步通信。</li>
+</ul>
+<hr>
+</section>
+<section id="软件定时器配置" class="level2">
+<h2 class="anchored" data-anchor-id="软件定时器配置">8. 软件定时器配置</h2>
+<p>软件定时器依赖<strong>消息队列。</strong></p>
+<p>常见配置包括：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_BASE_CORE_SWTMR YES</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_BASE_CORE_SWTMR_LIMIT </span><span class="dv">16</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>含义：</p>
+<ul>
+<li>是否启用软件定时器；</li>
+<li>最大支持的软件定时器数量。</li>
+</ul>
+<p>软件定时器用于定时执行某些回调函数。</p>
+<hr>
+</section>
+<section id="内存模块配置" class="level2">
+<h2 class="anchored" data-anchor-id="内存模块配置">9. 内存模块配置</h2>
+<p>内存配置包括：</p>
+<ul>
+<li>系统内存起始地址；</li>
+<li>系统内存结束地址；</li>
+<li>系统内存大小；</li>
+<li>内存节点完整性检查；</li>
+<li>内存节点大小检查；</li>
+<li>bestfit 算法；</li>
+<li>多内存池检查；</li>
+<li>SLAB 分配机制。</li>
+</ul>
+<p>重点理解：</p>
+<blockquote class="blockquote">
+<p>LiteOS 需要知道自己可以管理哪一段 RAM，所以必须正确配置内存起始地址和大小。</p>
+</blockquote>
+<hr>
+</section>
+<section id="cmsis-配置" class="level2">
+<h2 class="anchored" data-anchor-id="cmsis-配置">10. CMSIS 配置</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LOSCFG_COMPAT_CMSIS_FW YES</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CMSIS_OS_VER </span><span class="dv">2</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>表示 LiteOS 对 CMSIS OS 接口的兼容配置。</p>
+<p>如果 <code>CMSIS_OS_VER</code> 是 2，则使用 CMSIS-RTOS2 相关接口。</p>
+<hr>
+</section>
+<section id="异常配置runstoptrack" class="level2">
+<h2 class="anchored" data-anchor-id="异常配置runstoptrack">11. 异常配置、Runstop、Track</h2>
+<p>这些属于扩展或调试相关功能。</p>
+<p>例如：</p>
+<ul>
+<li>异常模块；</li>
+<li>运行停止机制；</li>
+<li>跟踪模块。</li>
+</ul>
+<p>初学移植时通常可以关闭，减少复杂度。</p>
+<hr>
+</section>
+</section>
+<section id="四十六第七步创建任务测试" class="level1">
+<h1>四十六、第七步：创建任务测试</h1>
+<p>PPT 中示例是创建两个任务：</p>
+<ol type="1">
+<li>一个任务每 2 秒控制 LED1；</li>
+<li>另一个任务每 400ms 控制 LED2。</li>
+</ol>
+<p>这样可以验证 LiteOS 的任务调度是否正常。</p>
+<p>如果两个 LED 按不同周期闪烁，就说明：</p>
+<ul>
+<li>LiteOS 内核启动成功；</li>
+<li>任务创建成功；</li>
+<li>调度器运行正常；</li>
+<li>Tick 正常；</li>
+<li>延时函数正常。</li>
+</ul>
+<p>这一步非常关键。</p>
+<hr>
+</section>
+<section id="四十七liteos-启动流程" class="level1">
+<h1>四十七、LiteOS 启动流程</h1>
+<p>PPT 习题中问到 “LiteOS 是如何启动的”。</p>
+<p>可以按嵌入式 RTOS 的一般流程回答：</p>
+<ol type="1">
+<li>芯片上电复位；</li>
+<li>执行启动文件；</li>
+<li>初始化堆栈和中断向量表；</li>
+<li>调用系统初始化函数，例如 <code>SystemInit</code>；</li>
+<li>进入 <code>main</code> 函数；</li>
+<li>初始化硬件外设；</li>
+<li>调用 LiteOS 内核初始化函数；</li>
+<li>创建用户任务；</li>
+<li>调用 <code>LOS_Start()</code> 启动调度；</li>
+<li>系统进入多任务运行状态。</li>
+</ol>
+<p>可以简化背成：</p>
+<blockquote class="blockquote">
+<p>上电复位 → 硬件初始化 → 内核初始化 → 创建任务 → 启动调度器 → 多任务运行。</p>
+</blockquote>
+<hr>
+</section>
+<section id="四十八liteos-任务切换" class="level1">
+<h1>四十八、LiteOS 任务切换</h1>
+<p>PPT 习题中还问到 “LiteOS 的任务是如何切换的”。</p>
+<p>LiteOS 任务切换主要依赖：</p>
+<ul>
+<li>SysTick；</li>
+<li>PendSV；</li>
+<li>调度器；</li>
+<li>上下文保存和恢复。</li>
+</ul>
+<p>简单过程：</p>
+<ol type="1">
+<li>SysTick 周期性产生系统节拍；</li>
+<li>调度器判断是否需要任务切换；</li>
+<li>如果需要切换，触发 PendSV；</li>
+<li>PendSV 保存当前任务上下文；</li>
+<li>选择下一个任务；</li>
+<li>恢复下一个任务上下文；</li>
+<li>CPU 开始执行新任务。</li>
+</ol>
+<p>可以背成：</p>
+<blockquote class="blockquote">
+<p>SysTick 触发调度时机，PendSV 完成上下文切换。</p>
+</blockquote>
+<hr>
+</section>
+<section id="四十九liteos-任务状态" class="level1">
+<h1>四十九、LiteOS 任务状态</h1>
+<p>虽然 PPT 当前内容没有详细展开任务状态图，但复习时建议掌握常见 RTOS 任务状态：</p>
+<ol type="1">
+<li>就绪态；</li>
+<li>运行态；</li>
+<li>阻塞态；</li>
+<li>挂起态；</li>
+<li>退出态或删除态。</li>
+</ol>
+<hr>
+<section id="就绪态" class="level2">
+<h2 class="anchored" data-anchor-id="就绪态">1. 就绪态</h2>
+<p>任务已经具备运行条件，等待 CPU 调度。</p>
+</section>
+<section id="运行态" class="level2">
+<h2 class="anchored" data-anchor-id="运行态">2. 运行态</h2>
+<p>任务正在占用 CPU 执行。</p>
+</section>
+<section id="阻塞态" class="level2">
+<h2 class="anchored" data-anchor-id="阻塞态">3. 阻塞态</h2>
+<p>任务等待某个事件，例如：</p>
+<ul>
+<li>等待信号量；</li>
+<li>等待消息队列；</li>
+<li>延时未到；</li>
+<li>等待互斥锁。</li>
+</ul>
+</section>
+<section id="挂起态" class="level2">
+<h2 class="anchored" data-anchor-id="挂起态">4. 挂起态</h2>
+<p>任务被主动挂起，暂时不参与调度。</p>
+</section>
+<section id="删除态" class="level2">
+<h2 class="anchored" data-anchor-id="删除态">5. 删除态</h2>
+<p>任务被删除，资源被释放。</p>
+<hr>
+</section>
+</section>
+<section id="五十本章重点背诵版" class="level1">
+<h1>五十、本章重点背诵版</h1>
+<p>下面这部分适合考前直接背。</p>
+<hr>
+<section id="liteos-简介" class="level2">
+<h2 class="anchored" data-anchor-id="liteos-简介">1. LiteOS 简介</h2>
+<p>Huawei LiteOS 是华为面向物联网领域推出的轻量级物联网操作系统，具有轻量级、低功耗、互联互通、组件丰富、快速开发、可裁剪、快速启动等特点，可应用于可穿戴设备、智能家居、车联网、智慧城市和制造业等领域。</p>
+<hr>
+</section>
+<section id="liteos-的-1n-架构" class="level2">
+<h2 class="anchored" data-anchor-id="liteos-的-1n-架构">2. LiteOS 的 “1+N” 架构</h2>
+<p>LiteOS 采用 “1+N” 架构。“1” 指 LiteOS 内核，包括基础内核和扩展内核，负责系统资源管理；“N” 指多个中间件和功能框架，包括互联互通框架、传感器框架、安全框架、JavaScript 框架、运行引擎、低功耗框架、SOTA 远程升级和轻量级 AI 框架等。</p>
+<hr>
+</section>
+<section id="liteos-内核层次" class="level2">
+<h2 class="anchored" data-anchor-id="liteos-内核层次">3. LiteOS 内核层次</h2>
+<p>LiteOS 内核分为基础内核和扩展内核。基础内核提供 RTOS 特性，包括任务调度、内存管理、中断机制、队列管理、事件管理、IPC 机制、时间管理、软件定时器和双向链表等；扩展内核提供运行-暂停机制和动态框架等能力。</p>
+<hr>
+</section>
+<section id="liteos-基础内核子系统" class="level2">
+<h2 class="anchored" data-anchor-id="liteos-基础内核子系统">4. LiteOS 基础内核子系统</h2>
+<p>LiteOS 基础内核主要包括：</p>
+<ol type="1">
+<li>任务管理；</li>
+<li>内存管理；</li>
+<li>任务同步；</li>
+<li>任务间通信；</li>
+<li>时间管理；</li>
+<li>中断和硬件定时器管理。</li>
+</ol>
+<hr>
+</section>
+<section id="任务管理模块功能" class="level2">
+<h2 class="anchored" data-anchor-id="任务管理模块功能">5. 任务管理模块功能</h2>
+<p>任务管理模块负责 CPU 资源调度，提供任务创建、删除、延迟、挂起、恢复、锁定调度和解锁调度等功能。LiteOS 认为一个任务就是一个线程，支持优先级抢占调度和同优先级时间片轮转调度。</p>
+<hr>
+</section>
+<section id="静态内存与动态内存区别" class="level2">
+<h2 class="anchored" data-anchor-id="静态内存与动态内存区别">6. 静态内存与动态内存区别</h2>
+<p>静态内存管理在系统运行前或初始化时确定内存分配，分配速度快、确定性强、不易产生碎片，但灵活性较差；动态内存管理允许程序运行时申请和释放内存，灵活性高，但可能产生内存碎片。LiteOS 支持 BOX、SLAB、DLINK 等内存管理算法。</p>
+<hr>
+</section>
+<section id="liteos-sdk-作用" class="level2">
+<h2 class="anchored" data-anchor-id="liteos-sdk-作用">7. LiteOS SDK 作用</h2>
+<p>LiteOS SDK 是部署在物联网终端设备上的轻量级互联互通中间件，集成 MQTT、LwM2M、CoAP、mbedtls、LwIP 等协议栈，提供开放 API，帮助设备快速接入物联网平台，实现数据上报和命令接收。</p>
+<hr>
+</section>
+<section id="agent-lite-sdk-与-agent-tiny-sdk-区别" class="level2">
+<h2 class="anchored" data-anchor-id="agent-lite-sdk-与-agent-tiny-sdk-区别">8. Agent Lite SDK 与 Agent Tiny SDK 区别</h2>
+<p>Agent Lite SDK 面向计算和存储能力较强的嵌入式设备，如工业网关、采集器，支持 HTTPS 和 MQTTS；Agent Tiny SDK 面向功耗、存储、计算资源受限的终端设备，如单片机、芯片和模组，支持 LwM2M over CoAP 和 MQTT。</p>
+<hr>
+</section>
+<section id="osal-作用" class="level2">
+<h2 class="anchored" data-anchor-id="osal-作用">9. OSAL 作用</h2>
+<p>OSAL 是操作系统抽象层，用于屏蔽不同操作系统之间的差异。它将任务创建、任务删除、互斥锁、信号量、内存管理等操作系统相关接口抽象出来，使 SDK 可以运行在 LiteOS、Linux、MacOS 等不同系统上。</p>
+<hr>
+</section>
+<section id="liteos-移植流程" class="level2">
+<h2 class="anchored" data-anchor-id="liteos-移植流程">10. LiteOS 移植流程</h2>
+<p>LiteOS 移植到 STM32 的主要流程包括：</p>
+<ol type="1">
+<li>创建并验证 STM32 裸机工程；</li>
+<li>下载 LiteOS 源码；</li>
+<li>提取并复制 <code>arch</code>、<code>kernel</code>、<code>OS_CONFIG</code> 等核心目录；</li>
+<li>在 MDK 中添加 LiteOS 源码文件；</li>
+<li>配置头文件路径；</li>
+<li>屏蔽原工程中的 SysTick 和 PendSV 中断处理函数；</li>
+<li>修改 <code>target_config.h</code>，配置 MCU 头文件、系统时钟、RAM 大小和内核功能；</li>
+<li>重定向 <code>printf</code>；</li>
+<li>创建任务进行测试；</li>
+<li>编译下载并验证运行结果。</li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="五十一考试可能这样问" class="level1">
+<h1>五十一、考试可能这样问</h1>
+<section id="题目1liteos-内核可分为哪些层次" class="level2">
+<h2 class="anchored" data-anchor-id="题目1liteos-内核可分为哪些层次">题目1：LiteOS 内核可分为哪些层次？</h2>
+<p>答：</p>
+<p>LiteOS 内核可分为基础内核和扩展内核两个层次。基础内核为终端设备提供 RTOS 特性，包括任务调度、内存管理、中断机制、队列管理、事件管理、IPC 机制、时间管理、软件定时器等功能；扩展内核提供运行-暂停机制和动态框架等扩展能力。</p>
+<hr>
+</section>
+<section id="题目2liteos-与-liteos-sdk-有何关系" class="level2">
+<h2 class="anchored" data-anchor-id="题目2liteos-与-liteos-sdk-有何关系">题目2：LiteOS 与 LiteOS SDK 有何关系？</h2>
+<p>答：</p>
+<p>LiteOS 是面向物联网设备的轻量级操作系统，主要提供内核调度、内存管理、中断管理、时间管理等系统能力。LiteOS SDK 是运行在设备端的轻量级互联互通中间件，集成 MQTT、LwM2M、CoAP、mbedtls、LwIP 等协议栈，并提供开放 API，用于设备快速接入物联网平台、数据上报和命令接收。二者关系是：LiteOS 提供系统运行基础，LiteOS SDK 提供端云通信和物联网业务接入能力。</p>
+<hr>
+</section>
+<section id="题目3liteos-是如何启动的" class="level2">
+<h2 class="anchored" data-anchor-id="题目3liteos-是如何启动的">题目3：LiteOS 是如何启动的？</h2>
+<p>答：</p>
+<p>LiteOS 启动一般包括上电复位、启动文件初始化、系统时钟和硬件初始化、进入 main 函数、LiteOS 内核初始化、创建用户任务、调用调度启动函数、进入多任务调度运行状态。可以概括为：上电复位 → 硬件初始化 → 内核初始化 → 创建任务 → 启动调度器 → 多任务运行。</p>
+<hr>
+</section>
+<section id="题目4huawei-liteos-sdk-是如何分类的" class="level2">
+<h2 class="anchored" data-anchor-id="题目4huawei-liteos-sdk-是如何分类的">题目4：Huawei LiteOS SDK 是如何分类的？</h2>
+<p>答：</p>
+<p>Huawei LiteOS SDK 主要包括 Agent Lite SDK 和 Agent Tiny SDK。Agent Lite SDK 面向运算和存储能力较强的嵌入式设备，如工业网关、采集器等，支持 HTTPS 和 MQTTS；Agent Tiny SDK 面向功耗、存储和计算资源受限的终端设备，如单片机、芯片和模组，支持 LwM2M over CoAP 和 MQTT。</p>
+<hr>
+</section>
+<section id="题目5liteos-的任务是如何切换的" class="level2">
+<h2 class="anchored" data-anchor-id="题目5liteos-的任务是如何切换的">题目5：LiteOS 的任务是如何切换的？</h2>
+<p>答：</p>
+<p>LiteOS 支持基于优先级的抢占调度和同优先级时间片轮转调度。系统通过 SysTick 产生周期性节拍，调度器根据任务优先级和状态判断是否需要切换任务。当需要任务切换时，通常通过 PendSV 异常完成上下文保存和恢复，从而从当前任务切换到下一个任务。</p>
+<hr>
+</section>
+<section id="题目6任务管理模块主要具有哪些功能" class="level2">
+<h2 class="anchored" data-anchor-id="题目6任务管理模块主要具有哪些功能">题目6：任务管理模块主要具有哪些功能？</h2>
+<p>答：</p>
+<p>LiteOS 任务管理模块主要负责 CPU 资源调度，提供任务创建、删除、延迟、挂起、恢复、锁定调度和解锁调度等功能。LiteOS 中一个任务就是一个线程，系统支持优先级抢占调度和同优先级时间片轮转调度。</p>
+<hr>
+</section>
+<section id="题目7静态内存管理和动态内存管理有何区别liteos-各自采用哪些算法" class="level2">
+<h2 class="anchored" data-anchor-id="题目7静态内存管理和动态内存管理有何区别liteos-各自采用哪些算法">题目7：静态内存管理和动态内存管理有何区别？LiteOS 各自采用哪些算法？</h2>
+<p>答：</p>
+<p>静态内存管理是在系统初始化或运行前确定内存分配，具有分配速度快、确定性强、不易产生碎片等特点，但灵活性较差；动态内存管理是在程序运行过程中按需申请和释放内存，灵活性较高，但可能产生内存碎片。LiteOS 支持固定大小 BOX 算法、动态申请 SLAB 算法和 DLINK 算法，并提供内存统计和越界检测功能。</p>
+<hr>
+</section>
+<section id="题目8liteos-移植需要哪些软硬件条件" class="level2">
+<h2 class="anchored" data-anchor-id="题目8liteos-移植需要哪些软硬件条件">题目8：LiteOS 移植需要哪些软硬件条件？</h2>
+<p>答：</p>
+<p>LiteOS 移植一般需要具备目标硬件平台，例如 STM32 开发板；开发工具，例如 Keil MDK5 或 STM32CubeMX；LiteOS 源码；目标芯片对应的启动文件、CMSIS 文件和 HAL 或标准外设库；串口调试工具；下载调试器，如 ST-Link。软件上需要配置 LiteOS 内核源码、头文件路径、<code>target_config.h</code>、中断函数和任务测试程序。</p>
+<hr>
+</section>
+</section>
+<section id="五十二本章一句话总结" class="level1">
+<h1>五十二、本章一句话总结</h1>
+<p>这一章可以这样总结：</p>
+<blockquote class="blockquote">
+<p>LiteOS 是华为面向物联网设备推出的轻量级操作系统，采用“1+N”架构，以基础内核和扩展内核提供任务调度、内存管理、中断和时间管理等 RTOS 能力，并通过 SDK、互联互通、安全、传感器、低功耗和远程升级等组件支持物联网端云协同；LiteOS 移植的关键在于添加内核源码、配置头文件和 <code>target_config.h</code>，并让系统正确接管 Tick、调度和任务运行。</p>
+</blockquote>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

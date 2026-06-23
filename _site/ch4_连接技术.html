@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-Hans" xml:lang="zh-Hans"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第4章 连接技术 – 物联网终端操作系统笔记</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-1b8143a5af30aa0587ead8c64582f750.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">物联网终端操作系统笔记</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
+<span class="menu-text">首页</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/hugswangyu/iot-os-notes"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="展开或折叠侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch1_物联网及嵌入式概述.html">课程笔记</a></li><li class="breadcrumb-item"><a href="./ch4_连接技术.html">Ch4 连接技术</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="展开或折叠侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="搜索" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="搜索"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">首页</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">课程笔记</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="展开或折叠此栏">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch1_物联网及嵌入式概述.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch1 物联网及嵌入式概述</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch2_ch3_物联网操作系统的关键技术.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch2-3 物联网操作系统的关键技术</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch4_连接技术.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Ch4 连接技术</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch5_连接与协议.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch5 连接与协议</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch6_LiteOS操作系统及其移植.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch6 LiteOS 操作系统及其移植</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch7_任务.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch7 任务</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch8_信号量与互斥锁.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch8 信号量与互斥锁</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch9_消息队列_事件与软件定时器.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch9 消息队列、事件与软件定时器</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch10_内存管理与中断管理.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch10 内存管理与中断管理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch11_物联网操作系统的应用案例.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch11 物联网操作系统的应用案例</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">本页目录</h2>
+   
+  <ul>
+  <li><a href="#一本章总体框架" id="toc-一本章总体框架" class="nav-link active" data-scroll-target="#一本章总体框架">一、本章总体框架</a></li>
+  <li><a href="#二为什么物联网需要连接技术" id="toc-二为什么物联网需要连接技术" class="nav-link" data-scroll-target="#二为什么物联网需要连接技术">二、为什么物联网需要“连接技术”？</a></li>
+  <li><a href="#三物联网通信环境的特点" id="toc-三物联网通信环境的特点" class="nav-link" data-scroll-target="#三物联网通信环境的特点">三、物联网通信环境的特点</a></li>
+  <li><a href="#四华为物联网平台支持的主要协议" id="toc-四华为物联网平台支持的主要协议" class="nav-link" data-scroll-target="#四华为物联网平台支持的主要协议">四、华为物联网平台支持的主要协议</a>
+  <ul class="collapse">
+  <li><a href="#lwm2m" id="toc-lwm2m" class="nav-link" data-scroll-target="#lwm2m">1. LwM2M</a></li>
+  <li><a href="#coap" id="toc-coap" class="nav-link" data-scroll-target="#coap">2. CoAP</a></li>
+  <li><a href="#mqtt" id="toc-mqtt" class="nav-link" data-scroll-target="#mqtt">3. MQTT</a></li>
+  </ul></li>
+  <li><a href="#五nb-iot-是什么" id="toc-五nb-iot-是什么" class="nav-link" data-scroll-target="#五nb-iot-是什么">五、NB-IoT 是什么？</a></li>
+  <li><a href="#六nb-iot-的技术特点" id="toc-六nb-iot-的技术特点" class="nav-link" data-scroll-target="#六nb-iot-的技术特点">六、NB-IoT 的技术特点</a>
+  <ul class="collapse">
+  <li><a href="#网络覆盖强" id="toc-网络覆盖强" class="nav-link" data-scroll-target="#网络覆盖强">1. 网络覆盖强</a></li>
+  <li><a href="#低功耗运行" id="toc-低功耗运行" class="nav-link" data-scroll-target="#低功耗运行">2. 低功耗运行</a>
+  <ul class="collapse">
+  <li><a href="#psm" id="toc-psm" class="nav-link" data-scroll-target="#psm">PSM</a></li>
+  <li><a href="#edrx" id="toc-edrx" class="nav-link" data-scroll-target="#edrx">eDRX</a></li>
+  </ul></li>
+  <li><a href="#低成本" id="toc-低成本" class="nav-link" data-scroll-target="#低成本">3. 低成本</a></li>
+  <li><a href="#容量大" id="toc-容量大" class="nav-link" data-scroll-target="#容量大">4. 容量大</a></li>
+  </ul></li>
+  <li><a href="#七nb-iot-网络架构" id="toc-七nb-iot-网络架构" class="nav-link" data-scroll-target="#七nb-iot-网络架构">七、NB-IoT 网络架构</a>
+  <ul class="collapse">
+  <li><a href="#ue-终端" id="toc-ue-终端" class="nav-link" data-scroll-target="#ue-终端">1. UE 终端</a></li>
+  <li><a href="#无线网侧" id="toc-无线网侧" class="nav-link" data-scroll-target="#无线网侧">2. 无线网侧</a></li>
+  <li><a href="#核心网" id="toc-核心网" class="nav-link" data-scroll-target="#核心网">3. 核心网</a></li>
+  <li><a href="#物联网平台" id="toc-物联网平台" class="nav-link" data-scroll-target="#物联网平台">4. 物联网平台</a></li>
+  <li><a href="#应用服务器" id="toc-应用服务器" class="nav-link" data-scroll-target="#应用服务器">5. 应用服务器</a></li>
+  </ul></li>
+  <li><a href="#八nb-iot-网络结构中的关键网元" id="toc-八nb-iot-网络结构中的关键网元" class="nav-link" data-scroll-target="#八nb-iot-网络结构中的关键网元">八、NB-IoT 网络结构中的关键网元</a>
+  <ul class="collapse">
+  <li><a href="#mme移动管理节点" id="toc-mme移动管理节点" class="nav-link" data-scroll-target="#mme移动管理节点">1. MME（移动管理节点）</a></li>
+  <li><a href="#scef服务能力开放平台" id="toc-scef服务能力开放平台" class="nav-link" data-scroll-target="#scef服务能力开放平台">2. SCEF（服务能力开放平台）</a></li>
+  <li><a href="#s-gw服务网关" id="toc-s-gw服务网关" class="nav-link" data-scroll-target="#s-gw服务网关">3. S-GW（服务网关）</a></li>
+  <li><a href="#p-gwpdn-网关" id="toc-p-gwpdn-网关" class="nav-link" data-scroll-target="#p-gwpdn-网关">4. P-GW（PDN 网关）</a></li>
+  <li><a href="#x2-接口" id="toc-x2-接口" class="nav-link" data-scroll-target="#x2-接口">5. X2 接口</a></li>
+  <li><a href="#s1-接口" id="toc-s1-接口" class="nav-link" data-scroll-target="#s1-接口">6. S1 接口</a></li>
+  </ul></li>
+  <li><a href="#九nb-iot-的传输方式" id="toc-九nb-iot-的传输方式" class="nav-link" data-scroll-target="#九nb-iot-的传输方式">九、NB-IoT 的传输方式</a>
+  <ul class="collapse">
+  <li><a href="#控制侧传输优化" id="toc-控制侧传输优化" class="nav-link" data-scroll-target="#控制侧传输优化">1. 控制侧传输优化</a></li>
+  <li><a href="#用户侧传输优化" id="toc-用户侧传输优化" class="nav-link" data-scroll-target="#用户侧传输优化">2. 用户侧传输优化</a></li>
+  </ul></li>
+  <li><a href="#十nb-iot-的部署模式" id="toc-十nb-iot-的部署模式" class="nav-link" data-scroll-target="#十nb-iot-的部署模式">十、NB-IoT 的部署模式（🌟）</a>
+  <ul class="collapse">
+  <li><a href="#独立部署" id="toc-独立部署" class="nav-link" data-scroll-target="#独立部署">1. 独立部署</a></li>
+  <li><a href="#保护带部署" id="toc-保护带部署" class="nav-link" data-scroll-target="#保护带部署">2. 保护带部署</a></li>
+  <li><a href="#带内部署" id="toc-带内部署" class="nav-link" data-scroll-target="#带内部署">3. 带内部署</a></li>
+  <li><a href="#三种部署方式对比" id="toc-三种部署方式对比" class="nav-link" data-scroll-target="#三种部署方式对比">4. 三种部署方式对比</a></li>
+  </ul></li>
+  <li><a href="#十一nb-iot-半双工模式" id="toc-十一nb-iot-半双工模式" class="nav-link" data-scroll-target="#十一nb-iot-半双工模式">十一、NB-IoT 半双工模式</a>
+  <ul class="collapse">
+  <li><a href="#type-a" id="toc-type-a" class="nav-link" data-scroll-target="#type-a">1. Type A</a></li>
+  <li><a href="#type-b" id="toc-type-b" class="nav-link" data-scroll-target="#type-b">2. Type B</a></li>
+  </ul></li>
+  <li><a href="#十二nb-iot-上行信道" id="toc-十二nb-iot-上行信道" class="nav-link" data-scroll-target="#十二nb-iot-上行信道">十二、NB-IoT 上行信道</a>
+  <ul class="collapse">
+  <li><a href="#npuschuplink-shared-上行共享" id="toc-npuschuplink-shared-上行共享" class="nav-link" data-scroll-target="#npuschuplink-shared-上行共享">1. NPUSCH（Uplink Shared 上行共享）</a></li>
+  <li><a href="#nprachrandom-access-随机接入" id="toc-nprachrandom-access-随机接入" class="nav-link" data-scroll-target="#nprachrandom-access-随机接入">2. NPRACH（Random Access 随机接入）</a></li>
+  <li><a href="#npusch-两种格式" id="toc-npusch-两种格式" class="nav-link" data-scroll-target="#npusch-两种格式">3. NPUSCH 两种格式</a>
+  <ul class="collapse">
+  <li><a href="#格式-1传用户数据" id="toc-格式-1传用户数据" class="nav-link" data-scroll-target="#格式-1传用户数据">格式 1（传用户数据）</a></li>
+  <li><a href="#格式-2传控制信息" id="toc-格式-2传控制信息" class="nav-link" data-scroll-target="#格式-2传控制信息">格式 2（传控制信息）</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#十三nb-iot-下行信道" id="toc-十三nb-iot-下行信道" class="nav-link" data-scroll-target="#十三nb-iot-下行信道">十三、NB-IoT 下行信道</a>
+  <ul class="collapse">
+  <li><a href="#npbchbroadcast-广播" id="toc-npbchbroadcast-广播" class="nav-link" data-scroll-target="#npbchbroadcast-广播">1. NPBCH（Broadcast 广播）</a></li>
+  <li><a href="#npdcchdownlink-control-下行控制" id="toc-npdcchdownlink-control-下行控制" class="nav-link" data-scroll-target="#npdcchdownlink-control-下行控制">2. NPDCCH（Downlink Control 下行控制）</a></li>
+  <li><a href="#npdschdownlink-shared-下行共享" id="toc-npdschdownlink-shared-下行共享" class="nav-link" data-scroll-target="#npdschdownlink-shared-下行共享">3. NPDSCH（Downlink Shared 下行共享）</a></li>
+  </ul></li>
+  <li><a href="#十四lora-是什么" id="toc-十四lora-是什么" class="nav-link" data-scroll-target="#十四lora-是什么">十四、LoRa 是什么？</a></li>
+  <li><a href="#十五lora-和-lorawan-的关系" id="toc-十五lora-和-lorawan-的关系" class="nav-link" data-scroll-target="#十五lora-和-lorawan-的关系">十五、LoRa 和 LoRaWAN 的关系</a>
+  <ul class="collapse">
+  <li><a href="#lora-与-lorawan-对比" id="toc-lora-与-lorawan-对比" class="nav-link" data-scroll-target="#lora-与-lorawan-对比">LoRa 与 LoRaWAN 对比</a></li>
+  </ul></li>
+  <li><a href="#十六lorawan-的优势" id="toc-十六lorawan-的优势" class="nav-link" data-scroll-target="#十六lorawan-的优势">十六、LoRaWAN 的优势</a>
+  <ul class="collapse">
+  <li><a href="#低功耗" id="toc-低功耗" class="nav-link" data-scroll-target="#低功耗">1. 低功耗</a></li>
+  <li><a href="#低成本-1" id="toc-低成本-1" class="nav-link" data-scroll-target="#低成本-1">2. 低成本</a></li>
+  <li><a href="#深度穿透" id="toc-深度穿透" class="nav-link" data-scroll-target="#深度穿透">3. 深度穿透</a></li>
+  <li><a href="#免授权频段" id="toc-免授权频段" class="nav-link" data-scroll-target="#免授权频段">4. 免授权频段</a></li>
+  </ul></li>
+  <li><a href="#十七lorawan-三种工作模式" id="toc-十七lorawan-三种工作模式" class="nav-link" data-scroll-target="#十七lorawan-三种工作模式">十七、LoRaWAN 三种工作模式（🌟）</a>
+  <ul class="collapse">
+  <li><a href="#class-a双向终端设备" id="toc-class-a双向终端设备" class="nav-link" data-scroll-target="#class-a双向终端设备">1. Class A：双向终端设备</a></li>
+  <li><a href="#class-b具有确定接收时隙的双向终端设备" id="toc-class-b具有确定接收时隙的双向终端设备" class="nav-link" data-scroll-target="#class-b具有确定接收时隙的双向终端设备">2. Class B：具有确定接收时隙的双向终端设备</a></li>
+  <li><a href="#class-c最大化接收时隙的双向终端设备" id="toc-class-c最大化接收时隙的双向终端设备" class="nav-link" data-scroll-target="#class-c最大化接收时隙的双向终端设备">3. Class C：最大化接收时隙的双向终端设备</a></li>
+  <li><a href="#class-abc-对比" id="toc-class-abc-对比" class="nav-link" data-scroll-target="#class-abc-对比">4. Class A/B/C 对比</a></li>
+  </ul></li>
+  <li><a href="#十八lorawan-网关" id="toc-十八lorawan-网关" class="nav-link" data-scroll-target="#十八lorawan-网关">十八、LoRaWAN 网关</a></li>
+  <li><a href="#十九lora-服务器" id="toc-十九lora-服务器" class="nav-link" data-scroll-target="#十九lora-服务器">十九、LoRa 服务器</a>
+  <ul class="collapse">
+  <li><a href="#网络服务器-ns" id="toc-网络服务器-ns" class="nav-link" data-scroll-target="#网络服务器-ns">1. 网络服务器 NS</a></li>
+  <li><a href="#应用服务器-as" id="toc-应用服务器-as" class="nav-link" data-scroll-target="#应用服务器-as">2. 应用服务器 AS</a></li>
+  <li><a href="#客户服务器-cs" id="toc-客户服务器-cs" class="nav-link" data-scroll-target="#客户服务器-cs">3. 客户服务器 CS</a></li>
+  </ul></li>
+  <li><a href="#二十lorawan-网络架构" id="toc-二十lorawan-网络架构" class="nav-link" data-scroll-target="#二十lorawan-网络架构">二十、LoRaWAN 网络架构</a>
+  <ul class="collapse">
+  <li><a href="#end-node-终端节点" id="toc-end-node-终端节点" class="nav-link" data-scroll-target="#end-node-终端节点">1. End Node 终端节点</a></li>
+  <li><a href="#gateway-网关" id="toc-gateway-网关" class="nav-link" data-scroll-target="#gateway-网关">2. Gateway 网关</a></li>
+  <li><a href="#network-server-网络服务器" id="toc-network-server-网络服务器" class="nav-link" data-scroll-target="#network-server-网络服务器">3. Network Server 网络服务器</a></li>
+  <li><a href="#application-server-应用服务器" id="toc-application-server-应用服务器" class="nav-link" data-scroll-target="#application-server-应用服务器">4. Application Server 应用服务器</a></li>
+  <li><a href="#lorawan-网络架构总结" id="toc-lorawan-网络架构总结" class="nav-link" data-scroll-target="#lorawan-网络架构总结">5. LoRaWAN 网络架构总结</a></li>
+  </ul></li>
+  <li><a href="#二十一lorawan-上行链路和下行链路" id="toc-二十一lorawan-上行链路和下行链路" class="nav-link" data-scroll-target="#二十一lorawan-上行链路和下行链路">二十一、LoRaWAN 上行链路和下行链路</a>
+  <ul class="collapse">
+  <li><a href="#上行链路" id="toc-上行链路" class="nav-link" data-scroll-target="#上行链路">1. 上行链路</a></li>
+  <li><a href="#下行链路" id="toc-下行链路" class="nav-link" data-scroll-target="#下行链路">2. 下行链路</a></li>
+  <li><a href="#物理帧结构" id="toc-物理帧结构" class="nav-link" data-scroll-target="#物理帧结构">3. 物理帧结构</a></li>
+  </ul></li>
+  <li><a href="#二十二lorawan-入网模式" id="toc-二十二lorawan-入网模式" class="nav-link" data-scroll-target="#二十二lorawan-入网模式">二十二、LoRaWAN 入网模式（🌟）</a>
+  <ul class="collapse">
+  <li><a href="#abp手动激活" id="toc-abp手动激活" class="nav-link" data-scroll-target="#abp手动激活">1. ABP：手动激活</a>
+  <ul class="collapse">
+  <li><a href="#devaddr" id="toc-devaddr" class="nav-link" data-scroll-target="#devaddr">DevAddr</a></li>
+  <li><a href="#nwkskey" id="toc-nwkskey" class="nav-link" data-scroll-target="#nwkskey">NwkSKey</a></li>
+  <li><a href="#appskey" id="toc-appskey" class="nav-link" data-scroll-target="#appskey">AppSKey</a></li>
+  </ul></li>
+  <li><a href="#abp-的优缺点" id="toc-abp-的优缺点" class="nav-link" data-scroll-target="#abp-的优缺点">2. ABP 的优缺点</a></li>
+  <li><a href="#otaa空中激活" id="toc-otaa空中激活" class="nav-link" data-scroll-target="#otaa空中激活">3. OTAA：空中激活</a></li>
+  <li><a href="#abp-与-otaa-对比" id="toc-abp-与-otaa-对比" class="nav-link" data-scroll-target="#abp-与-otaa-对比">4. ABP 与 OTAA 对比</a></li>
+  </ul></li>
+  <li><a href="#二十三nb-iot-与-lora-对比" id="toc-二十三nb-iot-与-lora-对比" class="nav-link" data-scroll-target="#二十三nb-iot-与-lora-对比">二十三、NB-IoT 与 LoRa 对比</a>
+  <ul class="collapse">
+  <li><a href="#通信距离" id="toc-通信距离" class="nav-link" data-scroll-target="#通信距离">1. 通信距离</a></li>
+  <li><a href="#电池寿命" id="toc-电池寿命" class="nav-link" data-scroll-target="#电池寿命">2. 电池寿命</a></li>
+  <li><a href="#组网成本" id="toc-组网成本" class="nav-link" data-scroll-target="#组网成本">3. 组网成本</a>
+  <ul class="collapse">
+  <li><a href="#nb-iot" id="toc-nb-iot" class="nav-link" data-scroll-target="#nb-iot">NB-IoT</a></li>
+  <li><a href="#lora" id="toc-lora" class="nav-link" data-scroll-target="#lora">LoRa</a></li>
+  </ul></li>
+  <li><a href="#nb-iot-与-lora-对比表" id="toc-nb-iot-与-lora-对比表" class="nav-link" data-scroll-target="#nb-iot-与-lora-对比表">4. NB-IoT 与 LoRa 对比表</a></li>
+  </ul></li>
+  <li><a href="#二十四本章重点背诵版" id="toc-二十四本章重点背诵版" class="nav-link" data-scroll-target="#二十四本章重点背诵版">二十四、本章重点背诵版</a>
+  <ul class="collapse">
+  <li><a href="#nb-iot-定义" id="toc-nb-iot-定义" class="nav-link" data-scroll-target="#nb-iot-定义">1. NB-IoT 定义</a></li>
+  <li><a href="#nb-iot-技术特点" id="toc-nb-iot-技术特点" class="nav-link" data-scroll-target="#nb-iot-技术特点">2. NB-IoT 技术特点</a></li>
+  <li><a href="#nb-iot-网络架构" id="toc-nb-iot-网络架构" class="nav-link" data-scroll-target="#nb-iot-网络架构">3. NB-IoT 网络架构</a></li>
+  <li><a href="#nb-iot-部署模式" id="toc-nb-iot-部署模式" class="nav-link" data-scroll-target="#nb-iot-部署模式">4. NB-IoT 部署模式</a></li>
+  <li><a href="#nb-iot-上行和下行信道" id="toc-nb-iot-上行和下行信道" class="nav-link" data-scroll-target="#nb-iot-上行和下行信道">5. NB-IoT 上行和下行信道</a></li>
+  <li><a href="#lora-与-lorawan-的关系" id="toc-lora-与-lorawan-的关系" class="nav-link" data-scroll-target="#lora-与-lorawan-的关系">6. LoRa 与 LoRaWAN 的关系</a></li>
+  <li><a href="#lorawan-网络架构" id="toc-lorawan-网络架构" class="nav-link" data-scroll-target="#lorawan-网络架构">7. LoRaWAN 网络架构</a></li>
+  <li><a href="#lorawan-三类终端" id="toc-lorawan-三类终端" class="nav-link" data-scroll-target="#lorawan-三类终端">8. LoRaWAN 三类终端</a></li>
+  <li><a href="#lorawan-入网模式" id="toc-lorawan-入网模式" class="nav-link" data-scroll-target="#lorawan-入网模式">9. LoRaWAN 入网模式</a></li>
+  </ul></li>
+  <li><a href="#二十五考试可能这样问" id="toc-二十五考试可能这样问" class="nav-link" data-scroll-target="#二十五考试可能这样问">二十五、考试可能这样问</a>
+  <ul class="collapse">
+  <li><a href="#题目1nb-iot-有哪些技术特点" id="toc-题目1nb-iot-有哪些技术特点" class="nav-link" data-scroll-target="#题目1nb-iot-有哪些技术特点">题目1：NB-IoT 有哪些技术特点？</a></li>
+  <li><a href="#题目2简述-nb-iot-的网络架构" id="toc-题目2简述-nb-iot-的网络架构" class="nav-link" data-scroll-target="#题目2简述-nb-iot-的网络架构">题目2：简述 NB-IoT 的网络架构。</a></li>
+  <li><a href="#题目3nb-iot-有哪些部署模式" id="toc-题目3nb-iot-有哪些部署模式" class="nav-link" data-scroll-target="#题目3nb-iot-有哪些部署模式">题目3：NB-IoT 有哪些部署模式？</a></li>
+  <li><a href="#题目4lora-与-lorawan-有什么联系和区别" id="toc-题目4lora-与-lorawan-有什么联系和区别" class="nav-link" data-scroll-target="#题目4lora-与-lorawan-有什么联系和区别">题目4：LoRa 与 LoRaWAN 有什么联系和区别？</a></li>
+  <li><a href="#题目5lorawan-的网络架构是什么" id="toc-题目5lorawan-的网络架构是什么" class="nav-link" data-scroll-target="#题目5lorawan-的网络架构是什么">题目5：LoRaWAN 的网络架构是什么？</a></li>
+  <li><a href="#题目6简述-lorawan-三类终端设备" id="toc-题目6简述-lorawan-三类终端设备" class="nav-link" data-scroll-target="#题目6简述-lorawan-三类终端设备">题目6：简述 LoRaWAN 三类终端设备。</a></li>
+  <li><a href="#题目7abp-和-otaa-有什么区别" id="toc-题目7abp-和-otaa-有什么区别" class="nav-link" data-scroll-target="#题目7abp-和-otaa-有什么区别">题目7：ABP 和 OTAA 有什么区别？</a></li>
+  </ul></li>
+  <li><a href="#二十六本章一句话总结" id="toc-二十六本章一句话总结" class="nav-link" data-scroll-target="#二十六本章一句话总结">二十六、本章一句话总结</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch1_物联网及嵌入式概述.html">课程笔记</a></li><li class="breadcrumb-item"><a href="./ch4_连接技术.html">Ch4 连接技术</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">第4章 连接技术</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>这一章节的重点是 <strong>NB-IoT</strong> 和 <strong>LoRa/LoRaWAN</strong>。它主要解决的问题是：<strong>物联网设备到底通过什么技术接入网络，以及不同连接技术适合什么应用场景。</strong></p>
+<hr>
+<section id="一本章总体框架" class="level1">
+<h1>一、本章总体框架</h1>
+<p>这份 PPT 的重点可以分成两大部分：</p>
+<ol type="1">
+<li><strong>NB-IoT 技术</strong>
+<ul>
+<li>NB-IoT 的定义；</li>
+<li>NB-IoT 的技术特点；</li>
+<li>NB-IoT 的网络架构；</li>
+<li>NB-IoT 的部署方式；</li>
+<li>NB-IoT 的上下行信道。</li>
+</ul></li>
+<li><strong>LoRa 与 LoRaWAN</strong>
+<ul>
+<li>LoRa 和 LoRaWAN 的关系；</li>
+<li>LoRaWAN 的系统架构；</li>
+<li>LoRaWAN 的三类终端设备；</li>
+<li>LoRaWAN 的网关和服务器；</li>
+<li>LoRaWAN 的入网模式；</li>
+<li>LoRa 与 NB-IoT 的对比。</li>
+</ul></li>
+</ol>
+<p>这一章最容易考的是：</p>
+<blockquote class="blockquote">
+<p>NB-IoT 的技术特点、部署模式、网络架构； LoRa 和 LoRaWAN 的区别； LoRaWAN 的 Class A/B/C； LoRaWAN 网络架构； ABP 和 OTAA 入网方式。</p>
+</blockquote>
+<hr>
+</section>
+<section id="二为什么物联网需要连接技术" class="level1">
+<h1>二、为什么物联网需要“连接技术”？</h1>
+<p>PPT 开头强调：</p>
+<blockquote class="blockquote">
+<p>连接是物联网的基本特性之一，也是物联网操作系统的基本需求之一。</p>
+</blockquote>
+<p>物联网的核心不是单个设备独立运行，而是大量设备能够采集数据、上传数据、接收控制命令，并和云平台、手机 App、其他设备进行交互。</p>
+<p>所以物联网系统必须解决两个问题：</p>
+<ol type="1">
+<li><strong>设备怎么连上网络？</strong></li>
+<li><strong>设备连上网络后怎么传数据？</strong></li>
+</ol>
+<p>其中：</p>
+<ul>
+<li>NB-IoT、LoRa、Wi-Fi、蓝牙、ZigBee 属于连接方式；</li>
+<li>MQTT、CoAP、LwM2M 属于通信协议。</li>
+</ul>
+<p>可以简单理解：</p>
+<blockquote class="blockquote">
+<p>连接技术解决“路怎么通”； 通信协议解决“路通之后按什么规则说话”。</p>
+</blockquote>
+<hr>
+</section>
+<section id="三物联网通信环境的特点" class="level1">
+<h1>三、物联网通信环境的特点</h1>
+<p>物联网通信环境比普通互联网复杂得多，主要原因有：</p>
+<ol type="1">
+<li>设备数量巨大；</li>
+<li>设备类型复杂；</li>
+<li>设备资源受限；</li>
+<li>很多设备靠电池供电；</li>
+<li>有些设备部署在地下、野外、楼宇深处；</li>
+<li>通信数据通常比较小，但设备数量多；</li>
+<li>不同应用对实时性、功耗、成本要求不同。</li>
+</ol>
+<p>因此，物联网中不会只有一种通信技术，而是多种技术并存。</p>
+<p>例如：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>技术</th>
+<th>适合场景</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>蓝牙</td>
+<td>近距离、低功耗、个人设备</td>
+</tr>
+<tr class="even">
+<td>Wi-Fi</td>
+<td>高速率、家庭或办公网络</td>
+</tr>
+<tr class="odd">
+<td>ZigBee</td>
+<td>智能家居、低功耗组网</td>
+</tr>
+<tr class="even">
+<td>NB-IoT</td>
+<td>广覆盖、低功耗、运营商网络</td>
+</tr>
+<tr class="odd">
+<td>LoRa</td>
+<td>远距离、低功耗、自建网络</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="四华为物联网平台支持的主要协议" class="level1">
+<h1>四、华为物联网平台支持的主要协议</h1>
+<p>PPT 中列出了华为物联网平台支持的几种主要协议：</p>
+<ol type="1">
+<li>LwM2M；</li>
+<li>CoAP；</li>
+<li>MQTT。</li>
+</ol>
+<p>这部分虽然属于协议内容，但在本章中用于说明不同连接场景对应不同通信协议。</p>
+<hr>
+<section id="lwm2m" class="level2">
+<h2 class="anchored" data-anchor-id="lwm2m">1. LwM2M</h2>
+<p>LwM2M 是 OMA 定义的设备管理应用层协议。</p>
+<p>特点：</p>
+<ul>
+<li>主要用于资源受限的嵌入式设备；</li>
+<li>常用于 NB-IoT 设备接入平台；</li>
+<li>适合低功耗、广覆盖、实时性要求不高的场景。</li>
+</ul>
+<p>典型场景：</p>
+<ul>
+<li>智能水表；</li>
+<li>智能燃气表；</li>
+<li>智能停车；</li>
+<li>远程监控终端。</li>
+</ul>
+<hr>
+</section>
+<section id="coap" class="level2">
+<h2 class="anchored" data-anchor-id="coap">2. CoAP</h2>
+<p>CoAP 是面向资源受限设备和受限网络的 Web 传输协议。</p>
+<p>特点：</p>
+<ul>
+<li>基于 UDP；</li>
+<li>请求/响应模式；</li>
+<li>支持资源发现；</li>
+<li>适合低功耗设备。</li>
+</ul>
+<p>典型场景：</p>
+<ul>
+<li>NB-IoT 设备接入；</li>
+<li>低功耗传感器；</li>
+<li>业务实时性要求不高的设备。</li>
+</ul>
+<hr>
+</section>
+<section id="mqtt" class="level2">
+<h2 class="anchored" data-anchor-id="mqtt">3. MQTT</h2>
+<p>MQTT 是轻量级发布/订阅协议，构建在 TCP/IP 之上。</p>
+<p>特点：</p>
+<ul>
+<li>长连接；</li>
+<li>可靠性较高；</li>
+<li>适合实时性要求较高的设备；</li>
+<li>支持云端反向控制设备。</li>
+</ul>
+<p>典型场景：</p>
+<ul>
+<li>智能路灯；</li>
+<li>设备状态实时上报；</li>
+<li>云平台下发控制命令；</li>
+<li>长连接在线设备。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="五nb-iot-是什么" class="level1">
+<h1>五、NB-IoT 是什么？</h1>
+<p>NB-IoT 全称是：</p>
+<blockquote class="blockquote">
+<p>Narrow Band Internet of Things，基于蜂窝的窄带物联网。</p>
+</blockquote>
+<p>它是一种低功耗广域物联网通信技术，依托运营商蜂窝网络，适合大量低功耗设备接入。</p>
+<p>PPT 中强调 NB-IoT 是现阶段发展较快的无线物联网通信技术之一，具有：</p>
+<ul>
+<li>广域连接；</li>
+<li>低成本；</li>
+<li>低能耗；</li>
+<li>高稳定性。</li>
+</ul>
+<p>常见应用方向包括：</p>
+<ul>
+<li>工业 4.0；</li>
+<li>智慧城市；</li>
+<li>智能家居；</li>
+<li>智慧农业；</li>
+<li>智能抄表；</li>
+<li>智慧停车。</li>
+</ul>
+<hr>
+</section>
+<section id="六nb-iot-的技术特点" class="level1">
+<h1>六、NB-IoT 的技术特点</h1>
+<p>PPT 中重点讲了四个特点：</p>
+<ol type="1">
+<li>网络覆盖强；</li>
+<li>低功耗运行；</li>
+<li>低成本；</li>
+<li>容量大。</li>
+</ol>
+<hr>
+<section id="网络覆盖强" class="level2">
+<h2 class="anchored" data-anchor-id="网络覆盖强">1. 网络覆盖强</h2>
+<p>NB-IoT 的覆盖能力很强。</p>
+<p>PPT 中提到，NB-IoT 设计标准中物联网通信 MCL 定为 164 dB，比 GSM 网络覆盖基础上提升约 20 dB。</p>
+<p>你不需要死记这个数字的技术细节，但要知道它说明：</p>
+<blockquote class="blockquote">
+<p>NB-IoT 信号穿透能力强，覆盖范围广，适合地下、室内深处、偏远区域等场景。</p>
+</blockquote>
+<p>例如：</p>
+<ul>
+<li>地下水表井；</li>
+<li>地下停车场；</li>
+<li>楼宇内部；</li>
+<li>管道监测；</li>
+<li>偏远农业区域。</li>
+</ul>
+<p>这些地方普通无线网络可能覆盖不好，而 NB-IoT 更适合。</p>
+<hr>
+</section>
+<section id="低功耗运行" class="level2">
+<h2 class="anchored" data-anchor-id="低功耗运行">2. 低功耗运行</h2>
+<p>NB-IoT 面向大量低功耗终端，很多设备需要电池供电多年。</p>
+<p>为了降低功耗，NB-IoT 引入了两种重要机制：</p>
+<section id="psm" class="level3">
+<h3 class="anchored" data-anchor-id="psm">PSM</h3>
+<p>PSM 全称是：</p>
+<blockquote class="blockquote">
+<p>Power Saving Mode，省电模式。</p>
+</blockquote>
+<p>设备在不通信时进入深度休眠，只在需要上传数据或接收信息时唤醒。</p>
+</section>
+<section id="edrx" class="level3">
+<h3 class="anchored" data-anchor-id="edrx">eDRX</h3>
+<p>eDRX 全称是：</p>
+<blockquote class="blockquote">
+<p>extended Discontinuous Reception，增强型非连续接收。</p>
+</blockquote>
+<p>它允许设备不连续地监听网络，减少接收信号的时间，从而省电。</p>
+<p>可以这样理解：</p>
+<blockquote class="blockquote">
+<p>PSM 让设备长时间睡觉； eDRX 让设备少醒几次、少听网络，从而节省电量。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="低成本" class="level2">
+<h2 class="anchored" data-anchor-id="低成本">3. 低成本</h2>
+<p>NB-IoT 的设计目标本来就是低功耗、低带宽、低速率，所以模块可以做得比较简单。</p>
+<p>PPT 中提到 NB-IoT 模块支持 FDD 半双工模式，即上行和下行在频率上分开，发送和接收分开处理，这样可以减少硬件复杂度，降低元器件成本。</p>
+<p>考试中可以答：</p>
+<blockquote class="blockquote">
+<p>NB-IoT 通过低带宽、低速率、半双工设计等方式降低终端模块复杂度，从而降低设备成本。</p>
+</blockquote>
+<hr>
+</section>
+<section id="容量大" class="level2">
+<h2 class="anchored" data-anchor-id="容量大">4. 容量大</h2>
+<p>NB-IoT 面向海量物联网终端。</p>
+<p>很多 NB-IoT 场景是大量设备定期上传小数据，例如：</p>
+<ul>
+<li>水表每天上传几次用水量；</li>
+<li>农业传感器定时上传温湿度；</li>
+<li>停车传感器上传车位状态。</li>
+</ul>
+<p>这些数据量都不大，但设备数量很多。</p>
+<p>所以 NB-IoT 的设计重点不是高速率，而是：</p>
+<blockquote class="blockquote">
+<p>支持大量设备低频、小数据量接入。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="七nb-iot-网络架构" class="level1">
+<h1>七、NB-IoT 网络架构</h1>
+<p>PPT 中讲到 NB-IoT 的网络架构主要沿用 LTE 网络架构，由核心网和无线接入网组成。</p>
+<p>整体可以分成五个部分：</p>
+<ol type="1">
+<li>UE 终端；</li>
+<li>无线网侧；</li>
+<li>核心网；</li>
+<li>物联网平台；</li>
+<li>应用服务器。</li>
+</ol>
+<hr>
+<section id="ue-终端" class="level2">
+<h2 class="anchored" data-anchor-id="ue-终端">1. UE 终端</h2>
+<p>UE 是 User Equipment，即用户设备或终端设备。</p>
+<p>在 NB-IoT 中，UE 可以是：</p>
+<ul>
+<li>智能水表；</li>
+<li>智能电表；</li>
+<li>烟雾报警器；</li>
+<li>停车传感器；</li>
+<li>农业传感器；</li>
+<li>井盖监测设备。</li>
+</ul>
+<p>UE 通过空口接入到 LTE 架构基站 eNodeB。</p>
+<hr>
+</section>
+<section id="无线网侧" class="level2">
+<h2 class="anchored" data-anchor-id="无线网侧">2. 无线网侧</h2>
+<p>无线网侧主要负责无线接入。</p>
+<p>PPT 提到两种组网方式：</p>
+<ol type="1">
+<li>Single RAN；</li>
+<li>NB-IoT 新建网。</li>
+</ol>
+<p>无线网侧主要完成：</p>
+<ul>
+<li>空口接入处理；</li>
+<li>小区管理；</li>
+<li>数据转发。</li>
+</ul>
+<hr>
+</section>
+<section id="核心网" class="level2">
+<h2 class="anchored" data-anchor-id="核心网">3. 核心网</h2>
+<p>核心网主要是 EPC，即 Evolved Packet Core，演进分组核心网。</p>
+<p>它承担：</p>
+<ul>
+<li>与 UE 非接入层交互；</li>
+<li>数据转发；</li>
+<li>将数据传到物联网平台。</li>
+</ul>
+<p>可以简单理解：</p>
+<blockquote class="blockquote">
+<p>无线网负责设备接入，核心网负责把数据送往平台。</p>
+</blockquote>
+<hr>
+</section>
+<section id="物联网平台" class="level2">
+<h2 class="anchored" data-anchor-id="物联网平台">4. 物联网平台</h2>
+<p>PPT 中列举了多个物联网平台：</p>
+<ul>
+<li>中国移动 OneNET；</li>
+<li>中国电信物联网开放平台；</li>
+<li>中国联通物联网平台；</li>
+<li>阿里云物联网平台；</li>
+<li>华为 OceanConnect 物联网平台。</li>
+</ul>
+<p>物联网平台负责：</p>
+<ul>
+<li>设备接入；</li>
+<li>设备管理；</li>
+<li>数据存储；</li>
+<li>数据分析；</li>
+<li>命令下发；</li>
+<li>应用接口开放。</li>
+</ul>
+<hr>
+</section>
+<section id="应用服务器" class="level2">
+<h2 class="anchored" data-anchor-id="应用服务器">5. 应用服务器</h2>
+<p>应用服务器面向具体业务。</p>
+<p>例如：</p>
+<ul>
+<li>水务公司抄表系统；</li>
+<li>停车管理系统；</li>
+<li>农业监测系统；</li>
+<li>智慧城市平台；</li>
+<li>智能家居 App。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="八nb-iot-网络结构中的关键网元" class="level1">
+<h1>八、NB-IoT 网络结构中的关键网元</h1>
+<p>PPT 中进一步细分了 NB-IoT 网络结构，提到几个关键概念。</p>
+<hr>
+<section id="mme移动管理节点" class="level2">
+<h2 class="anchored" data-anchor-id="mme移动管理节点">1. MME（移动管理节点）</h2>
+<p>MME 全称是：</p>
+<blockquote class="blockquote">
+<p>Mobility Management Entity，移动管理节点。</p>
+</blockquote>
+<p>它是接入网络的关键控制节点，主要负责控制面相关功能。</p>
+<p>例如：</p>
+<ul>
+<li>终端接入管理；</li>
+<li>移动性管理；</li>
+<li>信令控制。</li>
+</ul>
+<hr>
+</section>
+<section id="scef服务能力开放平台" class="level2">
+<h2 class="anchored" data-anchor-id="scef服务能力开放平台">2. SCEF（服务能力开放平台）</h2>
+<p>SCEF 全称是：</p>
+<blockquote class="blockquote">
+<p>Service Capability Exposure Function，服务能力开放平台。</p>
+</blockquote>
+<p>它是新增网元，支持 Non-IP 类型的数据传输。</p>
+<p>这个点比较专业，考试一般知道它是服务能力开放平台即可。</p>
+<hr>
+</section>
+<section id="s-gw服务网关" class="level2">
+<h2 class="anchored" data-anchor-id="s-gw服务网关">3. S-GW（服务网关）</h2>
+<p>S-GW 是 Serving Gateway，服务网关。</p>
+<p>主要负责用户数据包的路由与转发。</p>
+<hr>
+</section>
+<section id="p-gwpdn-网关" class="level2">
+<h2 class="anchored" data-anchor-id="p-gwpdn-网关">4. P-GW（PDN 网关）</h2>
+<p>P-GW 是 PDN Gateway，PDN 网关。</p>
+<p>它提供 UE 与外部分组数据网络之间的连接接口，同时也与业务计费等功能有关。</p>
+<hr>
+</section>
+<section id="x2-接口" class="level2">
+<h2 class="anchored" data-anchor-id="x2-接口">5. X2 接口</h2>
+<p>X2 接口用于 eNodeB 之间的消息命令传输和数据交互。</p>
+<hr>
+</section>
+<section id="s1-接口" class="level2">
+<h2 class="anchored" data-anchor-id="s1-接口">6. S1 接口</h2>
+<p>S1 接口连接 eNodeB 和核心网。</p>
+<p>它分为控制侧和用户侧：</p>
+<ul>
+<li>控制侧：eNodeB 与 MME 之间传输信令；</li>
+<li>用户侧：eNodeB 与 S-GW 之间传输用户数据。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="九nb-iot-的传输方式" class="level1">
+<h1>九、NB-IoT 的传输方式</h1>
+<p>PPT 中提到 NB-IoT 支持三种数据类型：</p>
+<ol type="1">
+<li>IP；</li>
+<li>Non-IP；</li>
+<li>SMS。</li>
+</ol>
+<p>这说明 NB-IoT 可以根据业务需求选择不同的数据传输方式。</p>
+<hr>
+<section id="控制侧传输优化" class="level2">
+<h2 class="anchored" data-anchor-id="控制侧传输优化">1. 控制侧传输优化</h2>
+<p>控制侧传输适合小包数据。</p>
+<p>PPT 中说，小包数据可以通过 NAS 信令传输到 MME，然后通过 MME 与 S-GW 之间的连接进行传输。</p>
+<p>简单理解：</p>
+<blockquote class="blockquote">
+<p>小数据可以走控制面，减少连接建立开销。</p>
+</blockquote>
+<hr>
+</section>
+<section id="用户侧传输优化" class="level2">
+<h2 class="anchored" data-anchor-id="用户侧传输优化">2. 用户侧传输优化</h2>
+<p>用户侧传输通过挂起流程与恢复流程，使 UE 能够从空闲状态快速进入连接状态。</p>
+<p>它的目标是减少重复建立承载和安全协商带来的开销。</p>
+<p>简单理解：</p>
+<blockquote class="blockquote">
+<p>用户面传输更适合相对正常的数据传输，但要通过优化机制降低小数据传输成本。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="十nb-iot-的部署模式" class="level1">
+<h1>十、NB-IoT 的部署模式（🌟）</h1>
+<p>NB-IoT 有三种部署方式：</p>
+<ol type="1">
+<li>独立部署；</li>
+<li>保护带部署；</li>
+<li>带内部署。</li>
+</ol>
+<p>这是考试高频点。</p>
+<hr>
+<section id="独立部署" class="level2">
+<h2 class="anchored" data-anchor-id="独立部署">1. 独立部署</h2>
+<p>独立部署不依靠 LTE 网络基站，可以重新利用 GSM 网络频段。</p>
+<p>因为 GSM 一个载波带宽大约 200 kHz，而 NB-IoT 占用约 180 kHz，刚好可以部署。</p>
+<p>特点：</p>
+<ul>
+<li>独占频谱；</li>
+<li>不与现有系统共存；</li>
+<li>可以利用重耕后的 GSM 频段。</li>
+</ul>
+<hr>
+</section>
+<section id="保护带部署" class="level2">
+<h2 class="anchored" data-anchor-id="保护带部署">2. 保护带部署</h2>
+<p>保护带部署是利用现有 LTE 网络频谱边缘的保护带。</p>
+<p>LTE 主频谱边缘往往有未使用的保护频带，NB-IoT 可以部署在其中。</p>
+<p>特点：</p>
+<ul>
+<li>利用 LTE 频谱边缘空闲资源；</li>
+<li>不占用正常 LTE 资源；</li>
+<li>适合运营商平滑部署。</li>
+</ul>
+<hr>
+</section>
+<section id="带内部署" class="level2">
+<h2 class="anchored" data-anchor-id="带内部署">3. 带内部署</h2>
+<p>带内部署是在 LTE 频带内部部署 NB-IoT。</p>
+<p>也就是用 LTE 资源块中的一部分来承载 NB-IoT。</p>
+<p>特点：</p>
+<ul>
+<li>与 LTE 网络共用频谱；</li>
+<li>需要运营商在 LTE 网络规划时考虑；</li>
+<li>可用多个 NB-IoT 载波替代对应 LTE PRB。</li>
+</ul>
+<hr>
+</section>
+<section id="三种部署方式对比" class="level2">
+<h2 class="anchored" data-anchor-id="三种部署方式对比">4. 三种部署方式对比</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>部署方式</th>
+<th>位置</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>独立部署</td>
+<td>独立频段，如重耕 GSM 频段</td>
+<td>独占频谱，不依赖 LTE</td>
+</tr>
+<tr class="even">
+<td>保护带部署</td>
+<td>LTE 频谱边缘保护带</td>
+<td>利用空闲保护频带</td>
+</tr>
+<tr class="odd">
+<td>带内部署</td>
+<td>LTE 频带内部</td>
+<td>与 LTE 共用频谱资源</td>
+</tr>
+</tbody>
+</table>
+<p>记忆口诀：</p>
+<blockquote class="blockquote">
+<p>独立部署用旧频段；保护带部署用边缘；带内部署用 LTE 内部资源。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="十一nb-iot-半双工模式" class="level1">
+<h1>十一、NB-IoT 半双工模式</h1>
+<p>PPT 中提到 NB-IoT 在 3GPP R13 中定义了半双工模式，包括 Type A 和 Type B。</p>
+<p>半双工的意思是：</p>
+<blockquote class="blockquote">
+<p>终端不能同时发送和接收，上行和下行需要分开。</p>
+</blockquote>
+<hr>
+<section id="type-a" class="level2">
+<h2 class="anchored" data-anchor-id="type-a">1. Type A</h2>
+<p>Type A 中，UE 在发送上行信号时，前一子帧下行信号的最后一个符号不接收，用作保护时隙 GP。</p>
+<p>可以理解为：</p>
+<blockquote class="blockquote">
+<p>Type A 的保护间隔较短。</p>
+</blockquote>
+<hr>
+</section>
+<section id="type-b" class="level2">
+<h2 class="anchored" data-anchor-id="type-b">2. Type B</h2>
+<p>Type B 中，UE 在发送上行信号时，前一个子帧和后一个子帧的下行信号都不接收，从而增长保护时隙 GP。</p>
+<p>可以理解为：</p>
+<blockquote class="blockquote">
+<p>Type B 的保护间隔更长，更保守。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="十二nb-iot-上行信道" class="level1">
+<h1>十二、NB-IoT 上行信道</h1>
+<p>PPT 中讲了 NB-IoT 上行信道，包括两种物理信道：</p>
+<ol type="1">
+<li>NPUSCH；</li>
+<li>NPRACH。</li>
+</ol>
+<hr>
+<section id="npuschuplink-shared-上行共享" class="level2">
+<h2 class="anchored" data-anchor-id="npuschuplink-shared-上行共享">1. NPUSCH（Uplink Shared 上行共享）</h2>
+<p>NPUSCH 全称是：</p>
+<blockquote class="blockquote">
+<p>Narrowband Physical Uplink Shared Channel，窄带物理上行共享信道。</p>
+</blockquote>
+<p>作用：</p>
+<ul>
+<li>发送上行数据；</li>
+<li>发送上行控制信息。</li>
+</ul>
+<p>NPUSCH 支持：</p>
+<ul>
+<li>Multi-tone 多音传输；</li>
+<li>Single-tone 单音传输。</li>
+</ul>
+<hr>
+</section>
+<section id="nprachrandom-access-随机接入" class="level2">
+<h2 class="anchored" data-anchor-id="nprachrandom-access-随机接入">2. NPRACH（Random Access 随机接入）</h2>
+<p>NPRACH 全称是：</p>
+<blockquote class="blockquote">
+<p>Narrowband Physical Random Access Channel，窄带物理随机接入信道。</p>
+</blockquote>
+<p>作用：</p>
+<ul>
+<li>用于随机接入；</li>
+<li>终端通过它发起接入网络请求。</li>
+</ul>
+<hr>
+</section>
+<section id="npusch-两种格式" class="level2">
+<h2 class="anchored" data-anchor-id="npusch-两种格式">3. NPUSCH 两种格式</h2>
+<p>PPT 中提到 NPUSCH 支持格式 1 和格式 2。</p>
+<section id="格式-1传用户数据" class="level3">
+<h3 class="anchored" data-anchor-id="格式-1传用户数据">格式 1（传用户数据）</h3>
+<p>承载上行共享信道，主要用于上传用户设备数据。</p>
+<p>可以通过一个或几个资源块调度，支持两种子载波传输方式。</p>
+</section>
+<section id="格式-2传控制信息" class="level3">
+<h3 class="anchored" data-anchor-id="格式-2传控制信息">格式 2（传控制信息）</h3>
+<p>承载上行控制信息，只能使用 Single-tone 模式。</p>
+<p>简单记：</p>
+<blockquote class="blockquote">
+<p>格式 1 传用户数据；格式 2 传控制信息。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+</section>
+<section id="十三nb-iot-下行信道" class="level1">
+<h1>十三、NB-IoT 下行信道</h1>
+<p>NB-IoT 下行定义了三种物理信道：</p>
+<ol type="1">
+<li>NPBCH；</li>
+<li>NPDCCH；</li>
+<li>NPDSCH。</li>
+</ol>
+<hr>
+<section id="npbchbroadcast-广播" class="level2">
+<h2 class="anchored" data-anchor-id="npbchbroadcast-广播">1. NPBCH（Broadcast 广播）</h2>
+<p>NPBCH 全称是：</p>
+<blockquote class="blockquote">
+<p>Narrowband Physical Broadcast Channel，窄带物理广播信道。</p>
+</blockquote>
+<p>作用：</p>
+<ul>
+<li>广播系统信息；</li>
+<li>帮助终端了解小区基本信息。</li>
+</ul>
+<hr>
+</section>
+<section id="npdcchdownlink-control-下行控制" class="level2">
+<h2 class="anchored" data-anchor-id="npdcchdownlink-control-下行控制">2. NPDCCH（Downlink Control 下行控制）</h2>
+<p>NPDCCH 全称是：</p>
+<blockquote class="blockquote">
+<p>Narrowband Physical Downlink Control Channel，窄带物理下行控制信道。</p>
+</blockquote>
+<p>作用：</p>
+<ul>
+<li>传输下行控制信息；</li>
+<li>告诉终端资源调度等控制信息。</li>
+</ul>
+<p>PPT 中提到它的处理步骤包括：</p>
+<ul>
+<li>加扰；</li>
+<li>调制解调；</li>
+<li>层映射；</li>
+<li>预编码；</li>
+<li>资源映射。</li>
+</ul>
+<hr>
+</section>
+<section id="npdschdownlink-shared-下行共享" class="level2">
+<h2 class="anchored" data-anchor-id="npdschdownlink-shared-下行共享">3. NPDSCH（Downlink Shared 下行共享）</h2>
+<p>NPDSCH 全称是：</p>
+<blockquote class="blockquote">
+<p>Narrowband Physical Downlink Shared Channel，窄带物理下行共享信道。</p>
+</blockquote>
+<p>作用：</p>
+<ul>
+<li>承载下行数据。</li>
+</ul>
+<p>简单记：</p>
+<blockquote class="blockquote">
+<p>广播看 NPBCH，控制看 NPDCCH，数据看 NPDSCH。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="十四lora-是什么" class="level1">
+<h1>十四、LoRa 是什么？</h1>
+<p>LoRa 是低功耗广域网通信技术中的一种，是 Semtech 公司提出的一种基于扩频技术的超远距离无线传输技术。</p>
+<p>LoRa 的特点：</p>
+<ul>
+<li>远距离；</li>
+<li>低功耗；</li>
+<li>低速率；</li>
+<li>低成本；</li>
+<li>工作在免授权频段；</li>
+<li>适合小数据量传输。</li>
+</ul>
+<p>典型应用：</p>
+<ul>
+<li>智慧农业；</li>
+<li>环境监测；</li>
+<li>智能建筑；</li>
+<li>物流追踪；</li>
+<li>水表抄表；</li>
+<li>烟雾报警；</li>
+<li>垃圾桶监测。</li>
+</ul>
+<hr>
+</section>
+<section id="十五lora-和-lorawan-的关系" class="level1">
+<h1>十五、LoRa 和 LoRaWAN 的关系</h1>
+<p>这是本章重点。</p>
+<p>PPT 明确说明：</p>
+<blockquote class="blockquote">
+<p>LoRaWAN 是 MAC 层，LoRa 是物理层。</p>
+</blockquote>
+<p>也就是说：</p>
+<ul>
+<li><strong>LoRa</strong> 负责底层无线传输；</li>
+<li><strong>LoRaWAN</strong> 负责通信协议和网络架构。</li>
+</ul>
+<p>可以这样理解：</p>
+<blockquote class="blockquote">
+<p>LoRa 是“无线信号怎么发”； LoRaWAN 是“设备、网关、服务器之间怎么组网和通信”。</p>
+</blockquote>
+<hr>
+<section id="lora-与-lorawan-对比" class="level2">
+<h2 class="anchored" data-anchor-id="lora-与-lorawan-对比">LoRa 与 LoRaWAN 对比</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>项目</th>
+<th>LoRa</th>
+<th>LoRaWAN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>所属层次</td>
+<td>物理层</td>
+<td>MAC 层/网络协议</td>
+</tr>
+<tr class="even">
+<td>作用</td>
+<td>实现远距离低功耗无线传输</td>
+<td>规定网络架构和通信规则</td>
+</tr>
+<tr class="odd">
+<td>关注重点</td>
+<td>调制、频段、距离、功耗</td>
+<td>入网、安全、上下行、终端类别</td>
+</tr>
+<tr class="even">
+<td>关系</td>
+<td>底层基础</td>
+<td>基于 LoRa 构建网络</td>
+</tr>
+</tbody>
+</table>
+<p>考试可以直接答：</p>
+<blockquote class="blockquote">
+<p>LoRa 是低功耗远距离无线传输技术，属于物理层；LoRaWAN 是基于 LoRa 的通信协议和系统架构，属于 MAC 层。LoRa 提供底层无线传输能力，LoRaWAN 规定终端、网关、服务器之间的通信方式。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="十六lorawan-的优势" class="level1">
+<h1>十六、LoRaWAN 的优势</h1>
+<p>PPT 中列出 LoRaWAN 的优势：</p>
+<ol type="1">
+<li>低功耗与长使用寿命；</li>
+<li>节省成本；</li>
+<li>支持定位服务；</li>
+<li>深度穿透；</li>
+<li>无须频率许可；</li>
+<li>快速搭建和商用；</li>
+<li>一站式管理。</li>
+</ol>
+<hr>
+<section id="低功耗" class="level2">
+<h2 class="anchored" data-anchor-id="低功耗">1. 低功耗</h2>
+<p>LoRaWAN 终端可以长时间休眠，只在需要上传数据时唤醒，因此适合电池供电设备。</p>
+<hr>
+</section>
+<section id="低成本-1" class="level2">
+<h2 class="anchored" data-anchor-id="低成本-1">2. 低成本</h2>
+<p>LoRaWAN 可以自建网络，不一定依赖运营商网络，网络建设和运营成本较低。</p>
+<hr>
+</section>
+<section id="深度穿透" class="level2">
+<h2 class="anchored" data-anchor-id="深度穿透">3. 深度穿透</h2>
+<p>LoRa 信号传输距离远，穿透能力较强，适合建筑物内部、农田、园区等环境。</p>
+<hr>
+</section>
+<section id="免授权频段" class="level2">
+<h2 class="anchored" data-anchor-id="免授权频段">4. 免授权频段</h2>
+<p>LoRa 通常工作在免授权频段，不需要像 NB-IoT 那样依赖运营商授权频谱。</p>
+<hr>
+</section>
+</section>
+<section id="十七lorawan-三种工作模式" class="level1">
+<h1>十七、LoRaWAN 三种工作模式（🌟）</h1>
+<p>LoRaWAN 终端设备分为三类：</p>
+<ol type="1">
+<li>Class A；</li>
+<li>Class B；</li>
+<li>Class C。</li>
+</ol>
+<p>这是考试重点。</p>
+<hr>
+<section id="class-a双向终端设备" class="level2">
+<h2 class="anchored" data-anchor-id="class-a双向终端设备">1. Class A：双向终端设备</h2>
+<p>Class A 是所有 LoRaWAN 设备都必须支持的基本模式。</p>
+<p>工作方式：</p>
+<ol type="1">
+<li>终端主动发送上行数据；</li>
+<li>上行发送后，紧跟两个短暂的下行接收窗口；</li>
+<li>服务器只能在这两个窗口中下发数据。</li>
+</ol>
+<p>特点：</p>
+<ul>
+<li>最省电；</li>
+<li>延时较高；</li>
+<li>下行控制不够及时。</li>
+</ul>
+<p>适合场景：</p>
+<ul>
+<li>垃圾桶检测；</li>
+<li>烟雾报警；</li>
+<li>气体监测；</li>
+<li>环境数据采集；</li>
+<li>小数据、低实时性场景。</li>
+</ul>
+<p>记忆：</p>
+<blockquote class="blockquote">
+<p>Class A 最省电，但服务器要等终端上报后才能下发。</p>
+</blockquote>
+<hr>
+</section>
+<section id="class-b具有确定接收时隙的双向终端设备" class="level2">
+<h2 class="anchored" data-anchor-id="class-b具有确定接收时隙的双向终端设备">2. Class B：具有确定接收时隙的双向终端设备</h2>
+<p>Class B 在 Class A 的基础上增加了定时接收窗口。</p>
+<p>终端会根据网关下发的信标进行时间同步，然后在指定时间打开接收窗口。</p>
+<p>特点：</p>
+<ul>
+<li>比 Class A 实时性更好；</li>
+<li>比 Class C 更省电；</li>
+<li>需要时间同步；</li>
+<li>兼顾低功耗和实时性。</li>
+</ul>
+<p>适合场景：</p>
+<ul>
+<li>阀控水表；</li>
+<li>阀控气表；</li>
+<li>电表控制；</li>
+<li>需要定时下发命令的设备。</li>
+</ul>
+<p>记忆：</p>
+<blockquote class="blockquote">
+<p>Class B 有固定接收窗口，兼顾实时性和功耗。</p>
+</blockquote>
+<hr>
+</section>
+<section id="class-c最大化接收时隙的双向终端设备" class="level2">
+<h2 class="anchored" data-anchor-id="class-c最大化接收时隙的双向终端设备">3. Class C：最大化接收时隙的双向终端设备</h2>
+<p>Class C 几乎一直打开接收窗口，除了发送数据时关闭。</p>
+<p>特点：</p>
+<ul>
+<li>延时最低；</li>
+<li>实时性最好；</li>
+<li>功耗最高；</li>
+<li>适合有稳定电源的设备。</li>
+</ul>
+<p>适合场景：</p>
+<ul>
+<li>路灯控制；</li>
+<li>工业控制；</li>
+<li>需要频繁下行控制的设备。</li>
+</ul>
+<p>记忆：</p>
+<blockquote class="blockquote">
+<p>Class C 基本常开接收，实时性最好，但最耗电。</p>
+</blockquote>
+<hr>
+</section>
+<section id="class-abc-对比" class="level2">
+<h2 class="anchored" data-anchor-id="class-abc-对比">4. Class A/B/C 对比</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 38%">
+<col style="width: 6%">
+<col style="width: 9%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>类型</th>
+<th>接收方式</th>
+<th>功耗</th>
+<th>实时性</th>
+<th>典型应用</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Class A</td>
+<td>上行后打开两个短接收窗口</td>
+<td>最低</td>
+<td>较差</td>
+<td>垃圾桶、烟雾、气体监测</td>
+</tr>
+<tr class="even">
+<td>Class B</td>
+<td>按指定时间打开接收窗口</td>
+<td>中等</td>
+<td>中等</td>
+<td>阀控水表、气表、电表</td>
+</tr>
+<tr class="odd">
+<td>Class C</td>
+<td>几乎持续接收</td>
+<td>最高</td>
+<td>最好</td>
+<td>路灯控制、实时控制设备</td>
+</tr>
+</tbody>
+</table>
+<p>可以背成：</p>
+<blockquote class="blockquote">
+<p>A 最省电，B 折中，C 实时性最好。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="十八lorawan-网关" class="level1">
+<h1>十八、LoRaWAN 网关</h1>
+<p>LoRaWAN 网关的作用是：</p>
+<blockquote class="blockquote">
+<p>将终端节点采集的数据转发给服务器，并完成 LoRa 无线通信方式到网络通信方式的转换。</p>
+</blockquote>
+<p>可以理解为：</p>
+<blockquote class="blockquote">
+<p>终端用 LoRa 和网关通信； 网关再通过 IP 网络把数据转发到服务器。</p>
+</blockquote>
+<p>网关主要特点：</p>
+<ol type="1">
+<li>星形网络，结构简单；</li>
+<li>可靠性较高；</li>
+<li>功耗低；</li>
+<li>接入能力强；</li>
+<li>单网关可容纳大量节点；</li>
+<li>兼容性强；</li>
+<li>建设和运营成本较低。</li>
+</ol>
+<hr>
+</section>
+<section id="十九lora-服务器" class="level1">
+<h1>十九、LoRa 服务器</h1>
+<p>PPT 中 LoRa 服务器主要包括：</p>
+<ol type="1">
+<li>网络服务器 NS；</li>
+<li>应用服务器 AS；</li>
+<li>客户服务器 CS。</li>
+</ol>
+<hr>
+<section id="网络服务器-ns" class="level2">
+<h2 class="anchored" data-anchor-id="网络服务器-ns">1. 网络服务器 NS</h2>
+<p>Network Server，主要负责 LoRaWAN 网络层管理。</p>
+<p>例如：</p>
+<ul>
+<li>数据包完整性校验；</li>
+<li>重复数据过滤；</li>
+<li>上下行调度；</li>
+<li>网关管理；</li>
+<li>终端接入管理。</li>
+</ul>
+<hr>
+</section>
+<section id="应用服务器-as" class="level2">
+<h2 class="anchored" data-anchor-id="应用服务器-as">2. 应用服务器 AS</h2>
+<p>Application Server，主要负责应用数据处理。</p>
+<p>例如：</p>
+<ul>
+<li>应用数据加密和解密；</li>
+<li>业务数据解析；</li>
+<li>传感器数据处理；</li>
+<li>与业务系统对接。</li>
+</ul>
+<hr>
+</section>
+<section id="客户服务器-cs" class="level2">
+<h2 class="anchored" data-anchor-id="客户服务器-cs">3. 客户服务器 CS</h2>
+<p>Customer Server，可以理解为最终用户侧的业务服务器。</p>
+<p>例如：</p>
+<ul>
+<li>水务公司平台；</li>
+<li>路灯管理系统；</li>
+<li>农业监测平台。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="二十lorawan-网络架构" class="level1">
+<h1>二十、LoRaWAN 网络架构</h1>
+<p>PPT 中 LoRaWAN 网络实体分为四个部分：</p>
+<ol type="1">
+<li>End Node；</li>
+<li>Gateway；</li>
+<li>Network Server；</li>
+<li>Application Server。</li>
+</ol>
+<hr>
+<section id="end-node-终端节点" class="level2">
+<h2 class="anchored" data-anchor-id="end-node-终端节点">1. End Node 终端节点</h2>
+<p>终端节点一般是各种传感器或控制设备。</p>
+<p>作用：</p>
+<ul>
+<li>数据采集；</li>
+<li>状态监测；</li>
+<li>开关控制；</li>
+<li>上报信息。</li>
+</ul>
+<p>例如：</p>
+<ul>
+<li>温湿度传感器；</li>
+<li>水表；</li>
+<li>烟雾报警器；</li>
+<li>路灯控制器。</li>
+</ul>
+<hr>
+</section>
+<section id="gateway-网关" class="level2">
+<h2 class="anchored" data-anchor-id="gateway-网关">2. Gateway 网关</h2>
+<p>网关负责收集终端节点数据，并封装转发到服务器。</p>
+<p>它是 LoRa 网络和 IP 网络之间的桥梁。</p>
+<hr>
+</section>
+<section id="network-server-网络服务器" class="level2">
+<h2 class="anchored" data-anchor-id="network-server-网络服务器">3. Network Server 网络服务器</h2>
+<p>网络服务器负责 LoRaWAN 网络层处理，尤其是上下行数据包完整性校验。</p>
+<hr>
+</section>
+<section id="application-server-应用服务器" class="level2">
+<h2 class="anchored" data-anchor-id="application-server-应用服务器">4. Application Server 应用服务器</h2>
+<p>应用服务器负责应用层数据处理。</p>
+<p>PPT 中提到，AS 主要负责 OTAA 设备的入网激活，以及应用数据的加解密。</p>
+<hr>
+</section>
+<section id="lorawan-网络架构总结" class="level2">
+<h2 class="anchored" data-anchor-id="lorawan-网络架构总结">5. LoRaWAN 网络架构总结</h2>
+<p>可以这样描述：</p>
+<blockquote class="blockquote">
+<p>LoRaWAN 网络由终端节点、网关、网络服务器和应用服务器组成。终端节点通过 LoRa 无线方式向网关发送数据，网关将数据转发给网络服务器，网络服务器进行完整性校验和网络管理，应用服务器负责设备入网、应用数据加解密和业务处理。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="二十一lorawan-上行链路和下行链路" class="level1">
+<h1>二十一、LoRaWAN 上行链路和下行链路</h1>
+<p>PPT 中讲了 LoRaWAN 帧结构，包括上行链路和下行链路。</p>
+<hr>
+<section id="上行链路" class="level2">
+<h2 class="anchored" data-anchor-id="上行链路">1. 上行链路</h2>
+<p>上行链路是指：</p>
+<blockquote class="blockquote">
+<p>传感器或终端节点向服务器发送数据。</p>
+</blockquote>
+<p>数据传输路径：</p>
+<pre class="text"><code>终端节点 → 一个或多个网关 → 网络服务器 → 应用服务器</code></pre>
+<p>例如温湿度传感器把采集到的数据上传到平台，就是上行链路。</p>
+<hr>
+</section>
+<section id="下行链路" class="level2">
+<h2 class="anchored" data-anchor-id="下行链路">2. 下行链路</h2>
+<p>下行链路是指：</p>
+<blockquote class="blockquote">
+<p>网络服务器向终端设备发送数据或控制命令。</p>
+</blockquote>
+<p>数据传输路径：</p>
+<pre class="text"><code>服务器 → 一个网关 → 指定终端设备</code></pre>
+<p>例如平台下发开灯命令给路灯控制器，就是下行链路。</p>
+<p>PPT 中提到，下行链路中每条信息对应的监测设备是唯一确定的，并且只经过一个网关中转。</p>
+<hr>
+</section>
+<section id="物理帧结构" class="level2">
+<h2 class="anchored" data-anchor-id="物理帧结构">3. 物理帧结构</h2>
+<p>PPT 中提到：</p>
+<blockquote class="blockquote">
+<p>Preamble、PHDR、PHDR_CRC 和 CRC 都由硬件生成，不需要软件参与，只有 PHYPayload 需要软件参与。</p>
+</blockquote>
+<p>复习时重点记：</p>
+<blockquote class="blockquote">
+<p>LoRaWAN 帧中，底层物理同步、帧头和校验等很多由硬件处理，软件主要关注有效负载 PHYPayload。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="二十二lorawan-入网模式" class="level1">
+<h1>二十二、LoRaWAN 入网模式（🌟）</h1>
+<p>LoRaWAN 主要有两种入网模式：</p>
+<ol type="1">
+<li>ABP；</li>
+<li>OTAA。</li>
+</ol>
+<p>这是考试重点。</p>
+<hr>
+<section id="abp手动激活" class="level2">
+<h2 class="anchored" data-anchor-id="abp手动激活">1. ABP：手动激活</h2>
+<p>ABP 全称是：</p>
+<blockquote class="blockquote">
+<p>Activation By Personalization。</p>
+</blockquote>
+<p>它是一种简单的入网机制，适合私网。</p>
+<p>ABP 的核心思想是：</p>
+<blockquote class="blockquote">
+<p>服务器和终端提前保存好入网所需参数，终端启动后可以直接入网。</p>
+</blockquote>
+<p>需要保存三个参数：</p>
+<ol type="1">
+<li>DevAddr；</li>
+<li>NwkSKey；</li>
+<li>AppSKey。</li>
+</ol>
+<hr>
+<section id="devaddr" class="level3">
+<h3 class="anchored" data-anchor-id="devaddr">DevAddr</h3>
+<p>终端设备地址。</p>
+<p>用于标识终端设备。</p>
+<hr>
+</section>
+<section id="nwkskey" class="level3">
+<h3 class="anchored" data-anchor-id="nwkskey">NwkSKey</h3>
+<p>网络会话密钥。</p>
+<p>用于网络层相关安全校验。</p>
+<hr>
+</section>
+<section id="appskey" class="level3">
+<h3 class="anchored" data-anchor-id="appskey">AppSKey</h3>
+<p>应用会话密钥。</p>
+<p>用于应用数据加密和解密。</p>
+<hr>
+</section>
+</section>
+<section id="abp-的优缺点" class="level2">
+<h2 class="anchored" data-anchor-id="abp-的优缺点">2. ABP 的优缺点</h2>
+<p>优点：</p>
+<ul>
+<li>实现简单；</li>
+<li>入网速度快；</li>
+<li>适合私有网络；</li>
+<li>不需要复杂入网交互。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>安全性相对较低；</li>
+<li>参数预置后不够灵活；</li>
+<li>不适合大规模动态网络。</li>
+</ul>
+<hr>
+</section>
+<section id="otaa空中激活" class="level2">
+<h2 class="anchored" data-anchor-id="otaa空中激活">3. OTAA：空中激活</h2>
+<p>OTAA 全称是：</p>
+<blockquote class="blockquote">
+<p>Over-The-Air Activation。</p>
+</blockquote>
+<p>它是一种安全性更高的入网方式。</p>
+<p>设备不是提前固定所有会话参数，而是通过入网请求和服务器交互后动态生成会话密钥。</p>
+<p>优点：</p>
+<ul>
+<li>安全性高；</li>
+<li>更适合大规模网络；</li>
+<li>密钥可动态生成；</li>
+<li>更适合商用网络。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>实现复杂；</li>
+<li>入网过程比 ABP 复杂。</li>
+</ul>
+<hr>
+</section>
+<section id="abp-与-otaa-对比" class="level2">
+<h2 class="anchored" data-anchor-id="abp-与-otaa-对比">4. ABP 与 OTAA 对比</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>项目</th>
+<th>ABP</th>
+<th>OTAA</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>中文</td>
+<td>手动激活</td>
+<td>空中激活</td>
+</tr>
+<tr class="even">
+<td>复杂度</td>
+<td>简单</td>
+<td>较复杂</td>
+</tr>
+<tr class="odd">
+<td>安全性</td>
+<td>较低</td>
+<td>较高</td>
+</tr>
+<tr class="even">
+<td>入网方式</td>
+<td>预置参数，直接入网</td>
+<td>通过空中交互动态入网</td>
+</tr>
+<tr class="odd">
+<td>适用场景</td>
+<td>私网、小规模部署</td>
+<td>公网、大规模商用部署</td>
+</tr>
+</tbody>
+</table>
+<p>可以背成：</p>
+<blockquote class="blockquote">
+<p>ABP 简单但安全性较低；OTAA 复杂但安全性高。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="二十三nb-iot-与-lora-对比" class="level1">
+<h1>二十三、NB-IoT 与 LoRa 对比</h1>
+<p>PPT 最后提示要从通信距离、电池寿命、组网成本等角度比较 NB-IoT 和 LoRa。</p>
+<hr>
+<section id="通信距离" class="level2">
+<h2 class="anchored" data-anchor-id="通信距离">1. 通信距离</h2>
+<p>两者都属于低功耗广域通信技术，都能实现较远距离传输。</p>
+<p>不过：</p>
+<ul>
+<li>NB-IoT 依托运营商蜂窝网络，覆盖稳定；</li>
+<li>LoRa 依赖自建网关，覆盖范围取决于网关部署。</li>
+</ul>
+<hr>
+</section>
+<section id="电池寿命" class="level2">
+<h2 class="anchored" data-anchor-id="电池寿命">2. 电池寿命</h2>
+<p>两者都强调低功耗。</p>
+<ul>
+<li>NB-IoT 通过 PSM、eDRX 等机制降低功耗；</li>
+<li>LoRaWAN 通过 Class A 等低功耗工作模式降低功耗。</li>
+</ul>
+<p>如果设备只是偶尔上传小数据，二者都可以支持较长电池寿命。</p>
+<hr>
+</section>
+<section id="组网成本" class="level2">
+<h2 class="anchored" data-anchor-id="组网成本">3. 组网成本</h2>
+<p>这是两者差别比较明显的地方。</p>
+<section id="nb-iot" class="level3">
+<h3 class="anchored" data-anchor-id="nb-iot">NB-IoT</h3>
+<p>依赖运营商网络。</p>
+<p>优点：</p>
+<ul>
+<li>网络质量较好；</li>
+<li>覆盖广；</li>
+<li>运维由运营商承担。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>需要使用运营商网络；</li>
+<li>可能有通信资费；</li>
+<li>网络自主可控性较弱。</li>
+</ul>
+</section>
+<section id="lora" class="level3">
+<h3 class="anchored" data-anchor-id="lora">LoRa</h3>
+<p>可以自建网络。</p>
+<p>优点：</p>
+<ul>
+<li>免授权频段；</li>
+<li>可自建私网；</li>
+<li>运维成本可控；</li>
+<li>适合园区、农场、工厂等局部区域部署。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>需要自己部署网关；</li>
+<li>覆盖和质量取决于网关建设；</li>
+<li>大范围公网覆盖不如运营商网络方便。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="nb-iot-与-lora-对比表" class="level2">
+<h2 class="anchored" data-anchor-id="nb-iot-与-lora-对比表">4. NB-IoT 与 LoRa 对比表</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>对比项</th>
+<th>NB-IoT</th>
+<th>LoRa/LoRaWAN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>网络基础</td>
+<td>运营商蜂窝网络</td>
+<td>自建或第三方 LoRa 网络</td>
+</tr>
+<tr class="even">
+<td>频谱</td>
+<td>授权频谱</td>
+<td>免授权频谱</td>
+</tr>
+<tr class="odd">
+<td>功耗</td>
+<td>低</td>
+<td>低</td>
+</tr>
+<tr class="even">
+<td>覆盖</td>
+<td>广，依赖运营商</td>
+<td>远距离，依赖网关部署</td>
+</tr>
+<tr class="odd">
+<td>成本</td>
+<td>模块成本低，但可能有通信资费</td>
+<td>网关需自建，终端成本较低</td>
+</tr>
+<tr class="even">
+<td>实时性</td>
+<td>相对较好</td>
+<td>取决于 Class 类型</td>
+</tr>
+<tr class="odd">
+<td>适合场景</td>
+<td>抄表、停车、报警、城市级部署</td>
+<td>农业、园区、物流、私有网络</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="二十四本章重点背诵版" class="level1">
+<h1>二十四、本章重点背诵版</h1>
+<p>下面是考前可以直接背的内容。</p>
+<hr>
+<section id="nb-iot-定义" class="level2">
+<h2 class="anchored" data-anchor-id="nb-iot-定义">1. NB-IoT 定义</h2>
+<p>NB-IoT 是 Narrow Band Internet of Things，即基于蜂窝网络的窄带物联网通信技术，具有广覆盖、低功耗、低成本、大连接和高稳定性等特点，适合智能抄表、智慧停车、智慧农业、工业监测等低速率、小数据量、大规模连接场景。</p>
+<hr>
+</section>
+<section id="nb-iot-技术特点" class="level2">
+<h2 class="anchored" data-anchor-id="nb-iot-技术特点">2. NB-IoT 技术特点</h2>
+<p>NB-IoT 的主要技术特点包括：</p>
+<ol type="1">
+<li>网络覆盖强；</li>
+<li>低功耗运行；</li>
+<li>低成本；</li>
+<li>容量大。</li>
+</ol>
+<p>其中低功耗主要通过 PSM 省电模式和 eDRX 增强型非连续接收实现。</p>
+<hr>
+</section>
+<section id="nb-iot-网络架构" class="level2">
+<h2 class="anchored" data-anchor-id="nb-iot-网络架构">3. NB-IoT 网络架构</h2>
+<p>NB-IoT 网络架构主要由 UE 终端、无线网侧、核心网、物联网平台和应用服务器组成。UE 通过空口接入基站，无线接入网完成接入和小区管理，核心网负责数据转发，物联网平台负责设备管理和数据处理，应用服务器提供具体业务服务。</p>
+<hr>
+</section>
+<section id="nb-iot-部署模式" class="level2">
+<h2 class="anchored" data-anchor-id="nb-iot-部署模式">4. NB-IoT 部署模式</h2>
+<p>NB-IoT 有三种部署模式：</p>
+<ol type="1">
+<li>独立部署；</li>
+<li>保护带部署；</li>
+<li>带内部署。</li>
+</ol>
+<p>独立部署利用独立频段，如重耕 GSM 频段；保护带部署利用 LTE 频谱边缘的保护带；带内部署利用 LTE 频带内部资源。</p>
+<hr>
+</section>
+<section id="nb-iot-上行和下行信道" class="level2">
+<h2 class="anchored" data-anchor-id="nb-iot-上行和下行信道">5. NB-IoT 上行和下行信道</h2>
+<p>NB-IoT 上行信道包括：</p>
+<ol type="1">
+<li>NPUSCH；</li>
+<li>NPRACH。</li>
+</ol>
+<p>NB-IoT 下行信道包括：</p>
+<ol type="1">
+<li>NPBCH；</li>
+<li>NPDCCH；</li>
+<li>NPDSCH。</li>
+</ol>
+<p>可以背：</p>
+<blockquote class="blockquote">
+<p>上行共享和随机接入；下行广播、控制和共享。</p>
+</blockquote>
+<hr>
+</section>
+<section id="lora-与-lorawan-的关系" class="level2">
+<h2 class="anchored" data-anchor-id="lora-与-lorawan-的关系">6. LoRa 与 LoRaWAN 的关系</h2>
+<p>LoRa 是一种低功耗远距离无线传输技术，属于物理层；LoRaWAN 是为 LoRa 远距离通信网络设计的通信协议和系统架构，属于 MAC 层。LoRa 提供底层无线传输能力，LoRaWAN 规定终端、网关、服务器之间的通信规则。</p>
+<hr>
+</section>
+<section id="lorawan-网络架构" class="level2">
+<h2 class="anchored" data-anchor-id="lorawan-网络架构">7. LoRaWAN 网络架构</h2>
+<p>LoRaWAN 网络由四部分组成：</p>
+<ol type="1">
+<li>End Node 终端节点；</li>
+<li>Gateway 网关；</li>
+<li>Network Server 网络服务器；</li>
+<li>Application Server 应用服务器。</li>
+</ol>
+<p>终端节点采集数据并通过 LoRa 发送给网关，网关转发给网络服务器，网络服务器负责完整性校验和网络管理，应用服务器负责入网激活、数据加解密和业务处理。</p>
+<hr>
+</section>
+<section id="lorawan-三类终端" class="level2">
+<h2 class="anchored" data-anchor-id="lorawan-三类终端">8. LoRaWAN 三类终端</h2>
+<p>LoRaWAN 终端分为：</p>
+<ol type="1">
+<li>Class A；</li>
+<li>Class B；</li>
+<li>Class C。</li>
+</ol>
+<p>Class A 最省电，终端上行后打开两个下行接收窗口；Class B 在指定时间打开接收窗口，兼顾实时性和功耗；Class C 几乎持续接收，实时性最好但功耗最高。</p>
+<hr>
+</section>
+<section id="lorawan-入网模式" class="level2">
+<h2 class="anchored" data-anchor-id="lorawan-入网模式">9. LoRaWAN 入网模式</h2>
+<p>LoRaWAN 入网模式包括：</p>
+<ol type="1">
+<li>ABP，手动激活；</li>
+<li>OTAA，空中激活。</li>
+</ol>
+<p>ABP 简单，终端预置 DevAddr、NwkSKey 和 AppSKey 后直接入网，适合私网；OTAA 通过空中交互动态生成会话密钥，安全性更高，适合大规模商用网络。</p>
+<hr>
+</section>
+</section>
+<section id="二十五考试可能这样问" class="level1">
+<h1>二十五、考试可能这样问</h1>
+<section id="题目1nb-iot-有哪些技术特点" class="level2">
+<h2 class="anchored" data-anchor-id="题目1nb-iot-有哪些技术特点">题目1：NB-IoT 有哪些技术特点？</h2>
+<p>答：</p>
+<p>NB-IoT 具有网络覆盖强、低功耗、低成本、容量大和高稳定性等特点。其覆盖能力强，适合地下、室内深处等弱覆盖场景；通过 PSM 和 eDRX 等机制实现低功耗运行；由于采用低带宽、低速率和半双工设计，终端模块成本较低；同时支持大量设备接入，适合智能抄表、智慧停车、智慧农业等小数据量、大规模连接场景。</p>
+<hr>
+</section>
+<section id="题目2简述-nb-iot-的网络架构" class="level2">
+<h2 class="anchored" data-anchor-id="题目2简述-nb-iot-的网络架构">题目2：简述 NB-IoT 的网络架构。</h2>
+<p>答：</p>
+<p>NB-IoT 网络架构主要由 UE 终端、无线网侧、核心网、物联网平台和应用服务器组成。UE 通过空口接入 eNodeB，无线网侧负责空口接入和小区管理，核心网 EPC 负责与 UE 的非接入层交互和数据转发，物联网平台负责设备管理、数据存储和处理，应用服务器提供具体业务服务。</p>
+<hr>
+</section>
+<section id="题目3nb-iot-有哪些部署模式" class="level2">
+<h2 class="anchored" data-anchor-id="题目3nb-iot-有哪些部署模式">题目3：NB-IoT 有哪些部署模式？</h2>
+<p>答：</p>
+<p>NB-IoT 有三种部署模式：独立部署、保护带部署和带内部署。独立部署利用独立频段，例如重耕 GSM 频段；保护带部署利用 LTE 频谱边缘未使用的保护频带；带内部署则在 LTE 频带内部使用部分资源块部署 NB-IoT。</p>
+<hr>
+</section>
+<section id="题目4lora-与-lorawan-有什么联系和区别" class="level2">
+<h2 class="anchored" data-anchor-id="题目4lora-与-lorawan-有什么联系和区别">题目4：LoRa 与 LoRaWAN 有什么联系和区别？</h2>
+<p>答：</p>
+<p>LoRa 是一种基于扩频技术的低功耗、远距离无线传输技术，属于物理层；LoRaWAN 是基于 LoRa 的通信协议和系统架构，属于 MAC 层。LoRa 负责底层无线信号传输，LoRaWAN 规定终端、网关和服务器之间的组网方式、通信规则和入网机制。二者关系是 LoRa 提供传输基础，LoRaWAN 提供网络协议支持。</p>
+<hr>
+</section>
+<section id="题目5lorawan-的网络架构是什么" class="level2">
+<h2 class="anchored" data-anchor-id="题目5lorawan-的网络架构是什么">题目5：LoRaWAN 的网络架构是什么？</h2>
+<p>答：</p>
+<p>LoRaWAN 网络架构由终端节点、网关、网络服务器和应用服务器组成。终端节点一般是传感器或控制设备，负责采集数据和执行控制；网关负责接收终端节点数据并转发到服务器；网络服务器负责上下行数据包完整性校验和网络管理；应用服务器负责设备入网激活、应用数据加解密和业务处理。</p>
+<hr>
+</section>
+<section id="题目6简述-lorawan-三类终端设备" class="level2">
+<h2 class="anchored" data-anchor-id="题目6简述-lorawan-三类终端设备">题目6：简述 LoRaWAN 三类终端设备。</h2>
+<p>答：</p>
+<p>LoRaWAN 终端设备分为 Class A、Class B 和 Class C。Class A 是所有设备必须支持的基本模式，终端每次上行后打开两个短暂接收窗口，功耗最低，适合低实时性采集场景；Class B 在指定时间打开接收窗口，兼顾实时性和低功耗，适合阀控水表、气表等场景；Class C 几乎持续打开接收窗口，实时性最好但功耗最高，适合路灯控制等有稳定供电的场景。</p>
+<hr>
+</section>
+<section id="题目7abp-和-otaa-有什么区别" class="level2">
+<h2 class="anchored" data-anchor-id="题目7abp-和-otaa-有什么区别">题目7：ABP 和 OTAA 有什么区别？</h2>
+<p>答：</p>
+<p>ABP 是手动激活方式，终端预先保存 DevAddr、NwkSKey 和 AppSKey，启动后可直接加入网络，优点是简单，适合私网，但安全性相对较低。OTAA 是空中激活方式，终端通过与服务器交互动态完成入网并生成会话密钥，安全性更高，适合大规模商用网络，但实现复杂度更高。</p>
+<hr>
+</section>
+</section>
+<section id="二十六本章一句话总结" class="level1">
+<h1>二十六、本章一句话总结</h1>
+<p>这一章可以这样总结：</p>
+<blockquote class="blockquote">
+<p>连接技术是物联网实现“万物互联”的基础，其中 NB-IoT 依托运营商蜂窝网络，具有广覆盖、低功耗、大连接等特点，适合城市级大规模物联网部署；LoRa 提供低功耗远距离无线传输能力，LoRaWAN 在其基础上定义网络协议和架构，适合自建低成本广域物联网应用。</p>
+</blockquote>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

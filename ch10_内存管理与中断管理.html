@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-Hans" xml:lang="zh-Hans"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第10章 内存管理与中断管理 – 物联网终端操作系统笔记</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-1b8143a5af30aa0587ead8c64582f750.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">物联网终端操作系统笔记</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
+<span class="menu-text">首页</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/hugswangyu/iot-os-notes"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="展开或折叠侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch1_物联网及嵌入式概述.html">课程笔记</a></li><li class="breadcrumb-item"><a href="./ch10_内存管理与中断管理.html">Ch10 内存管理与中断管理</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="展开或折叠侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="搜索" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="搜索"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">首页</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">课程笔记</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="展开或折叠此栏">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch1_物联网及嵌入式概述.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch1 物联网及嵌入式概述</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch2_ch3_物联网操作系统的关键技术.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch2-3 物联网操作系统的关键技术</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch4_连接技术.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch4 连接技术</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch5_连接与协议.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch5 连接与协议</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch6_LiteOS操作系统及其移植.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch6 LiteOS 操作系统及其移植</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch7_任务.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch7 任务</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch8_信号量与互斥锁.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch8 信号量与互斥锁</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch9_消息队列_事件与软件定时器.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch9 消息队列、事件与软件定时器</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch10_内存管理与中断管理.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Ch10 内存管理与中断管理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch11_物联网操作系统的应用案例.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch11 物联网操作系统的应用案例</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">本页目录</h2>
+   
+  <ul>
+  <li><a href="#一本章总体框架" id="toc-一本章总体框架" class="nav-link active" data-scroll-target="#一本章总体框架">一、本章总体框架</a></li>
+  <li><a href="#二内存管理是什么" id="toc-二内存管理是什么" class="nav-link" data-scroll-target="#二内存管理是什么">二、内存管理是什么？</a></li>
+  <li><a href="#三静态内存分配与动态内存分配" id="toc-三静态内存分配与动态内存分配" class="nav-link" data-scroll-target="#三静态内存分配与动态内存分配">三、静态内存分配与动态内存分配</a>
+  <ul class="collapse">
+  <li><a href="#静态内存分配" id="toc-静态内存分配" class="nav-link" data-scroll-target="#静态内存分配">1. 静态内存分配</a>
+  <ul class="collapse">
+  <li><a href="#优点" id="toc-优点" class="nav-link" data-scroll-target="#优点">优点</a></li>
+  <li><a href="#缺点" id="toc-缺点" class="nav-link" data-scroll-target="#缺点">缺点</a></li>
+  </ul></li>
+  <li><a href="#动态内存分配" id="toc-动态内存分配" class="nav-link" data-scroll-target="#动态内存分配">2. 动态内存分配</a>
+  <ul class="collapse">
+  <li><a href="#优点-1" id="toc-优点-1" class="nav-link" data-scroll-target="#优点-1">优点</a></li>
+  <li><a href="#缺点-1" id="toc-缺点-1" class="nav-link" data-scroll-target="#缺点-1">缺点</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#四为什么需要动态内存" id="toc-四为什么需要动态内存" class="nav-link" data-scroll-target="#四为什么需要动态内存">四、为什么需要动态内存？</a></li>
+  <li><a href="#五liteos-内存分配算法" id="toc-五liteos-内存分配算法" class="nav-link" data-scroll-target="#五liteos-内存分配算法">五、LiteOS 内存分配算法</a>
+  <ul class="collapse">
+  <li><a href="#bestfit-最佳适应算法" id="toc-bestfit-最佳适应算法" class="nav-link" data-scroll-target="#bestfit-最佳适应算法">1. BestFit 最佳适应算法</a>
+  <ul class="collapse">
+  <li><a href="#优点-2" id="toc-优点-2" class="nav-link" data-scroll-target="#优点-2">优点</a></li>
+  <li><a href="#缺点-2" id="toc-缺点-2" class="nav-link" data-scroll-target="#缺点-2">缺点</a></li>
+  </ul></li>
+  <li><a href="#tlsf-算法" id="toc-tlsf-算法" class="nav-link" data-scroll-target="#tlsf-算法">2. TLSF 算法</a></li>
+  </ul></li>
+  <li><a href="#六嵌入式系统中的-ram-分布" id="toc-六嵌入式系统中的-ram-分布" class="nav-link" data-scroll-target="#六嵌入式系统中的-ram-分布">六、嵌入式系统中的 RAM 分布</a></li>
+  <li><a href="#七动态内存管理的运行机制" id="toc-七动态内存管理的运行机制" class="nav-link" data-scroll-target="#七动态内存管理的运行机制">七、动态内存管理的运行机制</a>
+  <ul class="collapse">
+  <li><a href="#初始化内存" id="toc-初始化内存" class="nav-link" data-scroll-target="#初始化内存">1. 初始化内存</a></li>
+  <li><a href="#分配内存" id="toc-分配内存" class="nav-link" data-scroll-target="#分配内存">2. 分配内存</a></li>
+  <li><a href="#释放内存" id="toc-释放内存" class="nav-link" data-scroll-target="#释放内存">3. 释放内存</a></li>
+  </ul></li>
+  <li><a href="#八静态内存池管理" id="toc-八静态内存池管理" class="nav-link" data-scroll-target="#八静态内存池管理">八、静态内存池管理</a></li>
+  <li><a href="#九静态内存池的开发流程" id="toc-九静态内存池的开发流程" class="nav-link" data-scroll-target="#九静态内存池的开发流程">九、静态内存池的开发流程</a>
+  <ul class="collapse">
+  <li><a href="#定义静态内存池" id="toc-定义静态内存池" class="nav-link" data-scroll-target="#定义静态内存池">1. 定义静态内存池</a></li>
+  <li><a href="#初始化静态内存池los_memboxinit" id="toc-初始化静态内存池los_memboxinit" class="nav-link" data-scroll-target="#初始化静态内存池los_memboxinit">2. 初始化静态内存池：<code>LOS_MemboxInit</code></a></li>
+  <li><a href="#分配静态内存块los_memboxalloc" id="toc-分配静态内存块los_memboxalloc" class="nav-link" data-scroll-target="#分配静态内存块los_memboxalloc">3. 分配静态内存块：<code>LOS_MemboxAlloc</code></a></li>
+  <li><a href="#释放静态内存块los_memboxfree" id="toc-释放静态内存块los_memboxfree" class="nav-link" data-scroll-target="#释放静态内存块los_memboxfree">4. 释放静态内存块：<code>LOS_MemboxFree</code></a></li>
+  <li><a href="#清除内存块内容los_memboxclr" id="toc-清除内存块内容los_memboxclr" class="nav-link" data-scroll-target="#清除内存块内容los_memboxclr">5. 清除内存块内容：<code>LOS_MemboxClr</code></a></li>
+  </ul></li>
+  <li><a href="#十静态内存和动态内存对比" id="toc-十静态内存和动态内存对比" class="nav-link" data-scroll-target="#十静态内存和动态内存对比">十、静态内存和动态内存对比</a></li>
+  <li><a href="#十一中断是什么" id="toc-十一中断是什么" class="nav-link" data-scroll-target="#十一中断是什么">十一、中断是什么？</a></li>
+  <li><a href="#十二异常同步异常和异步异常" id="toc-十二异常同步异常和异步异常" class="nav-link" data-scroll-target="#十二异常同步异常和异步异常">十二、异常、同步异常和异步异常</a>
+  <ul class="collapse">
+  <li><a href="#异常" id="toc-异常" class="nav-link" data-scroll-target="#异常">1. 异常</a></li>
+  <li><a href="#同步异常" id="toc-同步异常" class="nav-link" data-scroll-target="#同步异常">2. 同步异常</a></li>
+  <li><a href="#异步异常" id="toc-异步异常" class="nav-link" data-scroll-target="#异步异常">3. 异步异常</a></li>
+  </ul></li>
+  <li><a href="#十三中断相关硬件" id="toc-十三中断相关硬件" class="nav-link" data-scroll-target="#十三中断相关硬件">十三、中断相关硬件</a>
+  <ul class="collapse">
+  <li><a href="#外设" id="toc-外设" class="nav-link" data-scroll-target="#外设">1. 外设</a></li>
+  <li><a href="#中断控制器" id="toc-中断控制器" class="nav-link" data-scroll-target="#中断控制器">2. 中断控制器</a></li>
+  <li><a href="#cpu" id="toc-cpu" class="nav-link" data-scroll-target="#cpu">3. CPU</a></li>
+  </ul></li>
+  <li><a href="#十四中断相关术语" id="toc-十四中断相关术语" class="nav-link" data-scroll-target="#十四中断相关术语">十四、中断相关术语</a></li>
+  <li><a href="#十五中断的运行机制" id="toc-十五中断的运行机制" class="nav-link" data-scroll-target="#十五中断的运行机制">十五、中断的运行机制</a></li>
+  <li><a href="#十六中断发生的两种环境" id="toc-十六中断发生的两种环境" class="nav-link" data-scroll-target="#十六中断发生的两种环境">十六、中断发生的两种环境</a>
+  <ul class="collapse">
+  <li><a href="#任务运行时发生中断" id="toc-任务运行时发生中断" class="nav-link" data-scroll-target="#任务运行时发生中断">1. 任务运行时发生中断</a></li>
+  <li><a href="#中断服务程序中发生更高优先级中断" id="toc-中断服务程序中发生更高优先级中断" class="nav-link" data-scroll-target="#中断服务程序中发生更高优先级中断">2. 中断服务程序中发生更高优先级中断</a></li>
+  </ul></li>
+  <li><a href="#十七中断为什么要快进快出" id="toc-十七中断为什么要快进快出" class="nav-link" data-scroll-target="#十七中断为什么要快进快出">十七、中断为什么要“快进快出”？</a></li>
+  <li><a href="#十八中断延迟" id="toc-十八中断延迟" class="nav-link" data-scroll-target="#十八中断延迟">十八、中断延迟</a>
+  <ul class="collapse">
+  <li><a href="#中断延迟由哪些部分组成" id="toc-中断延迟由哪些部分组成" class="nav-link" data-scroll-target="#中断延迟由哪些部分组成">中断延迟由哪些部分组成？</a></li>
+  </ul></li>
+  <li><a href="#十九接管中断与非接管中断" id="toc-十九接管中断与非接管中断" class="nav-link" data-scroll-target="#十九接管中断与非接管中断">十九、接管中断与非接管中断</a>
+  <ul class="collapse">
+  <li><a href="#接管中断" id="toc-接管中断" class="nav-link" data-scroll-target="#接管中断">1. 接管中断</a></li>
+  <li><a href="#非接管中断" id="toc-非接管中断" class="nav-link" data-scroll-target="#非接管中断">2. 非接管中断</a></li>
+  </ul></li>
+  <li><a href="#二十liteos-接管中断的常用函数" id="toc-二十liteos-接管中断的常用函数" class="nav-link" data-scroll-target="#二十liteos-接管中断的常用函数">二十、LiteOS 接管中断的常用函数</a>
+  <ul class="collapse">
+  <li><a href="#创建硬件中断los_hwicreate" id="toc-创建硬件中断los_hwicreate" class="nav-link" data-scroll-target="#创建硬件中断los_hwicreate">1. 创建硬件中断：<code>LOS_HwiCreate</code></a></li>
+  <li><a href="#删除硬件中断los_hwidelete" id="toc-删除硬件中断los_hwidelete" class="nav-link" data-scroll-target="#删除硬件中断los_hwidelete">2. 删除硬件中断：<code>LOS_HwiDelete</code></a></li>
+  </ul></li>
+  <li><a href="#二十一使用接管中断时的注意事项" id="toc-二十一使用接管中断时的注意事项" class="nav-link" data-scroll-target="#二十一使用接管中断时的注意事项">二十一、使用接管中断时的注意事项</a></li>
+  <li><a href="#二十二非接管中断方式" id="toc-二十二非接管中断方式" class="nav-link" data-scroll-target="#二十二非接管中断方式">二十二、非接管中断方式</a></li>
+  <li><a href="#二十三中断向量表" id="toc-二十三中断向量表" class="nav-link" data-scroll-target="#二十三中断向量表">二十三、中断向量表</a></li>
+  <li><a href="#二十四中断管理实验" id="toc-二十四中断管理实验" class="nav-link" data-scroll-target="#二十四中断管理实验">二十四、中断管理实验</a></li>
+  <li><a href="#二十五内存管理与中断管理的联系" id="toc-二十五内存管理与中断管理的联系" class="nav-link" data-scroll-target="#二十五内存管理与中断管理的联系">二十五、内存管理与中断管理的联系</a></li>
+  <li><a href="#二十六本章重点背诵版" id="toc-二十六本章重点背诵版" class="nav-link" data-scroll-target="#二十六本章重点背诵版">二十六、本章重点背诵版</a>
+  <ul class="collapse">
+  <li><a href="#内存管理定义" id="toc-内存管理定义" class="nav-link" data-scroll-target="#内存管理定义">1. 内存管理定义</a></li>
+  <li><a href="#静态内存分配-1" id="toc-静态内存分配-1" class="nav-link" data-scroll-target="#静态内存分配-1">2. 静态内存分配</a></li>
+  <li><a href="#动态内存分配-1" id="toc-动态内存分配-1" class="nav-link" data-scroll-target="#动态内存分配-1">3. 动态内存分配</a></li>
+  <li><a href="#静态内存池常用函数" id="toc-静态内存池常用函数" class="nav-link" data-scroll-target="#静态内存池常用函数">4. 静态内存池常用函数</a></li>
+  <li><a href="#动态内存常用函数" id="toc-动态内存常用函数" class="nav-link" data-scroll-target="#动态内存常用函数">5. 动态内存常用函数</a></li>
+  <li><a href="#中断定义" id="toc-中断定义" class="nav-link" data-scroll-target="#中断定义">6. 中断定义</a></li>
+  <li><a href="#中断处理流程" id="toc-中断处理流程" class="nav-link" data-scroll-target="#中断处理流程">7. 中断处理流程</a></li>
+  <li><a href="#中断延迟" id="toc-中断延迟" class="nav-link" data-scroll-target="#中断延迟">8. 中断延迟</a></li>
+  <li><a href="#接管中断与非接管中断" id="toc-接管中断与非接管中断" class="nav-link" data-scroll-target="#接管中断与非接管中断">9. 接管中断与非接管中断</a></li>
+  <li><a href="#中断服务程序设计原则" id="toc-中断服务程序设计原则" class="nav-link" data-scroll-target="#中断服务程序设计原则">10. 中断服务程序设计原则</a></li>
+  </ul></li>
+  <li><a href="#二十七考试可能这样问" id="toc-二十七考试可能这样问" class="nav-link" data-scroll-target="#二十七考试可能这样问">二十七、考试可能这样问</a>
+  <ul class="collapse">
+  <li><a href="#题目1liteos-为什么不直接使用-mallocfree" id="toc-题目1liteos-为什么不直接使用-mallocfree" class="nav-link" data-scroll-target="#题目1liteos-为什么不直接使用-mallocfree">题目1：LiteOS 为什么不直接使用 malloc/free？</a></li>
+  <li><a href="#题目2静态内存分配和动态内存分配有什么区别" id="toc-题目2静态内存分配和动态内存分配有什么区别" class="nav-link" data-scroll-target="#题目2静态内存分配和动态内存分配有什么区别">题目2：静态内存分配和动态内存分配有什么区别？</a></li>
+  <li><a href="#题目3liteos-静态内存池如何使用" id="toc-题目3liteos-静态内存池如何使用" class="nav-link" data-scroll-target="#题目3liteos-静态内存池如何使用">题目3：LiteOS 静态内存池如何使用？</a></li>
+  <li><a href="#题目4liteos-动态内存管理的流程是什么" id="toc-题目4liteos-动态内存管理的流程是什么" class="nav-link" data-scroll-target="#题目4liteos-动态内存管理的流程是什么">题目4：LiteOS 动态内存管理的流程是什么？</a></li>
+  <li><a href="#题目5什么是中断" id="toc-题目5什么是中断" class="nav-link" data-scroll-target="#题目5什么是中断">题目5：什么是中断？</a></li>
+  <li><a href="#题目6中断处理过程是什么" id="toc-题目6中断处理过程是什么" class="nav-link" data-scroll-target="#题目6中断处理过程是什么">题目6：中断处理过程是什么？</a></li>
+  <li><a href="#题目7什么是中断延迟" id="toc-题目7什么是中断延迟" class="nav-link" data-scroll-target="#题目7什么是中断延迟">题目7：什么是中断延迟？</a></li>
+  <li><a href="#题目8接管中断和非接管中断有什么区别" id="toc-题目8接管中断和非接管中断有什么区别" class="nav-link" data-scroll-target="#题目8接管中断和非接管中断有什么区别">题目8：接管中断和非接管中断有什么区别？</a></li>
+  <li><a href="#题目9为什么中断服务程序要尽量短" id="toc-题目9为什么中断服务程序要尽量短" class="nav-link" data-scroll-target="#题目9为什么中断服务程序要尽量短">题目9：为什么中断服务程序要尽量短？</a></li>
+  </ul></li>
+  <li><a href="#二十八本章一句话总结" id="toc-二十八本章一句话总结" class="nav-link" data-scroll-target="#二十八本章一句话总结">二十八、本章一句话总结</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch1_物联网及嵌入式概述.html">课程笔记</a></li><li class="breadcrumb-item"><a href="./ch10_内存管理与中断管理.html">Ch10 内存管理与中断管理</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">第10章 内存管理与中断管理</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>核心主线是：<strong>LiteOS 如何管理 RAM 内存资源，以及如何处理中断事件。</strong></p>
+<hr>
+<section id="一本章总体框架" class="level1">
+<h1>一、本章总体框架</h1>
+<p>第十章节可以分成两大部分：</p>
+<ol type="1">
+<li><strong>内存管理</strong>
+<ul>
+<li>内存管理基本概念；</li>
+<li>静态内存分配；</li>
+<li>动态内存分配；</li>
+<li>静态内存池；</li>
+<li>动态内存堆；</li>
+<li><code>LOS_MemboxInit</code>、<code>LOS_MemboxAlloc</code>、<code>LOS_MemboxFree</code>；</li>
+<li><code>LOS_MemInit</code>、<code>LOS_MemAlloc</code>、<code>LOS_MemFree</code>。</li>
+</ul></li>
+<li><strong>中断管理</strong>
+<ul>
+<li>异常与中断；</li>
+<li>同步异常与异步异常；</li>
+<li>中断运行机制；</li>
+<li>中断嵌套；</li>
+<li>中断延迟；</li>
+<li>接管中断与非接管中断；</li>
+<li><code>LOS_HwiCreate</code>、<code>LOS_HwiDelete</code>；</li>
+<li>中断服务程序设计原则。</li>
+</ul></li>
+</ol>
+<p>这一章最重要的理解是：</p>
+<blockquote class="blockquote">
+<p>内存管理解决“RAM 如何分配和回收”； 中断管理解决“外部紧急事件如何打断 CPU 并得到响应”。</p>
+</blockquote>
+<hr>
+</section>
+<section id="二内存管理是什么" class="level1">
+<h1>二、内存管理是什么？</h1>
+<p>LiteOS 内存管理模块用于管理系统内存资源，是操作系统核心模块之一。它主要负责：</p>
+<ol type="1">
+<li><strong>内存初始化</strong>；</li>
+<li><strong>内存分配</strong>；</li>
+<li><strong>内存释放</strong>。</li>
+</ol>
+<p>在普通 C 程序里，我们可能会用：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>malloc<span class="op">();</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>free<span class="op">();</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>但是在嵌入式操作系统中，一般不直接使用标准库的 <code>malloc/free</code>，而是使用操作系统提供的内存管理接口。</p>
+<p>原因主要有三点：</p>
+<ol type="1">
+<li>小型嵌入式设备 RAM 很小，标准库函数不一定可用；</li>
+<li><code>malloc/free</code> 的实现可能占用较多代码空间；</li>
+<li>标准库内存管理函数不一定适合实时系统，安全性和确定性不足。</li>
+</ol>
+<p>所以 LiteOS 提供自己的内存管理函数，例如：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>LOS_MemAlloc<span class="op">();</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>LOS_MemFree<span class="op">();</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>LOS_MemboxAlloc<span class="op">();</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>LOS_MemboxFree<span class="op">();</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="三静态内存分配与动态内存分配" class="level1">
+<h1>三、静态内存分配与动态内存分配</h1>
+<p>LiteOS 内存分配分成两类：</p>
+<ol type="1">
+<li><strong>静态内存分配</strong>；</li>
+<li><strong>动态内存分配</strong>。</li>
+</ol>
+<hr>
+<section id="静态内存分配" class="level2">
+<h2 class="anchored" data-anchor-id="静态内存分配">1. 静态内存分配</h2>
+<p>静态内存分配是指：</p>
+<blockquote class="blockquote">
+<p>在静态内存池中分配用户初始化时预设固定大小的内存块。</p>
+</blockquote>
+<p>也就是说，内存池中每个块大小是固定的，初始化后不能改变。</p>
+<section id="优点" class="level3">
+<h3 class="anchored" data-anchor-id="优点">优点</h3>
+<ul>
+<li>分配速度快；</li>
+<li>释放速度快；</li>
+<li>无内存碎片；</li>
+<li>实时性较好；</li>
+<li>安全性较高。</li>
+</ul>
+</section>
+<section id="缺点" class="level3">
+<h3 class="anchored" data-anchor-id="缺点">缺点</h3>
+<ul>
+<li>只能分配<strong>固定大小</strong>的内存块；</li>
+<li>不够灵活；</li>
+<li>如果块太大，会浪费空间；</li>
+<li>如果块太小，可能不够用。</li>
+</ul>
+<p>适合场景：</p>
+<ul>
+<li>安全要求高的系统；</li>
+<li>内存块大小固定的场景；</li>
+<li>对实时性要求高的场景；</li>
+<li>不允许动态内存分配的嵌入式系统。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="动态内存分配" class="level2">
+<h2 class="anchored" data-anchor-id="动态内存分配">2. 动态内存分配</h2>
+<p>动态内存分配是指：</p>
+<blockquote class="blockquote">
+<p>在动态内存池中，根据用户需要分配指定大小的内存块。</p>
+</blockquote>
+<p>它更像我们平时理解的“按需申请内存”。</p>
+<section id="优点-1" class="level3">
+<h3 class="anchored" data-anchor-id="优点-1">优点</h3>
+<ul>
+<li>可以按需分配；</li>
+<li>灵活性高；</li>
+<li>适合大小不确定的数据结构；</li>
+<li>能提高内存利用率。</li>
+</ul>
+</section>
+<section id="缺点-1" class="level3">
+<h3 class="anchored" data-anchor-id="缺点-1">缺点</h3>
+<ul>
+<li>分配和释放时间可能更长；</li>
+<li>可能产生内存碎片；</li>
+<li>实时性不如静态内存池；</li>
+<li>如果忘记释放，会造成内存泄漏。</li>
+</ul>
+<p>适合场景：</p>
+<ul>
+<li>数组大小不确定；</li>
+<li>数据包长度不固定；</li>
+<li>临时缓冲区；</li>
+<li>运行时才知道内存需求的任务。</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+<section id="四为什么需要动态内存" class="level1">
+<h1>四、为什么需要动态内存？</h1>
+<p>举数组的例子。</p>
+<p>假设要定义一个 <code>float</code> 数组：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> Arr<span class="op">[];</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>问题是：</p>
+<blockquote class="blockquote">
+<p>数组到底应该定义多大？</p>
+</blockquote>
+<p>如果定义太小，可能越界； 如果定义太大，又浪费 RAM。</p>
+<p>在嵌入式系统中，RAM 很珍贵，所以不能随便浪费。</p>
+<p>动态内存分配的意义就是：</p>
+<blockquote class="blockquote">
+<p>程序运行时需要多大，就申请多大；用完后及时释放。</p>
+</blockquote>
+<p>例如：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="op">*</span>Arr <span class="op">=</span> LOS_MemAlloc<span class="op">(</span>pool<span class="op">,</span> size<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>这样就不需要提前写死数组大小。</p>
+<hr>
+</section>
+<section id="五liteos-内存分配算法" class="level1">
+<h1>五、LiteOS 内存分配算法</h1>
+<p>LiteOS 提供多种内存分配算法，默认使用 <strong>BestFit</strong>，也就是<strong>最佳适应算法</strong>。</p>
+<section id="bestfit-最佳适应算法" class="level2">
+<h2 class="anchored" data-anchor-id="bestfit-最佳适应算法">1. BestFit 最佳适应算法</h2>
+<p>BestFit 的思想是：</p>
+<blockquote class="blockquote">
+<p>每次分配内存时，寻找最合适大小的空闲内存块，尽量避免“大材小用”。</p>
+</blockquote>
+<p>例如用户需要 100 字节，如果系统里有：</p>
+<ul>
+<li>128 字节空闲块；</li>
+<li>512 字节空闲块；</li>
+<li>1024 字节空闲块；</li>
+</ul>
+<p>BestFit 会优先选择 128 字节的块。</p>
+<section id="优点-2" class="level3">
+<h3 class="anchored" data-anchor-id="优点-2">优点</h3>
+<ul>
+<li>尽量减少浪费；</li>
+<li>尽量保留大块连续空间；</li>
+<li>有助于减少碎片。</li>
+</ul>
+</section>
+<section id="缺点-2" class="level3">
+<h3 class="anchored" data-anchor-id="缺点-2">缺点</h3>
+<ul>
+<li>需要遍历空闲块链表；</li>
+<li>时间复杂度是 <code>O(n)</code>；</li>
+<li>分配时间不确定。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="tlsf-算法" class="level2">
+<h2 class="anchored" data-anchor-id="tlsf-算法">2. TLSF 算法</h2>
+<p>LiteOS 提供 <strong>TLSF 动态内存管理算法</strong>。</p>
+<p>TLSF 的特点是：</p>
+<blockquote class="blockquote">
+<p>时间复杂度为 <code>O(1)</code>，分配时间相对固定。</p>
+</blockquote>
+<p>这对实时系统很重要。</p>
+<p>因为实时系统不仅关心能不能分配内存，还关心：</p>
+<blockquote class="blockquote">
+<p>多久能完成分配？</p>
+</blockquote>
+<p>如果分配时间不确定，就可能影响实时性。</p>
+<hr>
+</section>
+</section>
+<section id="六嵌入式系统中的-ram-分布" class="level1">
+<h1>六、嵌入式系统中的 RAM 分布</h1>
+<p>程序的不同段位于不同存储区域：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>段</th>
+<th>位置</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>text</code> 段</td>
+<td>Flash</td>
+<td>存放程序代码</td>
+</tr>
+<tr class="even">
+<td><code>data</code> 段</td>
+<td>RAM</td>
+<td>存放<strong>已</strong>初始化全局变量</td>
+</tr>
+<tr class="odd">
+<td><code>bss</code> 段</td>
+<td>RAM</td>
+<td>存放<strong>未</strong>初始化全局变量</td>
+</tr>
+<tr class="even">
+<td>heap 堆</td>
+<td>RAM</td>
+<td>LiteOS 管理的<strong>动态内存</strong></td>
+</tr>
+<tr class="odd">
+<td>MSP 栈</td>
+<td>RAM 末尾附近</td>
+<td>主栈指针使用空间</td>
+</tr>
+</tbody>
+</table>
+<p>一般来说：</p>
+<blockquote class="blockquote">
+<p><code>text</code> 在 Flash 中，<code>data</code> 和 <code>bss</code> 在 RAM 中。 除去 <code>data</code>、<code>bss</code> 和 MSP 栈之后，剩余 RAM 可以作为 LiteOS 的 heap 进行动态内存管理。</p>
+</blockquote>
+<p>注：</p>
+<ul>
+<li>heap 起始地址通常在 <code>bss</code> 段结束之后；</li>
+<li>heap 结束地址通常在 MSP 栈起始地址之前。</li>
+</ul>
+<p>所以系统动态内存池并不是随便来的，而是 <strong>RAM 中一段连续区域</strong>。</p>
+<hr>
+</section>
+<section id="七动态内存管理的运行机制" class="level1">
+<h1>七、动态内存管理的运行机制</h1>
+<p>动态内存管理主要包括三个过程：</p>
+<ol type="1">
+<li>初始化内存；</li>
+<li>分配内存；</li>
+<li>释放内存。</li>
+</ol>
+<hr>
+<section id="初始化内存" class="level2">
+<h2 class="anchored" data-anchor-id="初始化内存">1. 初始化内存</h2>
+<p>LiteOS 在内核初始化时会初始化系统管理的内存堆。</p>
+<p>常见配置包括：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>OS_SYS_MEM_ADDR</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>OS_SYS_MEM_SIZE</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>其中：</p>
+<ul>
+<li><code>OS_SYS_MEM_ADDR</code>：动态内存池起始地址；</li>
+<li><code>OS_SYS_MEM_SIZE</code>：动态内存池大小。</li>
+</ul>
+<p>初始化函数是：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>LOS_MemInit<span class="op">();</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>不过通常在内核初始化阶段已经自动调用，用户不需要手动重复初始化。</p>
+<hr>
+</section>
+<section id="分配内存" class="level2">
+<h2 class="anchored" data-anchor-id="分配内存">2. 分配内存</h2>
+<p>动态内存分配函数是：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>LOS_MemAlloc<span class="op">();</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>基本形式：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="op">*</span>p <span class="op">=</span> LOS_MemAlloc<span class="op">(</span>pool<span class="op">,</span> size<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>含义是：</p>
+<blockquote class="blockquote">
+<p>从指定内存池 <code>pool</code> 中申请 <code>size</code> 字节内存。</p>
+</blockquote>
+<p>如果成功，返回内存地址； 如果失败，返回 <code>NULL</code>。</p>
+<p>分配时系统会遍历内存块链表，寻找合适大小的空闲块。如果空闲块比需要的更大，系统可能会把它切割成两部分：</p>
+<ol type="1">
+<li>一部分分给用户；</li>
+<li>另一部分继续作为空闲块留在内存池中。</li>
+</ol>
+<p>这样可以提高内存利用率。</p>
+<hr>
+</section>
+<section id="释放内存" class="level2">
+<h2 class="anchored" data-anchor-id="释放内存">3. 释放内存</h2>
+<p>释放函数是：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>LOS_MemFree<span class="op">();</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>基本形式：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>LOS_MemFree<span class="op">(</span>pool<span class="op">,</span> p<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>含义是：</p>
+<blockquote class="blockquote">
+<p>把之前从内存池中申请的内存块归还给系统。</p>
+</blockquote>
+<p>嵌入式系统内存有限，所以用完一定要释放。</p>
+<p>否则会出现：</p>
+<ul>
+<li>内存泄漏；</li>
+<li>后续任务申请内存失败；</li>
+<li>系统长期运行后崩溃。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="八静态内存池管理" class="level1">
+<h1>八、静态内存池管理</h1>
+<p>静态内存池本质上是一块静态数组。</p>
+<p>它由两部分组成：</p>
+<ol type="1">
+<li><strong>控制块</strong>；</li>
+<li><strong>若干相同大小的内存块</strong>。</li>
+</ol>
+<p>静态内存池控制块保存：</p>
+<ul>
+<li>内存块大小；</li>
+<li>内存块总数；</li>
+<li>已使用内存块数量；</li>
+<li>空闲内存块链表。</li>
+</ul>
+<p>结构类似：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    UINT32 uwBlkSize<span class="op">;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    UINT32 uwBlkNum<span class="op">;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    UINT32 uwBlkCnt<span class="op">;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    LOS_MEMBOX_NODE stFreeList<span class="op">;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> LOS_MEMBOX_INFO<span class="op">;</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>可以这样理解：</p>
+<blockquote class="blockquote">
+<p>静态内存池就是提前切好的固定大小小格子，需要时拿一个，用完再放回去。</p>
+</blockquote>
+<hr>
+</section>
+<section id="九静态内存池的开发流程" class="level1">
+<h1>九、静态内存池的开发流程</h1>
+<p>静态内存池使用流程是：</p>
+<ol type="1">
+<li>规划一块内存区域作为静态内存池；</li>
+<li>调用 <code>LOS_MemboxInit()</code> 初始化；</li>
+<li>调用 <code>LOS_MemboxAlloc()</code> 分配内存块；</li>
+<li>调用 <code>LOS_MemboxFree()</code> 释放内存块；</li>
+<li>调用 <code>LOS_MemboxClr()</code> 清除内存块内容。</li>
+</ol>
+<hr>
+<section id="定义静态内存池" class="level2">
+<h2 class="anchored" data-anchor-id="定义静态内存池">1. 定义静态内存池</h2>
+<p>例如：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MEM_BOXSIZE  </span><span class="dv">50</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MEM_BLKSIZE  </span><span class="dv">3</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> UINT32 BoxMem<span class="op">[</span>MEM_BOXSIZE <span class="op">*</span> MEM_BLKSIZE<span class="op">];</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>这里用数组保证内存连续。</p>
+<hr>
+</section>
+<section id="初始化静态内存池los_memboxinit" class="level2">
+<h2 class="anchored" data-anchor-id="初始化静态内存池los_memboxinit">2. 初始化静态内存池：<code>LOS_MemboxInit</code></h2>
+<p>函数形式：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>LOS_MemboxInit<span class="op">(</span>pBoxMem<span class="op">,</span> uwBoxSize<span class="op">,</span> uwBlkSize<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>参数含义：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pBoxMem</code></td>
+<td>内存池起始地址</td>
+</tr>
+<tr class="even">
+<td><code>uwBoxSize</code></td>
+<td>内存池总大小</td>
+</tr>
+<tr class="odd">
+<td><code>uwBlkSize</code></td>
+<td>每个内存块大小</td>
+</tr>
+</tbody>
+</table>
+<p>示例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>LOS_MemboxInit<span class="op">(&amp;</span>BoxMem<span class="op">[</span><span class="dv">0</span><span class="op">],</span> MEM_BOXSIZE<span class="op">,</span> MEM_BLKSIZE<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>初始化后，系统会：</p>
+<ol type="1">
+<li>在内存池头部放置控制块；</li>
+<li>根据块大小计算能切分多少块；</li>
+<li>把所有可用内存块链接成空闲链表。</li>
+</ol>
+<p>注意：</p>
+<ul>
+<li>内存池地址必须有效；</li>
+<li>内存块大小不能为 0；</li>
+<li>内存池大小要大于控制块大小；</li>
+<li>内存池地址要按要求对齐。</li>
+</ul>
+<hr>
+</section>
+<section id="分配静态内存块los_memboxalloc" class="level2">
+<h2 class="anchored" data-anchor-id="分配静态内存块los_memboxalloc">3. 分配静态内存块：<code>LOS_MemboxAlloc</code></h2>
+<p>函数：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>LOS_MemboxAlloc<span class="op">(</span>pBoxMem<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>示例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>UINT32 <span class="op">*</span>p_Num <span class="op">=</span> NULL<span class="op">;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>p_Num <span class="op">=</span> <span class="op">(</span>UINT32 <span class="op">*)</span>LOS_MemboxAlloc<span class="op">(</span>BoxMem<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>如果成功，返回内存块地址； 如果失败，返回 <code>NULL</code>。</p>
+<p>分配过程可以理解为：</p>
+<blockquote class="blockquote">
+<p>从空闲链表头部取出第一个空闲块，并返回给用户。</p>
+</blockquote>
+<hr>
+</section>
+<section id="释放静态内存块los_memboxfree" class="level2">
+<h2 class="anchored" data-anchor-id="释放静态内存块los_memboxfree">4. 释放静态内存块：<code>LOS_MemboxFree</code></h2>
+<p>函数：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>LOS_MemboxFree<span class="op">(</span>pBoxMem<span class="op">,</span> pBox<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>示例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>LOS_MemboxFree<span class="op">(</span>BoxMem<span class="op">,</span> p_Num<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>含义：</p>
+<blockquote class="blockquote">
+<p>把 <code>p_Num</code> 指向的内存块归还给 <code>BoxMem</code> 这个静态内存池。</p>
+</blockquote>
+<p>释放时，系统会把该内存块重新插入空闲链表。</p>
+<hr>
+</section>
+<section id="清除内存块内容los_memboxclr" class="level2">
+<h2 class="anchored" data-anchor-id="清除内存块内容los_memboxclr">5. 清除内存块内容：<code>LOS_MemboxClr</code></h2>
+<p>函数：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>LOS_MemboxClr<span class="op">(</span>pBoxMem<span class="op">,</span> pBox<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>示例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>LOS_MemboxClr<span class="op">(</span>BoxMem<span class="op">,</span> p_Num<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>作用：</p>
+<blockquote class="blockquote">
+<p>把指定内存块中的内容清零。</p>
+</blockquote>
+<p>这常用于避免旧数据残留。</p>
+<hr>
+</section>
+</section>
+<section id="十静态内存和动态内存对比" class="level1">
+<h1>十、静态内存和动态内存对比</h1>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>对比项</th>
+<th>静态内存池</th>
+<th>动态内存堆</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>分配大小</td>
+<td>固定块大小</td>
+<td>按需分配</td>
+</tr>
+<tr class="even">
+<td>灵活性</td>
+<td>较低</td>
+<td>较高</td>
+</tr>
+<tr class="odd">
+<td>分配速度</td>
+<td>快</td>
+<td>相对慢</td>
+</tr>
+<tr class="even">
+<td>碎片问题</td>
+<td>无碎片</td>
+<td>可能有碎片</td>
+</tr>
+<tr class="odd">
+<td>实时性</td>
+<td>好</td>
+<td>取决于算法</td>
+</tr>
+<tr class="even">
+<td>安全性</td>
+<td>高</td>
+<td>需要注意泄漏和碎片</td>
+</tr>
+<tr class="odd">
+<td>适合场景</td>
+<td>固定大小对象</td>
+<td>不确定大小数据</td>
+</tr>
+</tbody>
+</table>
+<p>考试可以这样答：</p>
+<blockquote class="blockquote">
+<p>静态内存池适合大小固定、实时性和安全性要求高的场景；动态内存适合大小不确定、需要按需申请的场景，但要注意碎片和内存泄漏。</p>
+</blockquote>
+<hr>
+</section>
+<section id="十一中断是什么" class="level1">
+<h1>十一、中断是什么？</h1>
+<p>中断属于<strong>异步异常</strong>。</p>
+<p>对中断的解释是：</p>
+<blockquote class="blockquote">
+<p>CPU 正在处理某件事情时，外部某一事件请求 CPU 迅速处理，CPU 暂停当前工作，转去处理该事件，处理完后再回到原来被打断的地方继续执行。</p>
+</blockquote>
+<p>例如：</p>
+<ul>
+<li>按键按下；</li>
+<li>串口收到数据；</li>
+<li>定时器计数到达；</li>
+<li>传感器产生报警；</li>
+<li>DMA 传输完成。</li>
+</ul>
+<p>中断的作用是：</p>
+<blockquote class="blockquote">
+<p>让 CPU 不必一直轮询外设状态，而是在外设真正需要处理时再响应，提高系统效率和实时性。</p>
+</blockquote>
+<hr>
+</section>
+<section id="十二异常同步异常和异步异常" class="level1">
+<h1>十二、异常、同步异常和异步异常</h1>
+<section id="异常" class="level2">
+<h2 class="anchored" data-anchor-id="异常">1. 异常</h2>
+<p>异常是导致处理器脱离正常执行流程、转向执行特殊代码的事件。</p>
+<p>异常如果不处理，可能导致系统错误甚至崩溃。</p>
+<hr>
+</section>
+<section id="同步异常" class="level2">
+<h2 class="anchored" data-anchor-id="同步异常">2. 同步异常</h2>
+<p>同步异常由<strong>处理器内部事件</strong>引起，通常与当前执行的指令有关。</p>
+<p>例如：</p>
+<ul>
+<li>除零错误；</li>
+<li>非法指令；</li>
+<li>非对齐访问；</li>
+<li>存储访问错误。</li>
+</ul>
+<p>特点：</p>
+<blockquote class="blockquote">
+<p>必须立即处理，否则程序无法继续正确执行。</p>
+</blockquote>
+<hr>
+</section>
+<section id="异步异常" class="level2">
+<h2 class="anchored" data-anchor-id="异步异常">3. 异步异常</h2>
+<p>异步异常通常由<strong>外部硬件事件</strong>引起。</p>
+<p>中断就是典型的异步异常。</p>
+<p>例如：</p>
+<ul>
+<li>按键中断；</li>
+<li>串口中断；</li>
+<li>外部传感器中断。</li>
+</ul>
+<p>特点：</p>
+<blockquote class="blockquote">
+<p>可以延迟处理，某些情况下甚至可以忽略。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="十三中断相关硬件" class="level1">
+<h1>十三、中断相关硬件</h1>
+<p>和中断相关的硬件主要有三类：</p>
+<ol type="1">
+<li><strong>外设</strong></li>
+<li><strong>中断控制器</strong></li>
+<li><strong>CPU</strong></li>
+</ol>
+<hr>
+<section id="外设" class="level2">
+<h2 class="anchored" data-anchor-id="外设">1. 外设</h2>
+<p>外设是中断源。</p>
+<p>例如：</p>
+<ul>
+<li>GPIO；</li>
+<li>USART；</li>
+<li>TIM；</li>
+<li>ADC；</li>
+<li>DMA；</li>
+<li>I2C；</li>
+<li>SPI。</li>
+</ul>
+<p>外设产生事件后，会向中断控制器发出中断请求。</p>
+<hr>
+</section>
+<section id="中断控制器" class="level2">
+<h2 class="anchored" data-anchor-id="中断控制器">2. 中断控制器</h2>
+<p>中断控制器负责管理中断请求。</p>
+<p>它会判断：</p>
+<ul>
+<li>哪个中断来了；</li>
+<li>是否允许响应；</li>
+<li>优先级如何；</li>
+<li>是否支持嵌套。</li>
+</ul>
+<p>在 Cortex-M 系列中，常见中断控制器是：</p>
+<pre class="text"><code>NVIC</code></pre>
+<hr>
+</section>
+<section id="cpu" class="level2">
+<h2 class="anchored" data-anchor-id="cpu">3. CPU</h2>
+<p>CPU 最终响应中断。</p>
+<p>当中断被允许响应时，CPU 会：</p>
+<ol type="1">
+<li>暂停当前任务；</li>
+<li>保存现场；</li>
+<li>跳转到中断服务程序；</li>
+<li>执行 ISR；</li>
+<li>恢复现场；</li>
+<li>回到原程序继续执行。</li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="十四中断相关术语" class="level1">
+<h1>十四、中断相关术语</h1>
+<p>中断相关的重点术语</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>术语</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>中断号</td>
+<td>标识某个中断源的编号</td>
+</tr>
+<tr class="even">
+<td>中断请求</td>
+<td>外设请求 CPU 处理事件</td>
+</tr>
+<tr class="odd">
+<td>中断优先级</td>
+<td>决定多个中断同时发生时谁先处理</td>
+</tr>
+<tr class="even">
+<td>中断向量</td>
+<td>中断服务程序入口地址</td>
+</tr>
+<tr class="odd">
+<td>中断向量表</td>
+<td>保存所有中断入口地址的表</td>
+</tr>
+<tr class="even">
+<td>中断处理程序</td>
+<td>ISR，真正处理中断的函数</td>
+</tr>
+<tr class="odd">
+<td>中断触发</td>
+<td>产生中断请求的动作</td>
+</tr>
+<tr class="even">
+<td>中断触发类型</td>
+<td>上升沿、下降沿、电平触发等</td>
+</tr>
+<tr class="odd">
+<td>临界段</td>
+<td>不希望被中断打断的代码段</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="十五中断的运行机制" class="level1">
+<h1>十五、中断的运行机制</h1>
+<p>CPU 响应中断的一般流程是：</p>
+<ol type="1">
+<li>保存当前处理器状态；</li>
+<li>查找中断向量；</li>
+<li>把中断处理程序入口地址载入 PC；</li>
+<li>执行中断服务程序；</li>
+<li>中断处理完成后恢复现场；</li>
+<li>回到被打断的位置继续执行。</li>
+</ol>
+<p>可以背成：</p>
+<blockquote class="blockquote">
+<p>保存现场 → 查找入口 → 执行 ISR → 恢复现场 → 返回原程序。</p>
+</blockquote>
+<hr>
+</section>
+<section id="十六中断发生的两种环境" class="level1">
+<h1>十六、中断发生的两种环境</h1>
+<p>中断可能发生在两种环境中：</p>
+<ol type="1">
+<li>任务上下文；</li>
+<li>中断服务程序上下文。</li>
+</ol>
+<hr>
+<section id="任务运行时发生中断" class="level2">
+<h2 class="anchored" data-anchor-id="任务运行时发生中断">1. 任务运行时发生中断</h2>
+<p>这是最常见的情况。</p>
+<p>某个任务正在运行时，外设产生中断。CPU 会打断当前任务，保存任务上下文，转去执行中断服务程序。</p>
+<p>ISR 执行完成后，CPU 恢复任务上下文，继续执行原任务。</p>
+<hr>
+</section>
+<section id="中断服务程序中发生更高优先级中断" class="level2">
+<h2 class="anchored" data-anchor-id="中断服务程序中发生更高优先级中断">2. 中断服务程序中发生更高优先级中断</h2>
+<p>这就是<strong>中断嵌套</strong>。</p>
+<p>例如：</p>
+<ul>
+<li>中断 1 正在执行；</li>
+<li>此时中断 2 发生；</li>
+<li>如果中断 2 优先级更高；</li>
+<li>CPU 会打断中断 1，先执行中断 2；</li>
+<li>中断 2 完成后，再回到中断 1。</li>
+</ul>
+<p>LiteOS 允许中断嵌套，也就是说优先级更高的中断可以打断正在执行的低优先级中断。</p>
+<hr>
+</section>
+</section>
+<section id="十七中断为什么要快进快出" class="level1">
+<h1>十七、中断为什么要“快进快出”？</h1>
+<p>中断可以打断任何任务，不管该任务优先级多高。</p>
+<p>因此 ISR 如果执行太久，会影响：</p>
+<ul>
+<li>任务调度；</li>
+<li>其他中断响应；</li>
+<li>系统实时性；</li>
+<li>低优先级中断响应；</li>
+<li>高优先级任务执行。</li>
+</ul>
+<p>所以中断服务程序中应该只做简单处理。</p>
+<p>推荐做法：</p>
+<ol type="1">
+<li>判断中断来源；</li>
+<li>清除中断标志位；</li>
+<li>设置标志；</li>
+<li>释放信号量或写事件；</li>
+<li>尽快退出。</li>
+</ol>
+<p>复杂处理交给任务完成。</p>
+<p>例如：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> USART_IRQHandler<span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>USART 收到数据<span class="op">)</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>        保存少量必要信息<span class="op">;</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>        LOS_SemPost<span class="op">(</span>Sem_Handle<span class="op">);</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>        清除中断标志<span class="op">;</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>然后在任务中：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">)</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    LOS_SemPend<span class="op">(</span>Sem_Handle<span class="op">,</span> LOS_WAIT_FOREVER<span class="op">);</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    处理串口数据<span class="op">;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>这就是：</p>
+<blockquote class="blockquote">
+<p>中断负责通知，任务负责处理。</p>
+</blockquote>
+<hr>
+</section>
+<section id="十八中断延迟" class="level1">
+<h1>十八、中断延迟</h1>
+<p>中断延迟是本章重点。</p>
+<p>定义：</p>
+<blockquote class="blockquote">
+<p>中断延迟是指从硬件中断发生到开始执行中断服务程序第一条指令之间的时间。</p>
+</blockquote>
+<p>也就是：</p>
+<pre class="text"><code>硬件中断发生 → ISR 第一条指令执行</code></pre>
+<p>之间的时间。</p>
+<hr>
+<section id="中断延迟由哪些部分组成" class="level2">
+<h2 class="anchored" data-anchor-id="中断延迟由哪些部分组成">中断延迟由哪些部分组成？</h2>
+<p>可以概括为：</p>
+<pre class="text"><code>中断延迟 = 识别中断时间 + 等待中断打开时间 + 关闭中断时间</code></pre>
+<p>其中：</p>
+<ol type="1">
+<li><strong>识别中断时间</strong>
+<ul>
+<li>CPU 查找中断源；</li>
+<li>读取中断向量；</li>
+<li>查找中断向量表；</li>
+<li>跳转 ISR。</li>
+</ul></li>
+<li><strong>等待中断打开时间</strong>
+<ul>
+<li>如果系统当前关闭中断，中断会被挂起；</li>
+<li>等系统重新打开中断后才能响应。</li>
+</ul></li>
+<li><strong>关闭中断时间</strong>
+<ul>
+<li>临界段中系统不允许中断打断；</li>
+<li>临界段越长，中断延迟越大。</li>
+</ul></li>
+</ol>
+<p>所以要记住：</p>
+<blockquote class="blockquote">
+<p>临界段要尽量短，中断关闭时间越短，系统实时性越好。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="十九接管中断与非接管中断" class="level1">
+<h1>十九、接管中断与非接管中断</h1>
+<p>两种方式：</p>
+<ol type="1">
+<li><strong>接管中断</strong></li>
+<li><strong>非接管中断</strong></li>
+</ol>
+<hr>
+<section id="接管中断" class="level2">
+<h2 class="anchored" data-anchor-id="接管中断">1. 接管中断</h2>
+<p>接管中断是指：</p>
+<blockquote class="blockquote">
+<p>系统中的中断由 <strong>RTOS 软件统一管理</strong>。</p>
+</blockquote>
+<p>LiteOS 接管中断版本支持：</p>
+<ul>
+<li>中断初始化；</li>
+<li>中断创建；</li>
+<li>中断删除；</li>
+<li>中断使能；</li>
+<li>中断屏蔽；</li>
+<li>中断共享。</li>
+</ul>
+<p>如果使用接管中断，需要配置：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>LOSCFG_PLATFORM_HWI <span class="op">=</span> YES</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>LOSCFG_PLATFORM_HWI_LIMIT</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>也就是开启硬件中断管理功能，并配置系统支持的最大中断数。</p>
+<hr>
+</section>
+<section id="非接管中断" class="level2">
+<h2 class="anchored" data-anchor-id="非接管中断">2. 非接管中断</h2>
+<p>非接管中断更接近裸机方式。</p>
+<p>用户自己：</p>
+<ul>
+<li>配置中断；</li>
+<li>使能中断；</li>
+<li>编写中断服务程序；</li>
+<li>在中断中使用信号量、事件等 IPC 通知任务。</li>
+</ul>
+<p>非接管中断版本支持：</p>
+<ul>
+<li>中断使能；</li>
+<li>中断屏蔽。</li>
+</ul>
+<p>它比较简单，适合初学者和普通移植场景。</p>
+<hr>
+</section>
+</section>
+<section id="二十liteos-接管中断的常用函数" class="level1">
+<h1>二十、LiteOS 接管中断的常用函数</h1>
+<section id="创建硬件中断los_hwicreate" class="level2">
+<h2 class="anchored" data-anchor-id="创建硬件中断los_hwicreate">1. 创建硬件中断：<code>LOS_HwiCreate</code></h2>
+<p>函数形式：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>LOS_HwiCreate<span class="op">(</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    HWI_HANDLE_T  uwHwiNum<span class="op">,</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    HWI_PRIOR_T   usHwiPrio<span class="op">,</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    HWI_MODE_T    usMode<span class="op">,</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    HWI_PROC_FUNC pfnHandler<span class="op">,</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    HWI_ARG_T     uwArg</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>参数含义：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>uwHwiNum</code></td>
+<td>硬件中断号</td>
+</tr>
+<tr class="even">
+<td><code>usHwiPrio</code></td>
+<td>中断优先级</td>
+</tr>
+<tr class="odd">
+<td><code>usMode</code></td>
+<td>中断模式</td>
+</tr>
+<tr class="even">
+<td><code>pfnHandler</code></td>
+<td>中断服务程序</td>
+</tr>
+<tr class="odd">
+<td><code>uwArg</code></td>
+<td>传给中断服务程序的参数</td>
+</tr>
+</tbody>
+</table>
+<p>示例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>LOS_HwiCreate<span class="op">(</span>KEY1_INT_EXTI_IRQ<span class="op">,</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>              <span class="dv">0</span><span class="op">,</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>              <span class="dv">0</span><span class="op">,</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>              KEY1_IRQHandler<span class="op">,</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>              <span class="dv">0</span><span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>创建中断时，LiteOS 会：</p>
+<ol type="1">
+<li>检查中断服务函数是否为空；</li>
+<li>检查中断号是否合法；</li>
+<li>检查中断是否已经注册；</li>
+<li>检查优先级是否合法；</li>
+<li>设置中断向量；</li>
+<li>使能 NVIC 中断；</li>
+<li>设置中断优先级。</li>
+</ol>
+<hr>
+</section>
+<section id="删除硬件中断los_hwidelete" class="level2">
+<h2 class="anchored" data-anchor-id="删除硬件中断los_hwidelete">2. 删除硬件中断：<code>LOS_HwiDelete</code></h2>
+<p>函数：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>LOS_HwiDelete<span class="op">(</span>uwHwiNum<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>作用：</p>
+<blockquote class="blockquote">
+<p>删除已创建的硬件中断。</p>
+</blockquote>
+<p>删除后：</p>
+<ul>
+<li>系统不再响应该中断；</li>
+<li>中断号和中断服务程序的映射关系被解除；</li>
+<li>中断会被禁用。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="二十一使用接管中断时的注意事项" class="level1">
+<h1>二十一、使用接管中断时的注意事项</h1>
+<p>强调几点：</p>
+<ol type="1">
+<li>创建中断不等于初始化中断；
+<ul>
+<li>外设中断初始化仍然需要用户自己写。</li>
+</ul></li>
+<li>中断号要根据具体芯片查找；
+<ul>
+<li>例如 STM32F10x 中可以在 <code>stm32f10x.h</code> 中找到。</li>
+</ul></li>
+<li>中断优先级数值越低，优先级越高；
+<ul>
+<li>默认优先级范围通常是 0～7。</li>
+</ul></li>
+<li>中断服务程序不能耗时太长；
+<ul>
+<li>否则影响其他中断响应。</li>
+</ul></li>
+<li>关闭中断后不能执行引起调度的函数；
+<ul>
+<li>否则可能导致系统异常。</li>
+</ul></li>
+</ol>
+<hr>
+</section>
+<section id="二十二非接管中断方式" class="level1">
+<h1>二十二、非接管中断方式</h1>
+<p>非接管中断方式和裸机基本类似。</p>
+<p>使用步骤一般是：</p>
+<ol type="1">
+<li>配置 GPIO；</li>
+<li>配置 EXTI；</li>
+<li>配置 NVIC；</li>
+<li>编写中断服务函数；</li>
+<li>中断中设置标志或释放信号量；</li>
+<li>任务中处理具体业务。</li>
+</ol>
+<p>在 Cortex-M 上，LiteOS 遵循与裸机中断一致的方法。如果用户需要自定义中断服务程序，只需要定义与启动文件中相同名称的函数，覆盖弱符号即可。</p>
+<p>例如启动文件中有：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>DCD EXTI0_IRQHandler</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>用户就可以写：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> EXTI0_IRQHandler<span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="二十三中断向量表" class="level1">
+<h1>二十三、中断向量表</h1>
+<p>中断向量表保存了各个<strong>中断服务程序的入口地址</strong>。</p>
+<p>STM32 启动文件中通常会有类似内容：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>DCD Reset_Handler</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>DCD NMI_Handler</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>DCD HardFault_Handler</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>DCD PendSV_Handler</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>DCD SysTick_Handler</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>DCD EXTI0_IRQHandler</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>DCD EXTI1_IRQHandler</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>...</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>每个 <code>DCD</code> 后面跟着一个处理函数入口。</p>
+<p>当某个中断发生时，CPU 根据中断号查找中断向量表，找到对应 ISR 地址，然后跳转执行。</p>
+<p>所以：</p>
+<blockquote class="blockquote">
+<p>中断向量表就是“中断号到中断处理函数地址”的映射表。</p>
+</blockquote>
+<hr>
+</section>
+<section id="二十四中断管理实验" class="level1">
+<h1>二十四、中断管理实验</h1>
+<p>实验主要是按键外部中断。</p>
+<p>基本思路是：</p>
+<ol type="1">
+<li>创建两个按键中断；</li>
+<li>编写对应 ISR；</li>
+<li>按键触发中断；</li>
+<li>中断服务程序中设置标志或释放信号量；</li>
+<li>任务获取信号量后通过串口输出信息。</li>
+</ol>
+<p>中断服务程序示例逻辑：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> KEY1_IRQHandler<span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>EXTI_GetITStatus<span class="op">(</span>KEY1_INT_EXTI_LINE<span class="op">)</span> <span class="op">!=</span> RESET<span class="op">)</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>        Trigger_Num <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>        LED1_TOGGLE<span class="op">;</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>        EXTI_ClearITPendingBit<span class="op">(</span>KEY1_INT_EXTI_LINE<span class="op">);</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>关键点是：</p>
+<blockquote class="blockquote">
+<p>ISR 中只做简单处理，并清除中断标志位。</p>
+</blockquote>
+<p>如果不清除中断标志位，可能会反复进入中断。</p>
+<hr>
+</section>
+<section id="二十五内存管理与中断管理的联系" class="level1">
+<h1>二十五、内存管理与中断管理的联系</h1>
+<p>这两个部分看起来不一样，但都属于操作系统底层核心能力。</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>模块</th>
+<th>解决问题</th>
+<th>关键点</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>内存管理</td>
+<td>RAM 怎么分配和释放</td>
+<td>防止浪费、碎片、泄漏</td>
+</tr>
+<tr class="even">
+<td>中断管理</td>
+<td>外部事件怎么及时响应</td>
+<td>快进快出、低延迟、正确清标志</td>
+</tr>
+</tbody>
+</table>
+<p>内存管理偏“资源管理”； 中断管理偏“实时响应”。</p>
+<p>它们共同服务于 LiteOS 的稳定运行。</p>
+<hr>
+</section>
+<section id="二十六本章重点背诵版" class="level1">
+<h1>二十六、本章重点背诵版</h1>
+<section id="内存管理定义" class="level2">
+<h2 class="anchored" data-anchor-id="内存管理定义">1. 内存管理定义</h2>
+<p>LiteOS 内存管理模块用于管理系统内存资源，是操作系统核心模块之一，主要包括内存初始化、内存分配和内存释放。LiteOS 一般不使用标准库 <code>malloc/free</code>，而使用自身提供的内存管理函数。</p>
+<hr>
+</section>
+<section id="静态内存分配-1" class="level2">
+<h2 class="anchored" data-anchor-id="静态内存分配-1">2. 静态内存分配</h2>
+<p>静态内存分配是在静态内存池中分配用户初始化时预设固定大小的内存块。其优点是分配和释放效率高、无内存碎片、安全性高；缺点是只能分配固定大小的内存块，灵活性较差。</p>
+<hr>
+</section>
+<section id="动态内存分配-1" class="level2">
+<h2 class="anchored" data-anchor-id="动态内存分配-1">3. 动态内存分配</h2>
+<p>动态内存分配是在动态内存池中根据用户指定大小按需分配内存块。其优点是灵活、按需分配；缺点是耗时较多，可能产生内存碎片，也可能出现内存泄漏。</p>
+<hr>
+</section>
+<section id="静态内存池常用函数" class="level2">
+<h2 class="anchored" data-anchor-id="静态内存池常用函数">4. 静态内存池常用函数</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>LOS_MemboxInit<span class="op">();</span>   <span class="co">// 初始化静态内存池</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>LOS_MemboxAlloc<span class="op">();</span>  <span class="co">// 分配静态内存块</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>LOS_MemboxFree<span class="op">();</span>   <span class="co">// 释放静态内存块</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>LOS_MemboxClr<span class="op">();</span>    <span class="co">// 清除内存块内容</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="动态内存常用函数" class="level2">
+<h2 class="anchored" data-anchor-id="动态内存常用函数">5. 动态内存常用函数</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>LOS_MemInit<span class="op">();</span>   <span class="co">// 初始化动态内存池</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>LOS_MemAlloc<span class="op">();</span>  <span class="co">// 申请动态内存</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>LOS_MemFree<span class="op">();</span>   <span class="co">// 释放动态内存</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="中断定义" class="level2">
+<h2 class="anchored" data-anchor-id="中断定义">6. 中断定义</h2>
+<p>中断是指 CPU 正在执行当前任务时，外部事件请求 CPU 迅速处理，CPU 暂停当前任务，转去执行中断服务程序，处理完成后再返回原程序继续执行。中断属于异步异常。</p>
+<hr>
+</section>
+<section id="中断处理流程" class="level2">
+<h2 class="anchored" data-anchor-id="中断处理流程">7. 中断处理流程</h2>
+<p>中断处理流程为：外设产生中断请求，CPU 响应中断，保存当前上下文，查找中断向量表，跳转到中断服务程序执行，执行完成后恢复上下文，并返回被打断的位置继续运行。</p>
+<hr>
+</section>
+<section id="中断延迟" class="level2">
+<h2 class="anchored" data-anchor-id="中断延迟">8. 中断延迟</h2>
+<p>中断延迟是从硬件中断发生到开始执行中断服务程序第一条指令之间的时间。它主要由识别中断时间、等待中断打开时间和关闭中断时间组成。临界段越长，中断关闭时间越长，中断延迟越大。</p>
+<hr>
+</section>
+<section id="接管中断与非接管中断" class="level2">
+<h2 class="anchored" data-anchor-id="接管中断与非接管中断">9. 接管中断与非接管中断</h2>
+<p>接管中断是指中断由 LiteOS 统一管理，支持中断创建、删除、使能、屏蔽和共享等功能；非接管中断类似裸机方式，由用户自己配置中断、使能中断和编写中断服务程序。</p>
+<hr>
+</section>
+<section id="中断服务程序设计原则" class="level2">
+<h2 class="anchored" data-anchor-id="中断服务程序设计原则">10. 中断服务程序设计原则</h2>
+<p>中断服务程序应尽量短小，做到快进快出。ISR 中不应执行复杂耗时操作，不应调用可能阻塞或引起调度的函数，通常只设置标志、释放信号量或写事件，然后由任务完成具体处理。</p>
+<hr>
+</section>
+</section>
+<section id="二十七考试可能这样问" class="level1">
+<h1>二十七、考试可能这样问</h1>
+<section id="题目1liteos-为什么不直接使用-mallocfree" class="level2">
+<h2 class="anchored" data-anchor-id="题目1liteos-为什么不直接使用-mallocfree">题目1：LiteOS 为什么不直接使用 malloc/free？</h2>
+<p>答：</p>
+<p>在嵌入式系统中，标准库 <code>malloc/free</code> 不一定可用，而且实现可能占用较多代码空间，不适合 RAM 较小的设备；同时其安全性和实时性不一定满足嵌入式操作系统要求。因此 LiteOS 提供自己的内存管理接口，如 <code>LOS_MemAlloc</code>、<code>LOS_MemFree</code>、<code>LOS_MemboxAlloc</code>、<code>LOS_MemboxFree</code> 等。</p>
+<hr>
+</section>
+<section id="题目2静态内存分配和动态内存分配有什么区别" class="level2">
+<h2 class="anchored" data-anchor-id="题目2静态内存分配和动态内存分配有什么区别">题目2：静态内存分配和动态内存分配有什么区别？</h2>
+<p>答：</p>
+<p>静态内存分配是在静态内存池中分配固定大小的内存块，分配释放效率高、无碎片、实时性好，但灵活性差；动态内存分配是在动态内存池中按需分配用户指定大小的内存块，灵活性高，但耗时较多，可能产生内存碎片和内存泄漏。</p>
+<hr>
+</section>
+<section id="题目3liteos-静态内存池如何使用" class="level2">
+<h2 class="anchored" data-anchor-id="题目3liteos-静态内存池如何使用">题目3：LiteOS 静态内存池如何使用？</h2>
+<p>答：</p>
+<p>LiteOS 静态内存池的使用流程是：先规划一块连续内存区域作为静态内存池，然后调用 <code>LOS_MemboxInit()</code> 初始化内存池；需要内存时调用 <code>LOS_MemboxAlloc()</code> 分配固定大小内存块；使用完成后调用 <code>LOS_MemboxFree()</code> 释放内存块；必要时可调用 <code>LOS_MemboxClr()</code> 清除内存块内容。</p>
+<hr>
+</section>
+<section id="题目4liteos-动态内存管理的流程是什么" class="level2">
+<h2 class="anchored" data-anchor-id="题目4liteos-动态内存管理的流程是什么">题目4：LiteOS 动态内存管理的流程是什么？</h2>
+<p>答：</p>
+<p>LiteOS 动态内存管理流程包括初始化、分配和释放。系统在内核初始化时调用 <code>LOS_MemInit()</code> 初始化动态内存堆；用户需要内存时调用 <code>LOS_MemAlloc()</code> 从内存池中分配指定大小内存块；使用完毕后调用 <code>LOS_MemFree()</code> 将内存归还给系统。</p>
+<hr>
+</section>
+<section id="题目5什么是中断" class="level2">
+<h2 class="anchored" data-anchor-id="题目5什么是中断">题目5：什么是中断？</h2>
+<p>答：</p>
+<p>中断是指 CPU 正在执行某个任务时，外部事件请求 CPU 立即处理，CPU 暂停当前工作，保存现场，转去执行中断服务程序，处理完成后恢复现场，并回到原程序继续执行。中断属于异步异常，常用于处理按键、串口、定时器等紧急外设事件。</p>
+<hr>
+</section>
+<section id="题目6中断处理过程是什么" class="level2">
+<h2 class="anchored" data-anchor-id="题目6中断处理过程是什么">题目6：中断处理过程是什么？</h2>
+<p>答：</p>
+<p>中断处理过程包括：外设产生中断请求；CPU 响应中断并保存当前上下文；根据中断号查找中断向量表；跳转到对应中断服务程序执行；中断服务程序处理完成后恢复上下文；最后返回原程序继续执行。</p>
+<hr>
+</section>
+<section id="题目7什么是中断延迟" class="level2">
+<h2 class="anchored" data-anchor-id="题目7什么是中断延迟">题目7：什么是中断延迟？</h2>
+<p>答：</p>
+<p>中断延迟是指从硬件中断发生到开始执行中断服务程序第一条指令之间的时间。它包括识别中断时间、等待中断打开时间和关闭中断时间。系统关闭中断或处于临界段时，中断会被延迟响应，因此临界段应尽量短。</p>
+<hr>
+</section>
+<section id="题目8接管中断和非接管中断有什么区别" class="level2">
+<h2 class="anchored" data-anchor-id="题目8接管中断和非接管中断有什么区别">题目8：接管中断和非接管中断有什么区别？</h2>
+<p>答：</p>
+<p>接管中断是指中断由 LiteOS 统一管理，支持中断创建、删除、使能、屏蔽和共享等功能，常用函数有 <code>LOS_HwiCreate()</code> 和 <code>LOS_HwiDelete()</code>。非接管中断则类似裸机方式，由用户自行配置中断、使能中断和编写中断服务程序，LiteOS 只提供基本的中断使能和屏蔽能力。</p>
+<hr>
+</section>
+<section id="题目9为什么中断服务程序要尽量短" class="level2">
+<h2 class="anchored" data-anchor-id="题目9为什么中断服务程序要尽量短">题目9：为什么中断服务程序要尽量短？</h2>
+<p>答：</p>
+<p>中断可以打断任务运行，甚至影响其他中断响应。如果中断服务程序执行时间过长，会增加中断延迟，影响系统实时性。因此 ISR 应尽量快进快出，只做必要操作，如清除中断标志、设置标志位、释放信号量或写事件，复杂处理应放到任务中完成。</p>
+<hr>
+</section>
+</section>
+<section id="二十八本章一句话总结" class="level1">
+<h1>二十八、本章一句话总结</h1>
+<p>第十章节可以这样总结：</p>
+<blockquote class="blockquote">
+<p>内存管理负责 LiteOS 中 RAM 的初始化、分配和释放，静态内存池强调固定块、高效率和无碎片，动态内存强调按需分配和灵活性；中断管理负责外部紧急事件的响应，CPU 通过保存现场、查找中断向量、执行 ISR 和恢复现场完成中断处理，实际开发中应减少中断延迟，ISR 要快进快出，并尽量通过信号量或事件通知任务完成复杂处理。</p>
+</blockquote>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

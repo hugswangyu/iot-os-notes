@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-Hans" xml:lang="zh-Hans"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第9章 消息队列、事件与软件定时器 – 物联网终端操作系统笔记</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-1b8143a5af30aa0587ead8c64582f750.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">物联网终端操作系统笔记</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
+<span class="menu-text">首页</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/hugswangyu/iot-os-notes"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="展开或折叠侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch1_物联网及嵌入式概述.html">课程笔记</a></li><li class="breadcrumb-item"><a href="./ch9_消息队列_事件与软件定时器.html">Ch9 消息队列、事件与软件定时器</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="展开或折叠侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="搜索" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="搜索"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">首页</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">课程笔记</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="展开或折叠此栏">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch1_物联网及嵌入式概述.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch1 物联网及嵌入式概述</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch2_ch3_物联网操作系统的关键技术.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch2-3 物联网操作系统的关键技术</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch4_连接技术.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch4 连接技术</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch5_连接与协议.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch5 连接与协议</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch6_LiteOS操作系统及其移植.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch6 LiteOS 操作系统及其移植</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch7_任务.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch7 任务</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch8_信号量与互斥锁.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch8 信号量与互斥锁</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch9_消息队列_事件与软件定时器.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Ch9 消息队列、事件与软件定时器</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch10_内存管理与中断管理.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch10 内存管理与中断管理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch11_物联网操作系统的应用案例.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ch11 物联网操作系统的应用案例</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">本页目录</h2>
+   
+  <ul>
+  <li><a href="#一本章总体框架" id="toc-一本章总体框架" class="nav-link active" data-scroll-target="#一本章总体框架">一、本章总体框架</a></li>
+  <li><a href="#二消息队列是什么" id="toc-二消息队列是什么" class="nav-link" data-scroll-target="#二消息队列是什么">二、消息队列是什么？</a></li>
+  <li><a href="#三消息队列的特点" id="toc-三消息队列的特点" class="nav-link" data-scroll-target="#三消息队列的特点">三、消息队列的特点</a></li>
+  <li><a href="#四消息队列的传输机制" id="toc-四消息队列的传输机制" class="nav-link" data-scroll-target="#四消息队列的传输机制">四、消息队列的传输机制</a></li>
+  <li><a href="#五复制传递与引用传递" id="toc-五复制传递与引用传递" class="nav-link" data-scroll-target="#五复制传递与引用传递">五、复制传递与引用传递</a>
+  <ul class="collapse">
+  <li><a href="#复制传递" id="toc-复制传递" class="nav-link" data-scroll-target="#复制传递">1. 复制传递</a></li>
+  <li><a href="#引用传递" id="toc-引用传递" class="nav-link" data-scroll-target="#引用传递">2. 引用传递</a></li>
+  </ul></li>
+  <li><a href="#六消息队列的阻塞机制" id="toc-六消息队列的阻塞机制" class="nav-link" data-scroll-target="#六消息队列的阻塞机制">六、消息队列的阻塞机制</a>
+  <ul class="collapse">
+  <li><a href="#出队阻塞" id="toc-出队阻塞" class="nav-link" data-scroll-target="#出队阻塞">1. 出队阻塞</a></li>
+  <li><a href="#入队阻塞" id="toc-入队阻塞" class="nav-link" data-scroll-target="#入队阻塞">2. 入队阻塞</a></li>
+  </ul></li>
+  <li><a href="#七消息队列控制块" id="toc-七消息队列控制块" class="nav-link" data-scroll-target="#七消息队列控制块">七、消息队列控制块</a></li>
+  <li><a href="#八消息队列常用函数" id="toc-八消息队列常用函数" class="nav-link" data-scroll-target="#八消息队列常用函数">八、消息队列常用函数</a>
+  <ul class="collapse">
+  <li><a href="#创建消息队列los_queuecreate" id="toc-创建消息队列los_queuecreate" class="nav-link" data-scroll-target="#创建消息队列los_queuecreate">1. 创建消息队列：<code>LOS_QueueCreate</code></a></li>
+  <li><a href="#写消息队列los_queuewrite" id="toc-写消息队列los_queuewrite" class="nav-link" data-scroll-target="#写消息队列los_queuewrite">2. 写消息队列：<code>LOS_QueueWrite</code></a></li>
+  <li><a href="#读消息队列los_queueread" id="toc-读消息队列los_queueread" class="nav-link" data-scroll-target="#读消息队列los_queueread">3. 读消息队列：<code>LOS_QueueRead</code></a></li>
+  <li><a href="#删除消息队列los_queuedelete" id="toc-删除消息队列los_queuedelete" class="nav-link" data-scroll-target="#删除消息队列los_queuedelete">4. 删除消息队列：<code>LOS_QueueDelete</code></a></li>
+  </ul></li>
+  <li><a href="#九消息队列常见错误" id="toc-九消息队列常见错误" class="nav-link" data-scroll-target="#九消息队列常见错误">九、消息队列常见错误</a></li>
+  <li><a href="#十事件是什么" id="toc-十事件是什么" class="nav-link" data-scroll-target="#十事件是什么">十、事件是什么？</a></li>
+  <li><a href="#十一事件标志组" id="toc-十一事件标志组" class="nav-link" data-scroll-target="#十一事件标志组">十一、事件标志组</a></li>
+  <li><a href="#十二事件的特点" id="toc-十二事件的特点" class="nav-link" data-scroll-target="#十二事件的特点">十二、事件的特点</a></li>
+  <li><a href="#十三事件的逻辑或与逻辑与" id="toc-十三事件的逻辑或与逻辑与" class="nav-link" data-scroll-target="#十三事件的逻辑或与逻辑与">十三、事件的逻辑或与逻辑与</a>
+  <ul class="collapse">
+  <li><a href="#逻辑或los_waitmode_or" id="toc-逻辑或los_waitmode_or" class="nav-link" data-scroll-target="#逻辑或los_waitmode_or">1. 逻辑或：<code>LOS_WAITMODE_OR</code></a></li>
+  <li><a href="#逻辑与los_waitmode_and" id="toc-逻辑与los_waitmode_and" class="nav-link" data-scroll-target="#逻辑与los_waitmode_and">2. 逻辑与：<code>LOS_WAITMODE_AND</code></a></li>
+  <li><a href="#自动清除los_waitmode_clr" id="toc-自动清除los_waitmode_clr" class="nav-link" data-scroll-target="#自动清除los_waitmode_clr">3. 自动清除：<code>LOS_WAITMODE_CLR</code></a></li>
+  </ul></li>
+  <li><a href="#十四事件控制块" id="toc-十四事件控制块" class="nav-link" data-scroll-target="#十四事件控制块">十四、事件控制块</a></li>
+  <li><a href="#十五事件常用函数" id="toc-十五事件常用函数" class="nav-link" data-scroll-target="#十五事件常用函数">十五、事件常用函数</a>
+  <ul class="collapse">
+  <li><a href="#初始化事件los_eventinit" id="toc-初始化事件los_eventinit" class="nav-link" data-scroll-target="#初始化事件los_eventinit">1. 初始化事件：<code>LOS_EventInit</code></a></li>
+  <li><a href="#写事件los_eventwrite" id="toc-写事件los_eventwrite" class="nav-link" data-scroll-target="#写事件los_eventwrite">2. 写事件：<code>LOS_EventWrite</code></a></li>
+  <li><a href="#读事件los_eventread" id="toc-读事件los_eventread" class="nav-link" data-scroll-target="#读事件los_eventread">3. 读事件：<code>LOS_EventRead</code></a></li>
+  <li><a href="#清除事件los_eventclear" id="toc-清除事件los_eventclear" class="nav-link" data-scroll-target="#清除事件los_eventclear">4. 清除事件：<code>LOS_EventClear</code></a></li>
+  <li><a href="#销毁事件los_eventdestory" id="toc-销毁事件los_eventdestory" class="nav-link" data-scroll-target="#销毁事件los_eventdestory">5. 销毁事件：<code>LOS_EventDestory</code></a></li>
+  </ul></li>
+  <li><a href="#十六事件常见错误" id="toc-十六事件常见错误" class="nav-link" data-scroll-target="#十六事件常见错误">十六、事件常见错误</a></li>
+  <li><a href="#十七事件和信号量消息队列的区别" id="toc-十七事件和信号量消息队列的区别" class="nav-link" data-scroll-target="#十七事件和信号量消息队列的区别">十七、事件和信号量、消息队列的区别</a></li>
+  <li><a href="#十八软件定时器是什么" id="toc-十八软件定时器是什么" class="nav-link" data-scroll-target="#十八软件定时器是什么">十八、软件定时器是什么？</a>
+  <ul class="collapse">
+  <li><a href="#硬件定时器" id="toc-硬件定时器" class="nav-link" data-scroll-target="#硬件定时器">1. 硬件定时器</a></li>
+  <li><a href="#软件定时器" id="toc-软件定时器" class="nav-link" data-scroll-target="#软件定时器">2. 软件定时器</a></li>
+  </ul></li>
+  <li><a href="#十九软件定时器的两种模式" id="toc-十九软件定时器的两种模式" class="nav-link" data-scroll-target="#十九软件定时器的两种模式">十九、软件定时器的两种模式</a>
+  <ul class="collapse">
+  <li><a href="#单次模式" id="toc-单次模式" class="nav-link" data-scroll-target="#单次模式">1. 单次模式</a></li>
+  <li><a href="#周期模式" id="toc-周期模式" class="nav-link" data-scroll-target="#周期模式">2. 周期模式</a></li>
+  </ul></li>
+  <li><a href="#二十软件定时器的运行机制" id="toc-二十软件定时器的运行机制" class="nav-link" data-scroll-target="#二十软件定时器的运行机制">二十、软件定时器的运行机制</a></li>
+  <li><a href="#二十一软件定时器和消息队列的关系" id="toc-二十一软件定时器和消息队列的关系" class="nav-link" data-scroll-target="#二十一软件定时器和消息队列的关系">二十一、软件定时器和消息队列的关系</a></li>
+  <li><a href="#二十二软件定时器状态" id="toc-二十二软件定时器状态" class="nav-link" data-scroll-target="#二十二软件定时器状态">二十二、软件定时器状态</a></li>
+  <li><a href="#二十三软件定时器精度" id="toc-二十三软件定时器精度" class="nav-link" data-scroll-target="#二十三软件定时器精度">二十三、软件定时器精度</a></li>
+  <li><a href="#二十四软件定时器使用注意事项" id="toc-二十四软件定时器使用注意事项" class="nav-link" data-scroll-target="#二十四软件定时器使用注意事项">二十四、软件定时器使用注意事项</a></li>
+  <li><a href="#二十五软件定时器控制块" id="toc-二十五软件定时器控制块" class="nav-link" data-scroll-target="#二十五软件定时器控制块">二十五、软件定时器控制块</a></li>
+  <li><a href="#二十六软件定时器常用函数" id="toc-二十六软件定时器常用函数" class="nav-link" data-scroll-target="#二十六软件定时器常用函数">二十六、软件定时器常用函数</a>
+  <ul class="collapse">
+  <li><a href="#创建软件定时器los_swtmrcreate" id="toc-创建软件定时器los_swtmrcreate" class="nav-link" data-scroll-target="#创建软件定时器los_swtmrcreate">1. 创建软件定时器：<code>LOS_SwtmrCreate</code></a></li>
+  <li><a href="#编写回调函数" id="toc-编写回调函数" class="nav-link" data-scroll-target="#编写回调函数">2. 编写回调函数</a></li>
+  <li><a href="#启动软件定时器los_swtmrstart" id="toc-启动软件定时器los_swtmrstart" class="nav-link" data-scroll-target="#启动软件定时器los_swtmrstart">3. 启动软件定时器：<code>LOS_SwtmrStart</code></a></li>
+  <li><a href="#停止软件定时器los_swtmrstop" id="toc-停止软件定时器los_swtmrstop" class="nav-link" data-scroll-target="#停止软件定时器los_swtmrstop">4. 停止软件定时器：<code>LOS_SwtmrStop</code></a></li>
+  <li><a href="#删除软件定时器los_swtmrdelete" id="toc-删除软件定时器los_swtmrdelete" class="nav-link" data-scroll-target="#删除软件定时器los_swtmrdelete">5. 删除软件定时器：<code>LOS_SwtmrDelete</code></a></li>
+  </ul></li>
+  <li><a href="#二十七软件定时器常见错误" id="toc-二十七软件定时器常见错误" class="nav-link" data-scroll-target="#二十七软件定时器常见错误">二十七、软件定时器常见错误</a></li>
+  <li><a href="#二十八消息队列事件软件定时器对比" id="toc-二十八消息队列事件软件定时器对比" class="nav-link" data-scroll-target="#二十八消息队列事件软件定时器对比">二十八、消息队列、事件、软件定时器对比</a></li>
+  <li><a href="#二十九本章重点背诵版" id="toc-二十九本章重点背诵版" class="nav-link" data-scroll-target="#二十九本章重点背诵版">二十九、本章重点背诵版</a>
+  <ul class="collapse">
+  <li><a href="#消息队列定义" id="toc-消息队列定义" class="nav-link" data-scroll-target="#消息队列定义">1. 消息队列定义</a></li>
+  <li><a href="#消息队列特点" id="toc-消息队列特点" class="nav-link" data-scroll-target="#消息队列特点">2. 消息队列特点</a></li>
+  <li><a href="#消息队列常用函数" id="toc-消息队列常用函数" class="nav-link" data-scroll-target="#消息队列常用函数">3. 消息队列常用函数</a></li>
+  <li><a href="#事件定义" id="toc-事件定义" class="nav-link" data-scroll-target="#事件定义">4. 事件定义</a></li>
+  <li><a href="#事件特点" id="toc-事件特点" class="nav-link" data-scroll-target="#事件特点">5. 事件特点</a></li>
+  <li><a href="#事件常用函数" id="toc-事件常用函数" class="nav-link" data-scroll-target="#事件常用函数">6. 事件常用函数</a></li>
+  <li><a href="#事件读取模式" id="toc-事件读取模式" class="nav-link" data-scroll-target="#事件读取模式">7. 事件读取模式</a></li>
+  <li><a href="#软件定时器定义" id="toc-软件定时器定义" class="nav-link" data-scroll-target="#软件定时器定义">8. 软件定时器定义</a></li>
+  <li><a href="#软件定时器模式" id="toc-软件定时器模式" class="nav-link" data-scroll-target="#软件定时器模式">9. 软件定时器模式</a></li>
+  <li><a href="#软件定时器常用函数" id="toc-软件定时器常用函数" class="nav-link" data-scroll-target="#软件定时器常用函数">10. 软件定时器常用函数</a></li>
+  </ul></li>
+  <li><a href="#三十考试可能这样问" id="toc-三十考试可能这样问" class="nav-link" data-scroll-target="#三十考试可能这样问">三十、考试可能这样问</a>
+  <ul class="collapse">
+  <li><a href="#题目1什么是消息队列它有什么特点" id="toc-题目1什么是消息队列它有什么特点" class="nav-link" data-scroll-target="#题目1什么是消息队列它有什么特点">题目1：什么是消息队列？它有什么特点？</a></li>
+  <li><a href="#题目2消息队列的阻塞机制是什么" id="toc-题目2消息队列的阻塞机制是什么" class="nav-link" data-scroll-target="#题目2消息队列的阻塞机制是什么">题目2：消息队列的阻塞机制是什么？</a></li>
+  <li><a href="#题目3事件与消息队列有什么区别" id="toc-题目3事件与消息队列有什么区别" class="nav-link" data-scroll-target="#题目3事件与消息队列有什么区别">题目3：事件与消息队列有什么区别？</a></li>
+  <li><a href="#题目4事件的逻辑或和逻辑与是什么意思" id="toc-题目4事件的逻辑或和逻辑与是什么意思" class="nav-link" data-scroll-target="#题目4事件的逻辑或和逻辑与是什么意思">题目4：事件的逻辑或和逻辑与是什么意思？</a></li>
+  <li><a href="#题目5软件定时器和硬件定时器有什么区别" id="toc-题目5软件定时器和硬件定时器有什么区别" class="nav-link" data-scroll-target="#题目5软件定时器和硬件定时器有什么区别">题目5：软件定时器和硬件定时器有什么区别？</a></li>
+  <li><a href="#题目6liteos-软件定时器有哪些工作模式" id="toc-题目6liteos-软件定时器有哪些工作模式" class="nav-link" data-scroll-target="#题目6liteos-软件定时器有哪些工作模式">题目6：LiteOS 软件定时器有哪些工作模式？</a></li>
+  <li><a href="#题目7使用软件定时器时应注意什么" id="toc-题目7使用软件定时器时应注意什么" class="nav-link" data-scroll-target="#题目7使用软件定时器时应注意什么">题目7：使用软件定时器时应注意什么？</a></li>
+  <li><a href="#题目8消息队列事件和软件定时器分别适合什么场景" id="toc-题目8消息队列事件和软件定时器分别适合什么场景" class="nav-link" data-scroll-target="#题目8消息队列事件和软件定时器分别适合什么场景">题目8：消息队列、事件和软件定时器分别适合什么场景？</a></li>
+  </ul></li>
+  <li><a href="#三十一本章一句话总结" id="toc-三十一本章一句话总结" class="nav-link" data-scroll-target="#三十一本章一句话总结">三十一、本章一句话总结</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch1_物联网及嵌入式概述.html">课程笔记</a></li><li class="breadcrumb-item"><a href="./ch9_消息队列_事件与软件定时器.html">Ch9 消息队列、事件与软件定时器</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">第9章 消息队列、事件与软件定时器</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>这一章的主线是：<strong>LiteOS 中任务之间如何传递数据、如何等待多个事件，以及如何实现定时触发任务。</strong></p>
+<hr>
+<section id="一本章总体框架" class="level1">
+<h1>一、本章总体框架</h1>
+<p>第九章节可以分成三部分：</p>
+<ol type="1">
+<li><strong>消息队列</strong>
+<ul>
+<li>解决“任务之间怎样传递数据”的问题；</li>
+<li>重点是 FIFO、LIFO、阻塞读写、队列创建与读写函数。</li>
+</ul></li>
+<li><strong>事件</strong>
+<ul>
+<li>解决“任务怎样等待一个或多个事件发生”的问题；</li>
+<li>重点是事件标志位、逻辑与、逻辑或、自动清除事件。</li>
+</ul></li>
+<li><strong>软件定时器</strong>
+<ul>
+<li>解决“怎样在指定时间后执行某个函数”的问题；</li>
+<li>重点是单次模式、周期模式、回调函数、Tick 精度。</li>
+</ul></li>
+</ol>
+<p>可以先这样记：</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 22%">
+<col style="width: 19%">
+<col style="width: 41%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>机制</th>
+<th>主要作用</th>
+<th>是否传数据</th>
+<th>典型用途</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>消息队列</td>
+<td>任务间传递消息</td>
+<td>能传数据</td>
+<td>按键任务发送消息给处理任务</td>
+</tr>
+<tr class="even">
+<td>事件</td>
+<td>多任务同步</td>
+<td>不传数据</td>
+<td>等待 KEY1、KEY2 等事件</td>
+</tr>
+<tr class="odd">
+<td>软件定时器</td>
+<td>定时触发回调</td>
+<td>不直接传数据</td>
+<td>周期翻转 LED、定时采样</td>
+</tr>
+</tbody>
+</table>
+<p>一句话概括：</p>
+<blockquote class="blockquote">
+<p>消息队列传“数据”，事件传“状态”，软件定时器管“时间”。</p>
+</blockquote>
+<hr>
+</section>
+<section id="二消息队列是什么" class="level1">
+<h1>二、消息队列是什么？</h1>
+<p>消息队列又称队列，是 LiteOS 中的一种任务间通信机制，可以在<strong>任务与任务之间</strong>、<strong>中断与任务之间</strong>传递消息。任务可以从队列中读取消息，也可以向队列中写入消息。队列中的消息为空时，读队列的任务可以进入阻塞态等待消息；队列满时，写队列的任务也可以根据超时时间进入阻塞态等待空闲空间。</p>
+<p>可以把消息队列理解成一个“邮箱”：</p>
+<ul>
+<li>发送任务把消息放进邮箱；</li>
+<li>接收任务从邮箱里取消息；</li>
+<li>邮箱空了，接收任务可以等待；</li>
+<li>邮箱满了，发送任务可以等待。</li>
+</ul>
+<hr>
+</section>
+<section id="三消息队列的特点" class="level1">
+<h1>三、消息队列的特点</h1>
+<p>LiteOS 消息队列有几个典型特点：</p>
+<ol type="1">
+<li><strong>支持先进先出 FIFO</strong>
+<ul>
+<li>先写入的消息先被读取；</li>
+<li>类似排队买票。</li>
+</ul></li>
+<li><strong>支持后进先出 LIFO</strong>
+<ul>
+<li>后写入的消息可以先被读取；</li>
+<li>适合紧急消息优先处理。</li>
+</ul></li>
+<li><strong>支持异步读写</strong>
+<ul>
+<li>写消息的任务和读消息的任务不需要同时运行。</li>
+</ul></li>
+<li><strong>读写都支持超时机制</strong>
+<ul>
+<li>队列空时，读任务可以等待；</li>
+<li>队列满时，写任务可以等待。</li>
+</ul></li>
+<li><strong>支持不同长度消息</strong>
+<ul>
+<li>只要不超过创建队列时指定的消息节点最大值即可。</li>
+</ul></li>
+<li><strong>多个任务可以读写同一个队列</strong>
+<ul>
+<li>一个任务可以从任意队列读写；</li>
+<li>多个任务也可以操作同一个队列。</li>
+</ul></li>
+</ol>
+<hr>
+</section>
+<section id="四消息队列的传输机制" class="level1">
+<h1>四、消息队列的传输机制</h1>
+<p>消息队列的基本传输方式是：</p>
+<pre class="text"><code>写消息 → 消息进入队列 → 读消息 → 消息出队</code></pre>
+<p>通常情况下是 FIFO：</p>
+<pre class="text"><code>消息1 → 消息2 → 消息3</code></pre>
+<p>读取顺序就是：</p>
+<pre class="text"><code>消息1 → 消息2 → 消息3</code></pre>
+<p>但 LiteOS 也支持 LIFO，用于紧急消息优先处理。例如某个报警消息后到，但比普通消息更重要，就可以让它优先被读取。</p>
+<hr>
+</section>
+<section id="五复制传递与引用传递" class="level1">
+<h1>五、复制传递与引用传递</h1>
+<p>两种数据传输方式：</p>
+<section id="复制传递" class="level2">
+<h2 class="anchored" data-anchor-id="复制传递">1. 复制传递</h2>
+<p>复制传递就是把数据内容复制一份放到队列中。</p>
+<p>优点：</p>
+<ul>
+<li>原数据被修改后，不影响队列中的数据；</li>
+<li>数据更安全。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>占用更多内存；</li>
+<li>大数据复制效率较低。</li>
+</ul>
+<p>适合：</p>
+<ul>
+<li>小数据；</li>
+<li>对数据稳定性要求较高的场景。</li>
+</ul>
+<hr>
+</section>
+<section id="引用传递" class="level2">
+<h2 class="anchored" data-anchor-id="引用传递">2. 引用传递</h2>
+<p>引用传递就是把数据地址，也就是指针，传递给队列。</p>
+<p>优点：</p>
+<ul>
+<li>速度快；</li>
+<li>占用内存少。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>如果源数据被修改，接收方看到的数据也会变化；</li>
+<li>如果源数据生命周期结束，指针可能失效。</li>
+</ul>
+<p>适合：</p>
+<ul>
+<li>大数据；</li>
+<li>缓冲区管理；</li>
+<li>对效率要求较高的场景。</li>
+</ul>
+<p>可以这样记：</p>
+<blockquote class="blockquote">
+<p>复制传递更安全，引用传递更高效。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="六消息队列的阻塞机制" class="level1">
+<h1>六、消息队列的阻塞机制</h1>
+<section id="出队阻塞" class="level2">
+<h2 class="anchored" data-anchor-id="出队阻塞">1. 出队阻塞</h2>
+<p>出队就是读队列。</p>
+<p>如果任务读取队列时发现队列为空，有三种选择：</p>
+<ol type="1">
+<li><strong>不等待</strong>
+<ul>
+<li>立即返回；</li>
+<li>不进入阻塞态。</li>
+</ul></li>
+<li><strong>等待一段时间</strong>
+<ul>
+<li>例如等待 1000 个 Tick；</li>
+<li>如果期间有消息到来，就读取；</li>
+<li>如果超时还没有消息，就恢复就绪态。</li>
+</ul></li>
+<li><strong>永久等待</strong>
+<ul>
+<li>一直阻塞；</li>
+<li>直到队列中有消息。</li>
+</ul></li>
+</ol>
+<p>这对应实际开发中的三种策略：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dv">0</span>                <span class="co">// 不等待</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dv">1000</span>             <span class="co">// 等待 1000 Tick</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LOS_WAIT_FOREVER <span class="co">// 永久等待</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="入队阻塞" class="level2">
+<h2 class="anchored" data-anchor-id="入队阻塞">2. 入队阻塞</h2>
+<p>入队就是写队列。</p>
+<p>如果任务写队列时发现队列已经满了，也可以选择：</p>
+<ol type="1">
+<li>不等待，立即返回失败；</li>
+<li>等待一段时间；</li>
+<li>永久等待，直到队列有空闲节点。</li>
+</ol>
+<p>注意：</p>
+<blockquote class="blockquote">
+<p>在中断中写队列不能使用阻塞等待，等待时间必须设为 0。</p>
+</blockquote>
+<p>因为中断服务程序不能阻塞。</p>
+<hr>
+</section>
+</section>
+<section id="七消息队列控制块" class="level1">
+<h1>七、消息队列控制块</h1>
+<p>每个队列都有一个队列控制块，用来保存队列信息。</p>
+<p>队列控制块包含：</p>
+<ul>
+<li>队列指针；</li>
+<li>队列状态；</li>
+<li>队列长度；</li>
+<li>消息节点大小；</li>
+<li>队列 ID；</li>
+<li>队列头指针；</li>
+<li>队列尾指针；</li>
+<li>可读/可写资源计数；</li>
+<li>读写阻塞链表；</li>
+<li>内存链表。</li>
+</ul>
+<p>可以这样理解：</p>
+<blockquote class="blockquote">
+<p>队列控制块就是消息队列的“管理表”，LiteOS 通过它知道队列在哪里、还有多少消息、还能不能写、有没有任务在等。</p>
+</blockquote>
+<hr>
+</section>
+<section id="八消息队列常用函数" class="level1">
+<h1>八、消息队列常用函数</h1>
+<section id="创建消息队列los_queuecreate" class="level2">
+<h2 class="anchored" data-anchor-id="创建消息队列los_queuecreate">1. 创建消息队列：<code>LOS_QueueCreate</code></h2>
+<p>函数原型：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">extern</span> UINT32 LOS_QueueCreate<span class="op">(</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    CHAR <span class="op">*</span>pcQueueName<span class="op">,</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    UINT16 usLen<span class="op">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    UINT32 <span class="op">*</span>puwQueueID<span class="op">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    UINT32 uwFlags<span class="op">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    UINT16 usMaxMsgSize</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>参数含义：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pcQueueName</code></td>
+<td>队列名称，保留参数，暂未使用</td>
+</tr>
+<tr class="even">
+<td><code>usLen</code></td>
+<td>队列长度，也就是最多能存几个消息</td>
+</tr>
+<tr class="odd">
+<td><code>puwQueueID</code></td>
+<td>队列 ID 指针，创建成功后返回队列 ID</td>
+</tr>
+<tr class="even">
+<td><code>uwFlags</code></td>
+<td>队列模式，保留参数</td>
+</tr>
+<tr class="odd">
+<td><code>usMaxMsgSize</code></td>
+<td>单个消息节点最大大小，单位字节</td>
+</tr>
+</tbody>
+</table>
+<p>例子：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>UINT32 Test_Queue_Handle<span class="op">;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>LOS_QueueCreate<span class="op">(</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Test_Queue"</span><span class="op">,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">128</span><span class="op">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">&amp;</span>Test_Queue_Handle<span class="op">,</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span><span class="op">,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="dv">16</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>含义是：</p>
+<blockquote class="blockquote">
+<p>创建一个队列，最多存 128 条消息，每条消息最大 16 字节。</p>
+</blockquote>
+<p>创建队列时，队列长度和消息节点大小已经确定，后续不能再改。队列创建成功后会占用相应内存，只有删除队列后才释放。</p>
+<hr>
+</section>
+<section id="写消息队列los_queuewrite" class="level2">
+<h2 class="anchored" data-anchor-id="写消息队列los_queuewrite">2. 写消息队列：<code>LOS_QueueWrite</code></h2>
+<p>常用形式：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>LOS_QueueWrite<span class="op">(</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    Test_Queue_Handle<span class="op">,</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">&amp;</span>send_data<span class="op">,</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">sizeof</span><span class="op">(</span>send_data<span class="op">),</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>含义：</p>
+<ul>
+<li>向 <code>Test_Queue_Handle</code> 对应的队列写入消息；</li>
+<li>消息内容是 <code>send_data</code>；</li>
+<li>消息长度是 <code>sizeof(send_data)</code>；</li>
+<li>等待时间为 0，表示不阻塞。</li>
+</ul>
+<p>例如，按下 KEY1 或 KEY2 后，会向队列写入不同消息，接收任务再从队列中读取并处理。</p>
+<hr>
+</section>
+<section id="读消息队列los_queueread" class="level2">
+<h2 class="anchored" data-anchor-id="读消息队列los_queueread">3. 读消息队列：<code>LOS_QueueRead</code></h2>
+<p>常用形式：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>LOS_QueueRead<span class="op">(</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    Test_Queue_Handle<span class="op">,</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">&amp;</span>read_buffer<span class="op">,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    buffer_size<span class="op">,</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    LOS_WAIT_FOREVER</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>含义：</p>
+<ul>
+<li>从队列中读取消息；</li>
+<li>如果队列为空，则一直等待；</li>
+<li>有消息后读取到 <code>read_buffer</code> 中。</li>
+</ul>
+<hr>
+</section>
+<section id="删除消息队列los_queuedelete" class="level2">
+<h2 class="anchored" data-anchor-id="删除消息队列los_queuedelete">4. 删除消息队列：<code>LOS_QueueDelete</code></h2>
+<p>函数：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>LOS_QueueDelete<span class="op">(</span>Test_Queue_Handle<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>注意：</p>
+<blockquote class="blockquote">
+<p>如果队列中还有任务阻塞等待读或写，或者队列正在使用，不能删除。</p>
+</blockquote>
+<p>如果有任务等待队列消息、等待写入队列，或者队列读写不同步，队列无法删除；删除成功后，队列控制块会回到空闲列表，队列内存会释放。</p>
+<hr>
+</section>
+</section>
+<section id="九消息队列常见错误" class="level1">
+<h1>九、消息队列常见错误</h1>
+<p>常见错误包括：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>错误代码</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>LOS_ERRNO_QUEUE_CREATE_NO_MEMORY</code></td>
+<td>创建队列内存不足</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_QUEUE_SIZE_TOO_BIG</code></td>
+<td>消息节点大小超过上限</td>
+</tr>
+<tr class="odd">
+<td><code>LOS_ERRNO_QUEUE_NOT_FOUND</code></td>
+<td>队列 ID 无效</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_QUEUE_TIMEOUT</code></td>
+<td>等待队列超时</td>
+</tr>
+<tr class="odd">
+<td><code>LOS_ERRNO_QUEUE_ISFULL</code></td>
+<td>队列满，无法写入</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_QUEUE_ISEMPTY</code></td>
+<td>队列空，无法读取</td>
+</tr>
+<tr class="odd">
+<td><code>LOS_ERRNO_QUEUE_READ_IN_INTERRUPT</code></td>
+<td>中断中不能阻塞读队列</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_QUEUE_WRITE_IN_INTERRUPT</code></td>
+<td>中断中不能阻塞写队列</td>
+</tr>
+<tr class="odd">
+<td><code>LOS_ERRNO_QUEUE_READ_PTR_NULL</code></td>
+<td>读队列传入空指针</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_QUEUE_WRITE_PTR_NULL</code></td>
+<td>写队列传入空指针</td>
+</tr>
+</tbody>
+</table>
+<p>最重要的是：</p>
+<blockquote class="blockquote">
+<p>中断中读写队列时不能阻塞，等待时间要设为 0。</p>
+</blockquote>
+<hr>
+</section>
+<section id="十事件是什么" class="level1">
+<h1>十、事件是什么？</h1>
+<p>事件是一种任务间通信机制，主要用于任务同步。</p>
+<p>但事件和消息队列不同：</p>
+<blockquote class="blockquote">
+<p>事件只能表示“某件事发生了”，不能传递具体数据。</p>
+</blockquote>
+<p>事件可以实现一对多、多对多同步。一个任务可以等待多个事件发生，可以是任意一个事件发生就唤醒任务，也可以是多个事件都发生后再唤醒任务。</p>
+<p>例如：</p>
+<ul>
+<li>KEY1 被按下；</li>
+<li>KEY2 被按下；</li>
+<li>串口接收完成；</li>
+<li>网络连接成功；</li>
+<li>传感器数据准备好。</li>
+</ul>
+<p>这些都可以作为事件。</p>
+<hr>
+</section>
+<section id="十一事件标志组" class="level1">
+<h1>十一、事件标志组</h1>
+<p>LiteOS 使用一个 32 位变量 <code>uwEventID</code> 来保存事件集合。</p>
+<p>每一位代表一种事件：</p>
+<pre class="text"><code>bit0 → 事件0
+bit1 → 事件1
+bit2 → 事件2
+...</code></pre>
+<p>如果某一位是 0，表示该事件没有发生； 如果某一位是 1，表示该事件已经发生。</p>
+<p>例如：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define KEY1_EVENT  </span><span class="op">(</span><span class="bn">0x01</span><span class="pp"> </span><span class="op">&lt;&lt;</span><span class="pp"> </span><span class="dv">0</span><span class="op">)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define KEY2_EVENT  </span><span class="op">(</span><span class="bn">0x01</span><span class="pp"> </span><span class="op">&lt;&lt;</span><span class="pp"> </span><span class="dv">1</span><span class="op">)</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>表示：</p>
+<ul>
+<li><code>KEY1_EVENT</code> 对应 bit0；</li>
+<li><code>KEY2_EVENT</code> 对应 bit1。</li>
+</ul>
+<p>注：<strong>第 25 位是 LiteOS 保留位</strong>，不能设置为 1。事件没有计数性，也就是说，如果同一个事件连续写入多次，但任务还没读取，效果等同于只写入一次。</p>
+<hr>
+</section>
+<section id="十二事件的特点" class="level1">
+<h1>十二、事件的特点</h1>
+<p>事件有以下特点：</p>
+<ol type="1">
+<li><strong>事件相互独立</strong>
+<ul>
+<li>每一位表示一种事件类型。</li>
+</ul></li>
+<li><strong>不传递数据</strong>
+<ul>
+<li>只表示事件是否发生。</li>
+</ul></li>
+<li><strong>无计数性</strong>
+<ul>
+<li>多次设置同一事件，效果相当于设置一次。</li>
+</ul></li>
+<li><strong>允许多个任务读写同一事件</strong>
+<ul>
+<li>多任务可以共享事件标志组。</li>
+</ul></li>
+<li><strong>支持超时等待</strong>
+<ul>
+<li>等不到事件时可以超时返回。</li>
+</ul></li>
+<li><strong>支持逻辑或和逻辑与</strong>
+<ul>
+<li>可以等待任意事件；</li>
+<li>也可以等待多个事件全部发生。</li>
+</ul></li>
+</ol>
+<hr>
+</section>
+<section id="十三事件的逻辑或与逻辑与" class="level1">
+<h1>十三、事件的逻辑或与逻辑与</h1>
+<section id="逻辑或los_waitmode_or" class="level2">
+<h2 class="anchored" data-anchor-id="逻辑或los_waitmode_or">1. 逻辑或：<code>LOS_WAITMODE_OR</code></h2>
+<p>逻辑或的意思是：</p>
+<blockquote class="blockquote">
+<p>等待的多个事件中，只要任意一个发生，任务就被唤醒。</p>
+</blockquote>
+<p>例如任务等待：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>KEY1_EVENT <span class="op">|</span> KEY2_EVENT</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>模式为：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>LOS_WAITMODE_OR</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>那么只要 KEY1 或 KEY2 任意一个按下，任务就会被唤醒。</p>
+<p>这叫<strong>独立型同步</strong>。</p>
+<hr>
+</section>
+<section id="逻辑与los_waitmode_and" class="level2">
+<h2 class="anchored" data-anchor-id="逻辑与los_waitmode_and">2. 逻辑与：<code>LOS_WAITMODE_AND</code></h2>
+<p>逻辑与的意思是：</p>
+<blockquote class="blockquote">
+<p>等待的多个事件必须全部发生，任务才被唤醒。</p>
+</blockquote>
+<p>例如任务等待：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>KEY1_EVENT <span class="op">|</span> KEY2_EVENT</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>模式为：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>LOS_WAITMODE_AND</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>那么必须 KEY1 和 KEY2 都发生，任务才会被唤醒。</p>
+<p>这叫<strong>关联型同步</strong>。</p>
+<p>一个任务等待事件 3 或事件 5 时使用 OR；另一个任务等待事件 3 和事件 5 都发生时使用 AND。</p>
+<hr>
+</section>
+<section id="自动清除los_waitmode_clr" class="level2">
+<h2 class="anchored" data-anchor-id="自动清除los_waitmode_clr">3. 自动清除：<code>LOS_WAITMODE_CLR</code></h2>
+<p>如果读取模式中加上：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>LOS_WAITMODE_CLR</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>表示读取成功后，自动清除对应事件位。</p>
+<p>例如：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>LOS_WAITMODE_AND <span class="op">|</span> LOS_WAITMODE_CLR</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>表示：</p>
+<blockquote class="blockquote">
+<p>等待所有事件都发生，读取成功后自动清除这些事件位。</p>
+</blockquote>
+<p>如果没有设置 <code>LOS_WAITMODE_CLR</code>，就需要用 <code>LOS_EventClear()</code> 手动清除。</p>
+<hr>
+</section>
+</section>
+<section id="十四事件控制块" class="level1">
+<h1>十四、事件控制块</h1>
+<p>事件控制块结构如下：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span> tagEvent <span class="op">{</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    UINT32      uwEventID<span class="op">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    LOS_DL_LIST stEventList<span class="op">;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> EVENT_CB_S<span class="op">;</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>含义：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>成员</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>uwEventID</code></td>
+<td>32 位事件集合，每一位表示一个事件</td>
+</tr>
+<tr class="even">
+<td><code>stEventList</code></td>
+<td>事件阻塞列表，记录等待事件的任务</td>
+</tr>
+</tbody>
+</table>
+<p>可以理解为：</p>
+<blockquote class="blockquote">
+<p>事件控制块就是事件标志组的“管理表”。</p>
+</blockquote>
+<hr>
+</section>
+<section id="十五事件常用函数" class="level1">
+<h1>十五、事件常用函数</h1>
+<section id="初始化事件los_eventinit" class="level2">
+<h2 class="anchored" data-anchor-id="初始化事件los_eventinit">1. 初始化事件：<code>LOS_EventInit</code></h2>
+<p>使用前要先定义事件控制块：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> EVENT_CB_S EventGroup_CB<span class="op">;</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>然后初始化：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>LOS_EventInit<span class="op">(&amp;</span>EventGroup_CB<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>初始化时，<code>uwEventID</code> 被置为 0，表示所有事件都没有发生，并初始化事件阻塞链表。</p>
+<hr>
+</section>
+<section id="写事件los_eventwrite" class="level2">
+<h2 class="anchored" data-anchor-id="写事件los_eventwrite">2. 写事件：<code>LOS_EventWrite</code></h2>
+<p>写事件就是把某个事件位设置为 1。</p>
+<p>例如：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>LOS_EventWrite<span class="op">(&amp;</span>EventGroup_CB<span class="op">,</span> KEY1_EVENT<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>表示 KEY1 事件发生。</p>
+<p>例如：按键任务</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>KEY1 被按下<span class="op">)</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    LOS_EventWrite<span class="op">(&amp;</span>EventGroup_CB<span class="op">,</span> KEY1_EVENT<span class="op">);</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>KEY2 被按下<span class="op">)</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    LOS_EventWrite<span class="op">(&amp;</span>EventGroup_CB<span class="op">,</span> KEY2_EVENT<span class="op">);</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>写事件后，LiteOS 会遍历阻塞在事件列表中的任务，如果写入的事件满足任务的唤醒条件，就把任务从阻塞态恢复为就绪态，并可能触发调度。</p>
+<hr>
+</section>
+<section id="读事件los_eventread" class="level2">
+<h2 class="anchored" data-anchor-id="读事件los_eventread">3. 读事件：<code>LOS_EventRead</code></h2>
+<p>函数形式：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>LOS_EventRead<span class="op">(</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">&amp;</span>EventGroup_CB<span class="op">,</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    KEY1_EVENT <span class="op">|</span> KEY2_EVENT<span class="op">,</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    LOS_WAITMODE_AND <span class="op">|</span> LOS_WAITMODE_CLR<span class="op">,</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    LOS_WAIT_FOREVER</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>含义：</p>
+<ul>
+<li>等待 KEY1 和 KEY2 两个事件；</li>
+<li>必须两个都发生；</li>
+<li>读取成功后自动清除；</li>
+<li>一直等待，直到事件满足。</li>
+</ul>
+<p>例如：LED 任务等待 KEY1 和 KEY2 都按下，满足后翻转 LED。</p>
+<hr>
+</section>
+<section id="清除事件los_eventclear" class="level2">
+<h2 class="anchored" data-anchor-id="清除事件los_eventclear">4. 清除事件：<code>LOS_EventClear</code></h2>
+<p>如果读取时没有使用 <code>LOS_WAITMODE_CLR</code>，就需要手动清除：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>LOS_EventClear<span class="op">(&amp;</span>EventGroup_CB<span class="op">,</span> <span class="op">~</span>KEY1_EVENT<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>注意这里通常要对事件掩码取反，因为源码中使用的是按位与方式清除指定事件位。</p>
+<hr>
+</section>
+<section id="销毁事件los_eventdestory" class="level2">
+<h2 class="anchored" data-anchor-id="销毁事件los_eventdestory">5. 销毁事件：<code>LOS_EventDestory</code></h2>
+<p>如果事件不再使用，可以销毁事件控制块：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>LOS_EventDestory<span class="op">(&amp;</span>EventGroup_CB<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>销毁后事件链表指针被置空。</p>
+<hr>
+</section>
+</section>
+<section id="十六事件常见错误" class="level1">
+<h1>十六、事件常见错误</h1>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>错误代码</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>LOS_ERRNO_EVENT_PTR_NULL</code></td>
+<td>事件控制块指针为空</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_EVENT_SETBIT_INVALID</code></td>
+<td>设置了保留位，第 25 位不能置 1</td>
+</tr>
+<tr class="odd">
+<td><code>LOS_ERRNO_EVENT_EVENTMASK_INVALID</code></td>
+<td>事件掩码无效</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_EVENT_READ_IN_INTERRUPT</code></td>
+<td>中断中读取事件</td>
+</tr>
+<tr class="odd">
+<td><code>LOS_ERRNO_EVENT_FLAGS_INVALID</code></td>
+<td>读取模式错误</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_EVENT_READ_IN_LOCK</code></td>
+<td>任务锁定时不能读取事件</td>
+</tr>
+<tr class="odd">
+<td><code>LOS_ERRNO_EVENT_READ_TIMEOUT</code></td>
+<td>读取事件超时</td>
+</tr>
+</tbody>
+</table>
+<p>重点记：</p>
+<blockquote class="blockquote">
+<p>事件可以由任务或中断写入，但读取事件可能导致阻塞，所以不能在中断中读取事件。</p>
+</blockquote>
+<hr>
+</section>
+<section id="十七事件和信号量消息队列的区别" class="level1">
+<h1>十七、事件和信号量、消息队列的区别</h1>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 18%">
+<col style="width: 24%">
+<col style="width: 24%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>机制</th>
+<th>是否传数据</th>
+<th>是否计数</th>
+<th>是否能等多个条件</th>
+<th>典型用途</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>信号量</td>
+<td>不传具体数据</td>
+<td>有计数</td>
+<td>通常等单一信号</td>
+<td>同步、资源计数</td>
+</tr>
+<tr class="even">
+<td>消息队列</td>
+<td>传数据</td>
+<td>队列中有多个消息</td>
+<td>一般按队列读消息</td>
+<td>任务间传递消息</td>
+</tr>
+<tr class="odd">
+<td>事件</td>
+<td>不传数据</td>
+<td>无计数</td>
+<td>能等多个事件</td>
+<td>多条件同步</td>
+</tr>
+</tbody>
+</table>
+<p>最关键的区别：</p>
+<blockquote class="blockquote">
+<p>消息队列能传数据；事件不能传数据。 信号量有计数性；事件无计数性。 事件能同时等待多个条件；信号量通常对应一个同步信号。</p>
+</blockquote>
+<hr>
+</section>
+<section id="十八软件定时器是什么" class="level1">
+<h1>十八、软件定时器是什么？</h1>
+<p>定时器是指从某个时刻开始，经过指定时间后触发一个超时事件。</p>
+<p>定时器分为：</p>
+<ol type="1">
+<li>硬件定时器；</li>
+<li>软件定时器。</li>
+</ol>
+<hr>
+<section id="硬件定时器" class="level2">
+<h2 class="anchored" data-anchor-id="硬件定时器">1. 硬件定时器</h2>
+<p>硬件定时器由芯片外设提供，通常基于外部晶振或内部时钟，计数到设定值后触发中断。</p>
+<p>特点：</p>
+<ul>
+<li>精度高；</li>
+<li>可达到较高时间分辨率；</li>
+<li>通常通过中断处理；</li>
+<li>数量受硬件资源限制。</li>
+</ul>
+<hr>
+</section>
+<section id="软件定时器" class="level2">
+<h2 class="anchored" data-anchor-id="软件定时器">2. 软件定时器</h2>
+<p>软件定时器由操作系统提供，建立在硬件定时器基础上。</p>
+<p>特点：</p>
+<ul>
+<li>不直接占用多个硬件定时器；</li>
+<li>可以创建多个定时业务；</li>
+<li>使用回调函数处理超时事件；</li>
+<li>精度不如硬件定时器；</li>
+<li>适合对时间精度要求不高的任务。</li>
+</ul>
+<p>可以这样理解：</p>
+<blockquote class="blockquote">
+<p>硬件定时器是真正的“硬件闹钟”，软件定时器是操作系统利用系统 Tick 模拟出来的“软件闹钟”。</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="十九软件定时器的两种模式" class="level1">
+<h1>十九、软件定时器的两种模式</h1>
+<p>LiteOS 软件定时器支持两种常用模式：</p>
+<section id="单次模式" class="level2">
+<h2 class="anchored" data-anchor-id="单次模式">1. 单次模式</h2>
+<p>单次模式是：</p>
+<blockquote class="blockquote">
+<p>定时时间到达后，只执行一次回调函数。</p>
+</blockquote>
+<p>例如创建一个 5000 Tick 的单次定时器，启动后经过 5000 Tick 执行一次回调函数，然后结束。</p>
+<p>课件中还提到单次模式执行完回调函数后，系统会自动删除该软件定时器并回收资源。</p>
+<hr>
+</section>
+<section id="周期模式" class="level2">
+<h2 class="anchored" data-anchor-id="周期模式">2. 周期模式</h2>
+<p>周期模式是：</p>
+<blockquote class="blockquote">
+<p>每隔指定时间重复执行回调函数。</p>
+</blockquote>
+<p>例如每 1000 Tick 翻转一次 LED。</p>
+<p>周期模式会一直运行，直到用户停止或删除定时器。</p>
+<hr>
+</section>
+</section>
+<section id="二十软件定时器的运行机制" class="level1">
+<h1>二十、软件定时器的运行机制</h1>
+<p>LiteOS 软件定时器以 Tick 为基本计时单位。</p>
+<p>运行过程如下：</p>
+<ol type="1">
+<li>用户创建软件定时器；</li>
+<li>用户指定超时时间、工作模式和回调函数；</li>
+<li>用户启动定时器；</li>
+<li>LiteOS 根据当前 Tick 和超时时间计算定时器到期时间；</li>
+<li>将软件定时器插入定时器列表；</li>
+<li>Tick 到期后，软件定时器任务被唤醒；</li>
+<li>软件定时器任务调用用户指定的回调函数。</li>
+</ol>
+<p>LiteOS 通过软件定时器任务 <code>osSwTmrTask</code> 管理软件定时器，该任务优先级为 0，也就是最高优先级，并且是在内核初始化时自动创建的。软件定时器使用系统中的一个队列和一个任务资源，通过软件定时器命令队列处理软件定时器。</p>
+<hr>
+</section>
+<section id="二十一软件定时器和消息队列的关系" class="level1">
+<h1>二十一、软件定时器和消息队列的关系</h1>
+<p>这是容易考的细节。</p>
+<p>前面 LiteOS 初始化内容提到：</p>
+<blockquote class="blockquote">
+<p>使用软件定时器时，必须启用消息队列功能。</p>
+</blockquote>
+<p>也就是说，在 <code>target_config.h</code> 中需要确认：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>LOSCFG_BASE_CORE_SWTMR <span class="op">=</span> YES</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>LOSCFG_BASE_IPC_QUEUE <span class="op">=</span> YES</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>因为 LiteOS 软件定时器依赖一个软件定时器命令队列来管理启动、停止、删除等操作。</p>
+<hr>
+</section>
+<section id="二十二软件定时器状态" class="level1">
+<h1>二十二、软件定时器状态</h1>
+<p>软件定时器有三种状态：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>状态</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>OS_SWTMR_STATUS_UNUSED</code></td>
+<td>未使用状态</td>
+</tr>
+<tr class="even">
+<td><code>OS_SWTMR_STATUS_CREATED</code></td>
+<td>已创建但未启动，或已停止</td>
+</tr>
+<tr class="odd">
+<td><code>OS_SWTMR_STATUS_TICKING</code></td>
+<td>运行状态</td>
+</tr>
+</tbody>
+</table>
+<p>状态变化可以这样理解：</p>
+<pre class="text"><code>未使用 → 创建 → 启动运行 → 停止 → 创建未启动状态</code></pre>
+<p>如果删除，则回到未使用状态。</p>
+<hr>
+</section>
+<section id="二十三软件定时器精度" class="level1">
+<h1>二十三、软件定时器精度</h1>
+<p>软件定时器以系统 Tick 为单位。</p>
+<p>例如系统配置：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>LOSCFG_BASE_CORE_TICK_PER_SECOND <span class="op">=</span> <span class="dv">1000</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>表示 1 秒有 1000 个 Tick，那么 1 Tick 约等于 1ms。</p>
+<p>如果把这个值调高：</p>
+<ul>
+<li>定时精度更高；</li>
+<li>但每秒进入 Tick 中断的次数更多；</li>
+<li>系统开销更大。</li>
+</ul>
+<p>所以：</p>
+<blockquote class="blockquote">
+<p>Tick 频率越高，定时器精度越高，但系统开销也越大。</p>
+</blockquote>
+<p>软件定时器可能被中断或调度影响，因此不适合纳秒级、微秒级高精度场景；如果需要高精度，应使用硬件定时器。</p>
+<hr>
+</section>
+<section id="二十四软件定时器使用注意事项" class="level1">
+<h1>二十四、软件定时器使用注意事项</h1>
+<p>强调几个注意点：</p>
+<ol type="1">
+<li><strong>回调函数执行时间要短</strong>
+<ul>
+<li>类似中断服务程序；</li>
+<li>不要做耗时操作。</li>
+</ul></li>
+<li><strong>回调函数中不能调用导致阻塞的函数</strong>
+<ul>
+<li>例如不要调用 <code>LOS_TaskDelay()</code>。</li>
+</ul></li>
+<li><strong>软件定时器占用一个队列和一个任务资源</strong>
+<ul>
+<li>软件定时器任务优先级为 0；</li>
+<li>不允许修改该优先级。</li>
+</ul></li>
+<li><strong>单次模式执行完会自动删除</strong>
+<ul>
+<li>执行回调后系统回收资源。</li>
+</ul></li>
+<li><strong>适合精度要求不高的定时任务</strong>
+<ul>
+<li>不适合严格高精度场景。</li>
+</ul></li>
+</ol>
+<hr>
+</section>
+<section id="二十五软件定时器控制块" class="level1">
+<h1>二十五、软件定时器控制块</h1>
+<p>每个软件定时器都有对应控制块。</p>
+<p>其中包含：</p>
+<ul>
+<li>指向下一个定时器控制块的指针；</li>
+<li>定时器状态；</li>
+<li>定时器模式；</li>
+<li>定时器 ID；</li>
+<li>剩余计数值；</li>
+<li>定时时间间隔；</li>
+<li>回调函数参数；</li>
+<li>回调函数。</li>
+</ul>
+<p>可以这样理解：</p>
+<blockquote class="blockquote">
+<p>软件定时器控制块就是软件定时器的“档案”，系统通过它知道定时器是否运行、多久超时、超时后执行哪个函数。</p>
+</blockquote>
+<hr>
+</section>
+<section id="二十六软件定时器常用函数" class="level1">
+<h1>二十六、软件定时器常用函数</h1>
+<section id="创建软件定时器los_swtmrcreate" class="level2">
+<h2 class="anchored" data-anchor-id="创建软件定时器los_swtmrcreate">1. 创建软件定时器：<code>LOS_SwtmrCreate</code></h2>
+<p>函数主要参数包括：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>uwInterval</code></td>
+<td>定时时间，单位 Tick</td>
+</tr>
+<tr class="even">
+<td><code>ucMode</code></td>
+<td>工作模式</td>
+</tr>
+<tr class="odd">
+<td><code>pfnHandler</code></td>
+<td>回调函数</td>
+</tr>
+<tr class="even">
+<td><code>pusSwTmrID</code></td>
+<td>软件定时器 ID 指针</td>
+</tr>
+<tr class="odd">
+<td><code>uwArg</code></td>
+<td>传给回调函数的参数</td>
+</tr>
+</tbody>
+</table>
+<p>例子：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>UINT16 Timer1_Handle<span class="op">;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>LOS_SwtmrCreate<span class="op">(</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">5000</span><span class="op">,</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    LOS_SWTMR_MODE_ONCE<span class="op">,</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span>SWTMR_PROC_FUNC<span class="op">)</span>Timer1_Callback<span class="op">,</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">&amp;</span>Timer1_Handle<span class="op">,</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>含义：</p>
+<blockquote class="blockquote">
+<p>创建一个 5000 Tick 后触发的单次软件定时器，超时后执行 <code>Timer1_Callback</code>。</p>
+</blockquote>
+<p>软件定时器模式包括 <code>LOS_SWTMR_MODE_ONCE</code>、<code>LOS_SWTMR_MODE_PERIOD</code>、<code>LOS_SWTMR_MODE_NO_SELFDELETE</code> 等，其中常用的是单次模式和周期模式。</p>
+<hr>
+</section>
+<section id="编写回调函数" class="level2">
+<h2 class="anchored" data-anchor-id="编写回调函数">2. 编写回调函数</h2>
+<p>回调函数由用户实现，例如：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> Timer1_Callback<span class="op">(</span>UINT32 arg<span class="op">)</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    TmrCb_Count<span class="op">++;</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    LED1_TOGGLE<span class="op">;</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">"Timer callback</span><span class="sc">\r\n</span><span class="st">"</span><span class="op">);</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>回调函数中不要写长时间阻塞代码，也不要调用 <code>LOS_TaskDelay()</code>。</p>
+<hr>
+</section>
+<section id="启动软件定时器los_swtmrstart" class="level2">
+<h2 class="anchored" data-anchor-id="启动软件定时器los_swtmrstart">3. 启动软件定时器：<code>LOS_SwtmrStart</code></h2>
+<p>创建完成的软件定时器默认只是“已创建”，还没有运行。</p>
+<p>需要调用：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>LOS_SwtmrStart<span class="op">(</span>Timer1_Handle<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>例如：创建了两个软件定时器，然后分别调用 <code>LOS_SwtmrStart()</code> 启动。</p>
+<hr>
+</section>
+<section id="停止软件定时器los_swtmrstop" class="level2">
+<h2 class="anchored" data-anchor-id="停止软件定时器los_swtmrstop">4. 停止软件定时器：<code>LOS_SwtmrStop</code></h2>
+<p>如果不想让定时器继续运行，可以调用：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>LOS_SwtmrStop<span class="op">(</span>Timer1_Handle<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>停止后，定时器进入创建未启动/停止状态。</p>
+<hr>
+</section>
+<section id="删除软件定时器los_swtmrdelete" class="level2">
+<h2 class="anchored" data-anchor-id="删除软件定时器los_swtmrdelete">5. 删除软件定时器：<code>LOS_SwtmrDelete</code></h2>
+<p>删除函数：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>LOS_SwtmrDelete<span class="op">(</span>Timer1_Handle<span class="op">);</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>删除后，定时器资源被系统回收，不能继续执行回调函数。建议删除前应先停止软件定时器，再删除。</p>
+<hr>
+</section>
+</section>
+<section id="二十七软件定时器常见错误" class="level1">
+<h1>二十七、软件定时器常见错误</h1>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>错误代码</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>LOS_ERRNO_SWTMR_PTR_NULL</code></td>
+<td>回调函数为空</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_SWTMR_INTERVAL_NOT_SUITED</code></td>
+<td>定时间隔为 0</td>
+</tr>
+<tr class="odd">
+<td><code>LOS_ERRNO_SWTMR_MODE_INVALID</code></td>
+<td>定时器模式错误</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_SWTMR_RET_PTR_NULL</code></td>
+<td>定时器 ID 指针为空</td>
+</tr>
+<tr class="odd">
+<td><code>LOS_ERRNO_SWTMR_MAXSIZE</code></td>
+<td>软件定时器数量超过上限</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_SWTMR_ID_INVALID</code></td>
+<td>定时器 ID 无效</td>
+</tr>
+<tr class="odd">
+<td><code>LOS_ERRNO_SWTMR_NOT_CREATED</code></td>
+<td>定时器未创建</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_SWTMR_NOT_STARTED</code></td>
+<td>定时器未启动</td>
+</tr>
+<tr class="odd">
+<td><code>LOS_ERRNO_SWTMR_STATUS_INVALID</code></td>
+<td>定时器状态错误</td>
+</tr>
+<tr class="even">
+<td><code>LOS_ERRNO_SWTMR_TICK_PTR_NULL</code></td>
+<td>获取超时 Tick 数时指针为空</td>
+</tr>
+</tbody>
+</table>
+<p>重点记：</p>
+<blockquote class="blockquote">
+<p>创建软件定时器时，<strong>回调函数不能为空，定时间隔不能为 0，定时器 ID 指针不能为空</strong>。</p>
+</blockquote>
+<hr>
+</section>
+<section id="二十八消息队列事件软件定时器对比" class="level1">
+<h1>二十八、消息队列、事件、软件定时器对比</h1>
+<p>这是第九章最适合考试的综合表。</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 29%">
+<col style="width: 27%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">对比项</th>
+<th>消息队列</th>
+<th style="text-align: left;">事件</th>
+<th>软件定时器</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">核心作用</td>
+<td>传递消息数据</td>
+<td style="text-align: left;">多事件同步</td>
+<td>定时触发</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">是否传数据</td>
+<td>是</td>
+<td style="text-align: left;">否</td>
+<td>否，主要触发回调</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">是否有计数</td>
+<td>有队列长度</td>
+<td style="text-align: left;">无计数性</td>
+<td>按 Tick 计时</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">是否可阻塞等待</td>
+<td>读写都可阻塞</td>
+<td style="text-align: left;">读事件可阻塞</td>
+<td>不用于等待，超时回调</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">是否支持多个条件</td>
+<td>主要按消息处理</td>
+<td style="text-align: left;">支持 AND/OR</td>
+<td>不涉及</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">典型函数</td>
+<td><code>LOS_QueueCreate/Read/Write/Delete</code></td>
+<td style="text-align: left;"><code>LOS_EventInit/Read/Write/Clear</code></td>
+<td><code>LOS_SwtmrCreate/Start/Stop/Delete</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">典型应用</td>
+<td>按键消息、传感器数据传递</td>
+<td style="text-align: left;">多按键组合触发</td>
+<td>周期采样、定时 LED 翻转</td>
+</tr>
+</tbody>
+</table>
+<p>一句话记：</p>
+<blockquote class="blockquote">
+<p><strong>消息队列用于“传消息”，事件用于“等条件”，软件定时器用于“到时间执行”。</strong></p>
+</blockquote>
+<hr>
+</section>
+<section id="二十九本章重点背诵版" class="level1">
+<h1>二十九、本章重点背诵版</h1>
+<section id="消息队列定义" class="level2">
+<h2 class="anchored" data-anchor-id="消息队列定义">1. 消息队列定义</h2>
+<p>消息队列是一种任务间通信机制，可以在任务与任务之间、中断与任务之间传送信息。任务可以向队列写入消息，也可以从队列读取消息。队列通常遵循 FIFO 原则，也支持 LIFO，读写队列均支持超时阻塞机制。</p>
+<hr>
+</section>
+<section id="消息队列特点" class="level2">
+<h2 class="anchored" data-anchor-id="消息队列特点">2. 消息队列特点</h2>
+<p>消息队列支持异步读写、FIFO 和 LIFO 排队方式、读写超时机制，允许多个任务从同一个队列中读取和写入消息。消息类型由通信双方约定，消息大小不能超过创建队列时指定的节点最大值。</p>
+<hr>
+</section>
+<section id="消息队列常用函数" class="level2">
+<h2 class="anchored" data-anchor-id="消息队列常用函数">3. 消息队列常用函数</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>LOS_QueueCreate<span class="op">();</span>  <span class="co">// 创建消息队列</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>LOS_QueueWrite<span class="op">();</span>   <span class="co">// 写消息队列</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>LOS_QueueRead<span class="op">();</span>    <span class="co">// 读消息队列</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>LOS_QueueDelete<span class="op">();</span>  <span class="co">// 删除消息队列</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="事件定义" class="level2">
+<h2 class="anchored" data-anchor-id="事件定义">4. 事件定义</h2>
+<p>事件是一种任务间通信机制，主要用于任务同步。事件不传输具体数据，而是通过事件集合中的位来表示不同事件是否发生。一个 32 位变量中的每一位可表示一个事件类型。</p>
+<hr>
+</section>
+<section id="事件特点" class="level2">
+<h2 class="anchored" data-anchor-id="事件特点">5. 事件特点</h2>
+<p>事件不提供数据传输功能，没有计数性，多次设置同一事件等效于设置一次。事件支持超时等待，允许多个任务读写同一事件，并支持逻辑或和逻辑与两种等待方式。</p>
+<hr>
+</section>
+<section id="事件常用函数" class="level2">
+<h2 class="anchored" data-anchor-id="事件常用函数">6. 事件常用函数</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>LOS_EventInit<span class="op">();</span>     <span class="co">// 初始化事件</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>LOS_EventWrite<span class="op">();</span>    <span class="co">// 写事件</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>LOS_EventRead<span class="op">();</span>     <span class="co">// 读事件</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>LOS_EventClear<span class="op">();</span>    <span class="co">// 清除事件</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>LOS_EventDestory<span class="op">();</span>  <span class="co">// 销毁事件</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="事件读取模式" class="level2">
+<h2 class="anchored" data-anchor-id="事件读取模式">7. 事件读取模式</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>LOS_WAITMODE_OR   <span class="co">// 任意一个事件发生即可唤醒</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>LOS_WAITMODE_AND  <span class="co">// 所有等待事件都发生才唤醒</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>LOS_WAITMODE_CLR  <span class="co">// 读取成功后自动清除事件位</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="软件定时器定义" class="level2">
+<h2 class="anchored" data-anchor-id="软件定时器定义">8. 软件定时器定义</h2>
+<p>软件定时器是操作系统提供的定时服务，建立在硬件定时器基础上，以系统 Tick 为计时单位。用户创建软件定时器时指定定时时间、工作模式和回调函数，定时时间到达后由系统调用回调函数。</p>
+<hr>
+</section>
+<section id="软件定时器模式" class="level2">
+<h2 class="anchored" data-anchor-id="软件定时器模式">9. 软件定时器模式</h2>
+<p>LiteOS 软件定时器常用模式包括单次模式和周期模式。单次模式在超时后只执行一次回调函数；周期模式按照指定时间间隔反复执行回调函数，直到用户停止或删除定时器。</p>
+<hr>
+</section>
+<section id="软件定时器常用函数" class="level2">
+<h2 class="anchored" data-anchor-id="软件定时器常用函数">10. 软件定时器常用函数</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>LOS_SwtmrCreate<span class="op">();</span>  <span class="co">// 创建软件定时器</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>LOS_SwtmrStart<span class="op">();</span>   <span class="co">// 启动软件定时器</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>LOS_SwtmrStop<span class="op">();</span>    <span class="co">// 停止软件定时器</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>LOS_SwtmrDelete<span class="op">();</span>  <span class="co">// 删除软件定时器</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="三十考试可能这样问" class="level1">
+<h1>三十、考试可能这样问</h1>
+<section id="题目1什么是消息队列它有什么特点" class="level2">
+<h2 class="anchored" data-anchor-id="题目1什么是消息队列它有什么特点">题目1：什么是消息队列？它有什么特点？</h2>
+<p>答：</p>
+<p>消息队列是 LiteOS 中用于任务间通信的数据结构，可以在任务与任务之间、中断与任务之间传递消息。消息队列支持先进先出 FIFO，也支持后进先出 LIFO；支持异步读写和超时等待；多个任务可以从同一个队列中读写消息；写入消息的类型由通信双方约定，消息大小不能超过创建队列时指定的节点最大值。</p>
+<hr>
+</section>
+<section id="题目2消息队列的阻塞机制是什么" class="level2">
+<h2 class="anchored" data-anchor-id="题目2消息队列的阻塞机制是什么">题目2：消息队列的阻塞机制是什么？</h2>
+<p>答：</p>
+<p>当任务读取队列时，如果队列为空，任务可以选择不等待、等待指定时间或永久等待；如果在等待时间内队列中有消息到来，任务被唤醒并读取消息，若超时仍没有消息，则任务恢复就绪态。当任务写队列时，如果队列已满，也可以根据超时时间等待空闲节点。中断中读写队列不能使用阻塞等待。</p>
+<hr>
+</section>
+<section id="题目3事件与消息队列有什么区别" class="level2">
+<h2 class="anchored" data-anchor-id="题目3事件与消息队列有什么区别">题目3：事件与消息队列有什么区别？</h2>
+<p>答：</p>
+<p>消息队列可以传递具体数据，适合任务间数据通信；事件不传输数据，只通过事件标志位表示某个事件是否发生，适合任务间同步。消息队列中的消息具有排队和存储特性，而事件没有计数性，多次设置同一事件等效于设置一次。</p>
+<hr>
+</section>
+<section id="题目4事件的逻辑或和逻辑与是什么意思" class="level2">
+<h2 class="anchored" data-anchor-id="题目4事件的逻辑或和逻辑与是什么意思">题目4：事件的逻辑或和逻辑与是什么意思？</h2>
+<p>答：</p>
+<p>事件逻辑或是指任务等待的多个事件中，只要任意一个事件发生，任务就被唤醒，对应 <code>LOS_WAITMODE_OR</code>。事件逻辑与是指任务等待的多个事件必须全部发生，任务才会被唤醒，对应 <code>LOS_WAITMODE_AND</code>。如果同时设置 <code>LOS_WAITMODE_CLR</code>，则读取成功后会自动清除对应事件位。</p>
+<hr>
+</section>
+<section id="题目5软件定时器和硬件定时器有什么区别" class="level2">
+<h2 class="anchored" data-anchor-id="题目5软件定时器和硬件定时器有什么区别">题目5：软件定时器和硬件定时器有什么区别？</h2>
+<p>答：</p>
+<p>硬件定时器由芯片硬件提供，精度高，通常通过中断触发，但数量受硬件资源限制。软件定时器由操作系统提供，建立在硬件定时器和系统 Tick 基础上，可以创建多个定时业务，但精度不如硬件定时器，适合对时间精度要求不高的定时任务。</p>
+<hr>
+</section>
+<section id="题目6liteos-软件定时器有哪些工作模式" class="level2">
+<h2 class="anchored" data-anchor-id="题目6liteos-软件定时器有哪些工作模式">题目6：LiteOS 软件定时器有哪些工作模式？</h2>
+<p>答：</p>
+<p>LiteOS 软件定时器主要有单次模式和周期模式。单次模式在定时时间到达后只执行一次回调函数；周期模式会按照指定时间间隔周期性执行回调函数，直到用户停止或删除该定时器。</p>
+<hr>
+</section>
+<section id="题目7使用软件定时器时应注意什么" class="level2">
+<h2 class="anchored" data-anchor-id="题目7使用软件定时器时应注意什么">题目7：使用软件定时器时应注意什么？</h2>
+<p>答：</p>
+<p>软件定时器回调函数执行时间应尽量短，不允许调用会导致任务阻塞或挂起的函数，如 <code>LOS_TaskDelay()</code>。软件定时器依赖系统 Tick，精度低于硬件定时器。使用软件定时器需要开启软件定时器功能和消息队列功能，因为 LiteOS 软件定时器依赖软件定时器任务和命令队列实现。</p>
+<hr>
+</section>
+<section id="题目8消息队列事件和软件定时器分别适合什么场景" class="level2">
+<h2 class="anchored" data-anchor-id="题目8消息队列事件和软件定时器分别适合什么场景">题目8：消息队列、事件和软件定时器分别适合什么场景？</h2>
+<p>答：</p>
+<p>消息队列适合任务之间传递具体数据，例如按键任务向处理任务发送按键值；事件适合任务之间或中断与任务之间进行状态同步，尤其适合等待多个事件组合触发；软件定时器适合周期性或延时性任务，例如周期翻转 LED、定时采样、定时上报状态等。</p>
+<hr>
+</section>
+</section>
+<section id="三十一本章一句话总结" class="level1">
+<h1>三十一、本章一句话总结</h1>
+<p>第九章节可以这样总结：</p>
+<blockquote class="blockquote">
+<p>消息队列用于任务间传递具体数据，支持 FIFO/LIFO 和阻塞读写；事件用于多任务同步，通过 32 位事件标志组实现逻辑与、逻辑或等待，但不传数据且无计数性；软件定时器用于基于 Tick 的定时回调，支持单次和周期模式，适合精度要求不高的定时任务。</p>
+</blockquote>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
