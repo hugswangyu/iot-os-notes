@@ -29,7 +29,7 @@ format:
       light: cosmo
       dark: darkly
     toc: true
-    toc-location: left
+    toc-location: right
     number-sections: false
     anchor-sections: true
     smooth-scroll: true
