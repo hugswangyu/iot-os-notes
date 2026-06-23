@@ -6,10 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="hugswangyu">
-<meta name="dcterms.date" content="2026-06-23">
 
-<title>物联网终端操作系统笔记</title>
+<title>关于 – 物联网终端操作系统笔记</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -35,7 +33,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./ch1_物联网及嵌入式概述.html" rel="next">
+<link href="./ch11_物联网操作系统的应用案例.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -253,7 +251,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html"><span class="chapter-title">前言</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./about.html"><span class="chapter-title">关于</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -284,7 +282,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">前言</span></a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">前言</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -339,7 +337,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./about.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">关于</span></a>
+  <a href="./about.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">关于</span></a>
   </div>
 </li>
     </ul>
@@ -347,8 +345,16 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#关于本书" id="toc-关于本书" class="nav-link active" data-scroll-target="#关于本书">关于本书</a></li>
+  <li><a href="#主要内容" id="toc-主要内容" class="nav-link" data-scroll-target="#主要内容">主要内容</a></li>
+  <li><a href="#关于作者" id="toc-关于作者" class="nav-link" data-scroll-target="#关于作者">关于作者</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -356,27 +362,14 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">物联网终端操作系统笔记</h1>
-<p class="subtitle lead">物联网终端操作系统选修课学习笔记</p>
+<h1 class="title"><span class="chapter-title">关于</span></h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>hugswangyu </p>
-          </div>
-  </div>
     
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">June 23, 2026</p>
-    </div>
-  </div>
   
     
   </div>
@@ -386,10 +379,29 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>本书是<strong>物联网终端操作系统</strong>选修课的学习笔记，涵盖物联网基础概念、连接技术与协议栈，以及华为 LiteOS 操作系统的核心机制与移植实践。</p>
-<p>笔记按课程章节组织，从物联网整体架构出发，逐步深入到操作系统任务调度、同步机制、内存管理，最终以完整应用案例收尾。</p>
+<section id="关于本书" class="level2">
+<h2 class="anchored" data-anchor-id="关于本书">关于本书</h2>
+<p>本书整理自<strong>物联网终端操作系统</strong>选修课的课堂笔记，内容以华为 LiteOS 为核心操作系统，覆盖物联网的感知层、连接层到操作系统内核机制的完整知识链。</p>
+<p>笔记的写作目标是把课件里分散的知识点串联成有逻辑的叙述，每章都以一个核心问题开头，帮助理清”为什么学这个”再到”怎么用”的思路。</p>
+</section>
+<section id="主要内容" class="level2">
+<h2 class="anchored" data-anchor-id="主要内容">主要内容</h2>
+<ul>
+<li><strong>物联网基础</strong>：定义、体系架构、四大要素</li>
+<li><strong>连接技术</strong>：NB-IoT、LoRa/LoRaWAN 的原理与选型对比</li>
+<li><strong>通信协议</strong>：MQTT、CoAP、LwM2M 的机制与适用场景</li>
+<li><strong>LiteOS 系统</strong>：架构、SDK、向 STM32 的移植流程</li>
+<li><strong>OS 内核机制</strong>：任务调度、信号量、互斥锁、消息队列、事件、软件定时器、内存管理、中断</li>
+<li><strong>综合案例</strong>：智慧农业种养殖环境监控系统</li>
+</ul>
+</section>
+<section id="关于作者" class="level2">
+<h2 class="anchored" data-anchor-id="关于作者">关于作者</h2>
+<p><a href="https://github.com/hugswangyu">hugswangyu</a> — 记录学习过程，仅供参考。</p>
+<p>如有错误欢迎在 <a href="https://github.com/hugswangyu/iot-os-notes/issues">GitHub Issues</a> 提出。</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -807,11 +819,11 @@ ul.task-list li input[type="checkbox"] {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="./ch11_物联网操作系统的应用案例.html" class="pagination-link" aria-label="第11章 物联网操作系统的应用案例">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第11章 物联网操作系统的应用案例</span></span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./ch1_物联网及嵌入式概述.html" class="pagination-link" aria-label="第1章 物联网及嵌入式概述">
-        <span class="nav-page-text"><span class="chapter-title">第1章 物联网及嵌入式概述</span></span> <i class="bi bi-arrow-right-short"></i>
-      </a>
   </div>
 </nav>
 </div> <!-- /content -->
