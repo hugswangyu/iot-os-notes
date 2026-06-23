@@ -22,7 +22,6 @@ book:
     - ch9_消息队列_事件与软件定时器.md
     - ch10_内存管理与中断管理.md
     - ch11_物联网操作系统的应用案例.md
-    - about.qmd
 
 format:
   html:
