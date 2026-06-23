@@ -1,0 +1,51 @@
+project:
+  type: website
+
+website:
+  title: "物联网终端操作系统笔记"
+  description: "物联网终端操作系统选修课学习笔记"
+  search: true
+  navbar:
+    left:
+      - href: index.qmd
+        text: 首页
+    right:
+      - icon: github
+        href: https://github.com/hugswangyu/iot-os-notes
+        aria-label: GitHub
+  sidebar:
+    style: docked
+    search: true
+    contents:
+      - text: "首页"
+        href: index.qmd
+      - section: "课程笔记"
+        contents:
+          - text: "Ch1 物联网及嵌入式概述"
+            href: ch1_物联网及嵌入式概述.md
+          - text: "Ch2-3 物联网操作系统的关键技术"
+            href: ch2_ch3_物联网操作系统的关键技术.md
+          - text: "Ch4 连接技术"
+            href: ch4_连接技术.md
+          - text: "Ch5 连接与协议"
+            href: ch5_连接与协议.md
+          - text: "Ch6 LiteOS 操作系统及其移植"
+            href: ch6_LiteOS操作系统及其移植.md
+          - text: "Ch7 任务"
+            href: ch7_任务.md
+          - text: "Ch8 信号量与互斥锁"
+            href: ch8_信号量与互斥锁.md
+          - text: "Ch9 消息队列、事件与软件定时器"
+            href: ch9_消息队列_事件与软件定时器.md
+          - text: "Ch10 内存管理与中断管理"
+            href: ch10_内存管理与中断管理.md
+          - text: "Ch11 物联网操作系统的应用案例"
+            href: ch11_物联网操作系统的应用案例.md
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    toc-title: "本页目录"
+    lang: zh
